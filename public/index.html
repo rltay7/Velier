@@ -1762,6 +1762,78 @@
       );
     };
 
+
+    // ── TRADE PAGE ──
+    const trades = [
+      { id: 1, title: 'Rolex Submariner Date', brand: 'Rolex', value: 14500, image: 'https://img.chrono24.com/images/uhren/32585129-b02ufm80eqd2mvz1mqzbqvcl-ExtraLarge.jpg', condition: 'Excellent', seeking: 'Patek Philippe Aquanaut 5167 or Audemars Piguet Royal Oak 41mm', owner: 'James R.', location: 'London, UK' },
+      { id: 2, title: 'Hermès Birkin 30 Biscuit Togo', brand: 'Hermès', value: 22000, image: 'https://mightychic.com/wp-content/uploads/2023/12/hermes-birkin-30-biscuit-bag-for-sale-on-mightychic.jpg', condition: 'Excellent', seeking: 'Chanel Classic Double Flap or Hermès Kelly 28', owner: 'Isabelle M.', location: 'Paris, France' },
+      { id: 3, title: 'Patek Philippe Calatrava 5127R', brand: 'Patek Philippe', value: 28000, image: 'https://cdn.swisswatchexpo.com/productphotos/10/11/patek-philippe-calatrava-rose-gold-automatic-mens-watch-5127r-65252_8fb2d.jpg', condition: 'Like New', seeking: 'Patek Philippe Nautilus 5711 or Perpetual Calendar', owner: 'Thomas K.', location: 'Geneva, Switzerland' },
+      { id: 4, title: 'Chanel Classic Double Flap Ivory', brand: 'Chanel', value: 9800, image: 'https://madisonavenuecouture.com/cdn/shop/files/C-V-230601-3-01_1024x1024.jpg?v=1690559192', condition: 'Very Good', seeking: 'Saint Laurent Le 5 à 7 Large or Bottega Veneta Cassette', owner: 'Sofia L.', location: 'Milan, Italy' },
+      { id: 5, title: 'Audemars Piguet Royal Oak 41mm', brand: 'Audemars Piguet', value: 32000, image: 'https://img.chrono24.com/images/uhren/38363070-j9iuygz0p39berthgowhnlm7-ExtraLarge.jpg', condition: 'Excellent', seeking: 'Patek Philippe Nautilus 5711 or Rolex Daytona White Gold', owner: 'Henrik S.', location: 'Stockholm, Sweden' },
+      { id: 6, title: 'Valentino VLogo Fuchsia Gown', brand: 'Valentino', value: 4200, image: 'https://a.1stdibscdn.com/archivesE/upload/366869/v_11197031460738547313/_MG_0562_copy_org_master.jpg?width=1200', condition: 'Excellent', seeking: 'Alexander McQueen gown or Givenchy couture piece', owner: 'Amara D.', location: 'Dubai, UAE' },
+    ];
+
+    const TradePage = () => {
+      return (
+        <div>
+          <div className="trade-hero">
+            <div className="container">
+              <div className="section-label" style={{marginBottom:'1rem'}}>New on Velier</div>
+              <h1>Asset Exchange</h1>
+              <p>Trade luxury pieces peer-to-peer. List your item, set what you're seeking, and exchange with verified members — at a fraction of resale friction.</p>
+              <a href="#/list" className="btn btn-gold" style={{display:'inline-block'}}>List an Item for Trade</a>
+            </div>
+          </div>
+          <div className="container section">
+            <div className="trade-fee-info">
+              <div className="section-label" style={{marginBottom:'1rem',textAlign:'center'}}>How Trades Work</div>
+              <div className="trade-fee-grid">
+                <div className="trade-fee-item">
+                  <div className="tfi-val">2.5%</div>
+                  <div className="tfi-label">Trade fee per party<br/>(capped at $500)</div>
+                </div>
+                <div className="trade-fee-item">
+                  <div className="tfi-val">◈</div>
+                  <div className="tfi-label">ID Verification<br/>required for all trades</div>
+                </div>
+                <div className="trade-fee-item">
+                  <div className="tfi-val">48h</div>
+                  <div className="tfi-label">Escrow window<br/>for condition confirmation</div>
+                </div>
+              </div>
+            </div>
+            <div className="section-header" style={{marginBottom:'2rem'}}>
+              <div className="section-label">Available Trades</div>
+              <h2>Browse Exchange Listings</h2>
+            </div>
+            <div className="trade-grid">
+              {trades.map(t => (
+                <div key={t.id} className="trade-card">
+                  <div className="trade-card-header">
+                    <span style={{fontSize:'0.7rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--champagne-dim)'}}>{t.owner} · {t.location}</span>
+                    <span className="trade-badge">Trade</span>
+                  </div>
+                  <div className="trade-item-img" style={{backgroundImage:`url(${t.image})`,backgroundSize:'cover',backgroundPosition:'center'}}></div>
+                  <div className="trade-item-title">{t.title}</div>
+                  <div className="trade-item-meta">{t.brand} · {t.condition}</div>
+                  <div className="trade-value">Estimated Value: <strong>${t.value.toLocaleString()}</strong></div>
+                  <div className="trade-seeking">
+                    <span style={{fontSize:'0.65rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--champagne-dim)',display:'block',marginBottom:'0.25rem'}}>Seeking</span>
+                    <span>{t.seeking}</span>
+                  </div>
+                  <button className="btn btn-gold" style={{width:'100%',fontSize:'0.78rem'}}
+                    onClick={() => window.dispatchEvent(new CustomEvent('velier-toast', {detail:'Trade enquiry sent. The lender will be notified.'}))}>
+                    Propose a Trade
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+          <Footer />
+        </div>
+      );
+    };
+
     // ── MAIN APP ──
     const App = () => {
       const hash = useHash();
