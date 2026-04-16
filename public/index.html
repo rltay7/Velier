@@ -2161,19 +2161,21 @@
       }
 
       return (
-        <div className={!showSplash ? 'page-entering' : ''}>
+        <>
           {showSplash && <SplashScreen onEnter={handleEnter} />}
           <Nav wishlistCount={wishlist.length} />
-          <main style={{paddingTop: page === 'home' ? '0' : '0'}}>
-            {page === 'home' && <HomePage wishlist={wishlist} onWishlistToggle={handleWishlistToggle} onToast={showToast} />}
-            {page === 'browse' && <BrowsePage wishlist={wishlist} onWishlistToggle={handleWishlistToggle} />}
-            {page === 'listing' && <ListingDetailPage id={listingId} wishlist={wishlist} onWishlistToggle={handleWishlistToggle} onToast={showToast} />}
-            {page === 'booking' && <BookingPage listingId={bookingId} searchParams={bookingSearch} />}
-            {page === 'list' && <ListPage />}
-            {page === 'trade' && <TradePage />}
-          </main>
+          <div className={!showSplash ? 'page-entering' : ''}>
+            <main style={{paddingTop: page === 'home' ? '0' : '0'}}>
+              {page === 'home' && <HomePage wishlist={wishlist} onWishlistToggle={handleWishlistToggle} onToast={showToast} />}
+              {page === 'browse' && <BrowsePage wishlist={wishlist} onWishlistToggle={handleWishlistToggle} />}
+              {page === 'listing' && <ListingDetailPage id={listingId} wishlist={wishlist} onWishlistToggle={handleWishlistToggle} onToast={showToast} />}
+              {page === 'booking' && <BookingPage listingId={bookingId} searchParams={bookingSearch} />}
+              {page === 'list' && <ListPage />}
+              {page === 'trade' && <TradePage />}
+            </main>
+          </div>
           {toast && <Toast message={toast} onClose={() => setToast(null)} />}
-        </div>
+        </>
       );
     };
 
