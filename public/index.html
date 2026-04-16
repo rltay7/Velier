@@ -47,6 +47,21 @@
     h3 { font-size: clamp(1.25rem, 2vw, 1.6rem); line-height: 1.25; }
     p { color: var(--champagne-dim); }
 
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
     /* ── SCROLLBAR ── */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--obsidian); }
@@ -181,15 +196,19 @@
       display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center;
       padding: 8rem 2rem 5rem;
       position: relative; overflow: hidden;
-      background: radial-gradient(ellipse at 50% 0%, rgba(200, 155, 50, 0.08) 0%, transparent 60%),
-                  var(--obsidian);
+      background: var(--obsidian);
     }
-    .hero::before {
-      content: '';
+    .hero-video {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      opacity: 0.45; pointer-events: none;
+    }
+    .hero-video-overlay {
       position: absolute; inset: 0;
-      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 30m-28 0a28 28 0 1 0 56 0a28 28 0 1 0-56 0' fill='none' stroke='rgba(200,160,60,0.025)' stroke-width='1'/%3E%3C/svg%3E") center/60px;
+      background: linear-gradient(to bottom, rgba(13,11,9,0.35) 0%, rgba(13,11,9,0.55) 50%, rgba(13,11,9,0.85) 100%);
       pointer-events: none;
     }
+    .hero > *:not(.hero-video):not(.hero-video-overlay) { position: relative; z-index: 2; }
     .hero-eyebrow {
       font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase;
       color: var(--gold); margin-bottom: 1.5rem;
@@ -551,27 +570,7 @@
     );
 
     // ── ITEM VISUALS MAP ──
-    const ITEM_VISUALS = {
-      'bag-prada': '👜',
-      'bag-gucci': '💼',
-      'bag-chanel': '🎀',
-      'bag-bottega': '🤎',
-      'dress-valentino': '👗',
-      'watch-rolex': '⌚',
-      'watch-ap': '🕰️',
-      'jewel-cartier': '💛',
-      'bag-hermes': '🟤',
-      'bag-syl': '🖤',
-      'shoe-loub': '👠',
-      'dress-mcqueen': '🦢',
-    };
-
-    const getItemVisual = (images) => {
-      if (!images) return '✨';
-      const arr = typeof images === 'string' ? JSON.parse(images) : images;
-      const key = arr[0]?.replace(/-\d+$/, '') || '';
-      return ITEM_VISUALS[key] || '✨';
-    };
+    const getItemVisual = (listing) => listing?.image || null;
 
     // ── ROUTER ──
     const useHash = () => {
@@ -698,13 +697,13 @@
 
     // ── LISTING CARD ──
     const ListingCard = ({ listing, wishlist, onWishlistToggle }) => {
-      const visual = getItemVisual(listing.images);
+      const imgUrl = getItemVisual(listing);
       const inWishlist = wishlist.includes(listing.id);
 
       return (
-        <div className="card" onClick={() => navigate(`#/listing/${listing.id}`)}>
-          <div className="card-image">
-            <div className="item-visual">{visual}</div>
+        <div className="card reveal" onClick={() => navigate(`#/listing/${listing.id}`)}>
+          <div className="card-image" style={imgUrl ? {backgroundImage:`url(${imgUrl})`,backgroundSize:'cover',backgroundPosition:'center'} : {}}>
+            {!imgUrl && <div className="item-visual">✦</div>}
             <div className={`wishlist-btn ${inWishlist ? 'active' : ''}`}
               onClick={(e) => { e.stopPropagation(); onWishlistToggle(listing.id); }}
             >
@@ -717,6 +716,7 @@
           <div className="card-body">
             <div className="card-brand">{listing.brand}</div>
             <div className="card-title">{listing.title}</div>
+            {listing.location && <div style={{fontSize:'0.72rem',color:'var(--champagne-dim)',marginBottom:'0.4rem',letterSpacing:'0.04em'}}>{listing.location}</div>}
             <div className="card-meta">
               <div className="card-price">
                 £{listing.daily_rate}<span>/day</span>
@@ -757,6 +757,11 @@
         <div>
           {/* HERO */}
           <section className="hero">
+            <video className="hero-video" autoPlay muted loop playsInline
+              src="https://cdn.coverr.co/videos/coverr-a-model-walking-on-the-runway-4017/1080p.mp4"
+              poster="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=80">
+            </video>
+            <div className="hero-video-overlay"></div>
             <div className="hero-eyebrow">The Velier Collection</div>
             <h1>The world's finest<br/><em>luxury awaits you</em></h1>
             <p className="hero-sub">Rent extraordinary pieces from Prada, Chanel, Rolex, and Hermès. Wear what was once unattainable.</p>
@@ -839,17 +844,17 @@
                 <p>Seamless, secure, and surprisingly simple</p>
               </div>
               <div className="hiw-steps">
-                <div className="hiw-step">
+                <div className="hiw-step reveal reveal-delay-1">
                   <div className="hiw-num">01</div>
                   <h3>Discover & Wish</h3>
                   <p>Browse thousands of verified luxury pieces from private owners across Europe and beyond. Save favourites to your wishlist.</p>
                 </div>
-                <div className="hiw-step">
+                <div className="hiw-step reveal reveal-delay-2">
                   <div className="hiw-num">02</div>
                   <h3>Reserve & Connect</h3>
                   <p>Select your dates, send a message to the owner, and confirm your booking. Our escrow payment system protects both parties.</p>
                 </div>
-                <div className="hiw-step">
+                <div className="hiw-step reveal reveal-delay-3">
                   <div className="hiw-num">03</div>
                   <h3>Wear & Return</h3>
                   <p>Receive the piece, live extraordinarily, and return it with care. Reviews build trust on both sides of every transaction.</p>
@@ -1055,7 +1060,7 @@
       const subtotal = days * listing.daily_rate;
       const serviceFee = subtotal * 0.15;
       const total = subtotal + serviceFee;
-      const visual = getItemVisual(listing.images);
+      const imgUrl = getItemVisual(listing);
 
       const handleWishlist = () => {
         onWishlistToggle(listing.id);
@@ -1084,13 +1089,14 @@
             <div className="listing-layout">
               {/* Gallery */}
               <div>
-                <div className="gallery-main">
-                  <div style={{fontSize:'10rem', userSelect:'none'}}>{visual}</div>
+                <div className="gallery-main" style={imgUrl ? {backgroundImage:`url(${imgUrl})`,backgroundSize:'cover',backgroundPosition:'center',borderRadius:'4px'} : {}}>
+                  {!imgUrl && <div style={{fontSize:'10rem',userSelect:'none'}}>✦</div>}
                 </div>
                 <div className="gallery-thumbs">
                   {[0,1,2].map(i => (
-                    <div key={i} className={`gallery-thumb ${activeImg === i ? 'active' : ''}`} onClick={() => setActiveImg(i)}>
-                      <span style={{fontSize:'2.5rem'}}>{visual}</span>
+                    <div key={i} className={`gallery-thumb ${activeImg === i ? 'active' : ''}`} onClick={() => setActiveImg(i)}
+                      style={imgUrl ? {backgroundImage:`url(${imgUrl})`,backgroundSize:'cover',backgroundPosition:'center'} : {}}>
+                      {!imgUrl && <span style={{fontSize:'2.5rem'}}>✦</span>}
                     </div>
                   ))}
                 </div>
@@ -1262,8 +1268,8 @@
                 {listing && (
                   <>
                     <div style={{background:'var(--obsidian-3)',padding:'1rem',marginBottom:'1rem',display:'flex',gap:'0.875rem',alignItems:'center'}}>
-                      <div style={{fontSize:'2.5rem',width:'56px',height:'56px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                        {getItemVisual(listing.images)}
+                      <div style={getItemVisual(listing) ? {width:'56px',height:'56px',flexShrink:0,backgroundImage:`url(${getItemVisual(listing)})`,backgroundSize:'cover',backgroundPosition:'center',borderRadius:'2px'} : {fontSize:'2.5rem',width:'56px',height:'56px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                        {!getItemVisual(listing) && '✦'}
                       </div>
                       <div>
                         <div style={{fontSize:'0.68rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.2rem'}}>{listing.brand}</div>
@@ -1591,6 +1597,19 @@
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
+  </script>
+  <script>
+    // Scroll Reveal
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.1 });
+    function initReveal() {
+      document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    }
+    initReveal();
+    new MutationObserver(initReveal).observe(document.body, { childList: true, subtree: true });
   </script>
 </body>
 </html>
