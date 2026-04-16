@@ -314,6 +314,96 @@ app.post('/api/listings/:id/wishlist', (req, res) => {
   res.json({ wishlist_count: listing.wishlist_count });
 });
 
+// ========================
+// ADMIN API (service-role key required in header)
+// ========================
+
+const ADMIN_SECRET = process.env.ADMIN_SECRET || 'velier-admin-2026';
+
+function requireAdmin(req, res, next) {
+  const secret = req.headers['x-admin-secret'];
+  if (secret !== ADMIN_SECRET) return res.status(403).json({ error: 'Forbidden' });
+  next();
+}
+
+// Admin: get all listings (including inactive)
+app.get('/api/admin/listings', requireAdmin, async (req, res) => {
+  const { data, error } = await supabase
+    .from('listings')
+    .select('*, profiles(full_name)')
+    .order('created_at', { ascending: false });
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data || []);
+});
+
+// Admin: approve/suspend listing
+app.patch('/api/admin/listings/:id', requireAdmin, async (req, res) => {
+  const { data, error } = await supabase
+    .from('listings')
+    .update(req.body)
+    .eq('id', req.params.id)
+    .select().single();
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
+});
+
+// Admin: delete listing
+app.delete('/api/admin/listings/:id', requireAdmin, async (req, res) => {
+  const { error } = await supabase
+    .from('listings')
+    .delete()
+    .eq('id', req.params.id);
+  if (error) return res.status(400).json({ error: error.message });
+  res.json({ status: 'deleted' });
+});
+
+// Admin: get all users
+app.get('/api/admin/users', requireAdmin, async (req, res) => {
+  const { data, error } = await supabase.auth.admin.listUsers();
+  if (error) return res.status(400).json({ error: error.message });
+  // Merge with profiles
+  const { data: profiles } = await supabase.from('profiles').select('*');
+  const profileMap = {};
+  (profiles || []).forEach(p => { profileMap[p.id] = p; });
+  const users = (data.users || []).map(u => ({
+    id: u.id,
+    email: u.email,
+    full_name: profileMap[u.id]?.full_name || u.user_metadata?.full_name || '',
+    created_at: u.created_at,
+    last_sign_in: u.last_sign_in_at,
+    confirmed: !!u.confirmed_at,
+  }));
+  res.json(users);
+});
+
+// Admin: delete user
+app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
+  const { error } = await supabase.auth.admin.deleteUser(req.params.id);
+  if (error) return res.status(400).json({ error: error.message });
+  res.json({ status: 'deleted' });
+});
+
+// Admin: get all bookings
+app.get('/api/admin/bookings', requireAdmin, async (req, res) => {
+  const { data, error } = await supabase
+    .from('bookings')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data || []);
+});
+
+// Admin: update booking status
+app.patch('/api/admin/bookings/:id', requireAdmin, async (req, res) => {
+  const { data, error } = await supabase
+    .from('bookings')
+    .update(req.body)
+    .eq('id', req.params.id)
+    .select().single();
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
