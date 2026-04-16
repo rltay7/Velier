@@ -1943,13 +1943,20 @@
     };
 
     // ── LIST AN ITEM PAGE ──
+    const SUPABASE_URL = 'https://gwcesifbgjlwsnchzjwi.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3Y2VzaWZiZ2psd3NuY2h6andpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzMjkzNjIsImV4cCI6MjA5MTkwNTM2Mn0.-Abj4om252fDFQQiKELAwTQURkhV1IpVrxKVPzycesU';
+
     const ListPage = () => {
+      const { user, token } = useAuth();
       const [step, setStep] = useState(1);
       const [form, setForm] = useState({
         title: '', brand: '', category: 'Bags', description: '',
         daily_rate: '', condition: 'Excellent', colour: '', size: '',
-        owner_name: '', owner_email: ''
+        location: '', owner_name: '', owner_email: ''
       });
+      const [photos, setPhotos] = useState([]);   // { file, preview, url }
+      const [uploading, setUploading] = useState(false);
+      const [uploadError, setUploadError] = useState('');
       const [submitted, setSubmitted] = useState(false);
 
       const brands = ['Prada', 'Gucci', 'Chanel', 'Hermès', 'Bottega Veneta', 'Valentino', 'Rolex', 'Audemars Piguet', 'Cartier', 'Saint Laurent', 'Louboutin', 'Alexander McQueen', 'Other'];
@@ -1960,11 +1967,54 @@
 
       const estimatedMonthly = form.daily_rate ? Math.round(parseFloat(form.daily_rate) * 3 * 0.80) : 0;
 
+      // Upload a single file to Supabase Storage
+      const uploadPhoto = async (file) => {
+        const ext = file.name.split('.').pop();
+        const userId = user?.id || 'guest';
+        const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const authHeader = token ? `Bearer ${token}` : `Bearer ${SUPABASE_ANON_KEY}`;
+        const res = await fetch(`${SUPABASE_URL}/storage/v1/object/listing-images/${path}`, {
+          method: 'POST',
+          headers: { 'Authorization': authHeader, 'Content-Type': file.type },
+          body: file,
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || 'Upload failed');
+        }
+        return `${SUPABASE_URL}/storage/v1/object/public/listing-images/${path}`;
+      };
+
+      const handleFileSelect = async (files) => {
+        const arr = Array.from(files).slice(0, 8 - photos.length);
+        if (!arr.length) return;
+        setUploading(true); setUploadError('');
+        const newPhotos = [];
+        for (const file of arr) {
+          const preview = URL.createObjectURL(file);
+          try {
+            const url = await uploadPhoto(file);
+            newPhotos.push({ file, preview, url });
+          } catch (e) {
+            setUploadError(`Failed to upload ${file.name}: ${e.message}`);
+          }
+        }
+        setPhotos(prev => [...prev, ...newPhotos]);
+        setUploading(false);
+      };
+
+      const removePhoto = (i) => setPhotos(prev => prev.filter((_, idx) => idx !== i));
+
       const handleSubmit = async () => {
         try {
+          const imageUrl = photos.length > 0 ? photos[0].url : null;
+          const authHeaders = token
+            ? { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+            : { 'Content-Type': 'application/json' };
           const res = await fetch('/api/submit-listing', {
-            method: 'POST', headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(form)
+            method: 'POST',
+            headers: authHeaders,
+            body: JSON.stringify({ ...form, image: imageUrl })
           });
           if (res.ok) setSubmitted(true);
         } catch (err) { console.error(err); }
@@ -2111,26 +2161,56 @@
             {/* Step 3: Photos */}
             {step === 3 && (
               <div>
-                <h3 style={{marginBottom:'1.5rem'}}>Upload Photos</h3>
-                <div style={{border:'2px dashed var(--border-hover)',padding:'3rem 2rem',textAlign:'center',marginBottom:'1.25rem',cursor:'pointer',transition:'all 0.2s'}}
-                  onMouseEnter={e => e.target.style.borderColor='var(--gold-dim)'}
-                  onMouseLeave={e => e.target.style.borderColor='var(--border-hover)'}>
-                  <div style={{fontSize:'2.5rem',marginBottom:'1rem'}}>📷</div>
-                  <h4 style={{fontFamily:'Cormorant Garamond',fontWeight:400,marginBottom:'0.5rem'}}>Drag & drop your photos here</h4>
-                  <p style={{fontSize:'0.82rem',marginBottom:'1rem'}}>Upload up to 8 high-quality photos. Include front, back, interior, and detail shots.</p>
-                  <button className="btn btn-outline btn-sm">Browse Files</button>
-                </div>
-                <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'0.5rem',marginBottom:'1.25rem'}}>
-                  {[1,2,3,4].map(i => (
-                    <div key={i} style={{aspectRatio:1,background:'var(--obsidian-3)',border:'1px dashed var(--border)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.5rem',color:'var(--champagne-dim)',opacity:0.5}}>+</div>
-                  ))}
-                </div>
-                <p style={{fontSize:'0.78rem',color:'var(--champagne-dim)',marginBottom:'1.5rem'}}>
-                  ✦ Professional photography tip: Natural light, neutral background, multiple angles. Higher quality photos get 3× more bookings.
+                <h3 style={{marginBottom:'0.5rem'}}>Upload Photos</h3>
+                <p style={{fontSize:'0.82rem',color:'var(--champagne-dim)',marginBottom:'1.5rem'}}>Add up to 8 photos. First photo will be the main listing image.</p>
+
+                {/* Drop zone */}
+                <label htmlFor="photo-upload" style={{display:'block',border:'2px dashed var(--border-hover)',padding:'2.5rem 2rem',textAlign:'center',marginBottom:'1.25rem',cursor:'pointer',transition:'border-color 0.2s'}}
+                  onMouseEnter={e => e.currentTarget.style.borderColor='var(--gold-dim)'}
+                  onMouseLeave={e => e.currentTarget.style.borderColor='var(--border-hover)'}
+                  onDragOver={e => { e.preventDefault(); e.currentTarget.style.borderColor='var(--gold)'; }}
+                  onDragLeave={e => e.currentTarget.style.borderColor='var(--border-hover)'}
+                  onDrop={e => { e.preventDefault(); e.currentTarget.style.borderColor='var(--border-hover)'; handleFileSelect(e.dataTransfer.files); }}>
+                  <input id="photo-upload" type="file" accept="image/*" multiple style={{display:'none'}}
+                    onChange={e => handleFileSelect(e.target.files)} />
+                  {uploading ? (
+                    <div style={{color:'var(--gold)'}}>Uploading...</div>
+                  ) : (
+                    <>
+                      <div style={{fontSize:'2rem',marginBottom:'0.75rem',opacity:0.6}}>+</div>
+                      <p style={{fontSize:'0.88rem',color:'var(--champagne)',marginBottom:'0.35rem'}}>Tap to select photos or drag & drop</p>
+                      <p style={{fontSize:'0.75rem',color:'var(--champagne-dim)'}}>JPG, PNG, WEBP · up to 8 photos</p>
+                    </>
+                  )}
+                </label>
+
+                {uploadError && <div style={{background:'rgba(200,60,60,0.12)',border:'1px solid rgba(200,60,60,0.25)',padding:'0.75rem',fontSize:'0.82rem',color:'#e88',marginBottom:'1rem'}}>{uploadError}</div>}
+
+                {/* Photo previews */}
+                {photos.length > 0 && (
+                  <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'0.5rem',marginBottom:'1.25rem'}}>
+                    {photos.map((p, i) => (
+                      <div key={i} style={{position:'relative',aspectRatio:1}}>
+                        <img src={p.preview} style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'2px'}} />
+                        {i === 0 && <span style={{position:'absolute',top:4,left:4,background:'var(--gold)',color:'var(--obsidian)',fontSize:'0.6rem',padding:'1px 5px',letterSpacing:'0.05em',textTransform:'uppercase'}}>Main</span>}
+                        <button onClick={() => removePhoto(i)} style={{position:'absolute',top:3,right:3,background:'rgba(0,0,0,0.7)',border:'none',color:'#fff',width:20,height:20,borderRadius:'50%',cursor:'pointer',fontSize:'0.75rem',lineHeight:1,display:'flex',alignItems:'center',justifyContent:'center'}}>×</button>
+                      </div>
+                    ))}
+                    {photos.length < 8 && (
+                      <label htmlFor="photo-upload-more" style={{aspectRatio:1,background:'var(--obsidian-3)',border:'1px dashed var(--border)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.5rem',color:'var(--champagne-dim)',cursor:'pointer'}}>
+                        <input id="photo-upload-more" type="file" accept="image/*" multiple style={{display:'none'}} onChange={e => handleFileSelect(e.target.files)} />
+                        +
+                      </label>
+                    )}
+                  </div>
+                )}
+
+                <p style={{fontSize:'0.75rem',color:'var(--champagne-dim)',marginBottom:'1.5rem'}}>
+                  ✦ Natural light, neutral background, multiple angles — higher quality photos get 3× more bookings.
                 </p>
                 <div style={{display:'flex',gap:'0.75rem'}}>
                   <button className="btn btn-outline" onClick={() => setStep(2)}>← Back</button>
-                  <button className="btn btn-gold" style={{flex:1}} onClick={() => setStep(4)}>Continue to Review →</button>
+                  <button className="btn btn-gold" style={{flex:1}} onClick={() => setStep(4)} disabled={uploading}>Continue to Review →</button>
                 </div>
               </div>
             )}
