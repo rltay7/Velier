@@ -747,35 +747,69 @@
 
       const categories = [
         { label: 'Watches', cat: 'Watches', icon: (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" width="36" height="36">
-            <circle cx="12" cy="12" r="7"/>
-            <path d="M12 8v4l2 2"/>
-            <path d="M9 3h6l-0.5 3h-5L9 3z"/>
-            <path d="M9 21h6l-0.5-3h-5L9 21z"/>
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" width="40" height="40">
+            {/* Case lugs top */}
+            <rect x="15" y="4" width="10" height="5" rx="1.5"/>
+            {/* Case lugs bottom */}
+            <rect x="15" y="31" width="10" height="5" rx="1.5"/>
+            {/* Watch case */}
+            <circle cx="20" cy="20" r="11" strokeWidth="1"/>
+            {/* Dial ring */}
+            <circle cx="20" cy="20" r="8.5" strokeWidth="0.6" strokeDasharray="1 2.1"/>
+            {/* Hands */}
+            <line x1="20" y1="20" x2="20" y2="13.5" strokeWidth="1.2"/>
+            <line x1="20" y1="20" x2="24" y2="22" strokeWidth="0.9"/>
+            {/* Crown */}
+            <rect x="31" y="18.5" width="2.5" height="3" rx="0.8"/>
           </svg>
         )},
         { label: 'Bags', cat: 'Bags', icon: (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" width="36" height="36">
-            <path d="M6 7h12a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
-            <path d="M9 7V5a3 3 0 0 1 6 0v2"/>
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" width="40" height="40">
+            {/* Handle arch */}
+            <path d="M14 14 Q14 7 20 7 Q26 7 26 14"/>
+            {/* Body */}
+            <rect x="8" y="14" width="24" height="19" rx="2.5"/>
+            {/* Clasp */}
+            <rect x="17" y="21" width="6" height="4" rx="1"/>
+            <line x1="20" y1="21" x2="20" y2="19"/>
           </svg>
         )},
         { label: 'Dresses', cat: 'Dresses', icon: (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" width="36" height="36">
-            <path d="M8 3h8l1 5-4 2 4 11H7l4-11-4-2 1-5z"/>
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" width="40" height="40">
+            {/* Neckline */}
+            <path d="M15 5 Q20 10 25 5"/>
+            {/* Shoulders to waist */}
+            <path d="M15 5 L13 16 L20 18 L27 16 L25 5"/>
+            {/* Skirt flare */}
+            <path d="M13 16 Q8 24 6 36 L34 36 Q32 24 27 16"/>
+            {/* Waist detail */}
+            <line x1="13" y1="20" x2="27" y2="20" strokeWidth="0.6"/>
           </svg>
         )},
         { label: 'Jewellery', cat: 'Jewellery', icon: (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" width="36" height="36">
-            <path d="M12 21l-7-9h14l-7 9z"/>
-            <path d="M5 12l2-5h10l2 5"/>
-            <path d="M9 7l1-4h4l1 4"/>
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" width="40" height="40">
+            {/* Necklace chain arc */}
+            <path d="M8 12 Q20 28 32 12" strokeWidth="0.8"/>
+            {/* Pendant diamond */}
+            <path d="M20 26 L16 31 L20 37 L24 31 Z"/>
+            <line x1="16" y1="31" x2="24" y2="31" strokeWidth="0.7"/>
+            {/* Chain clasps */}
+            <circle cx="8" cy="12" r="1.2" fill="currentColor"/>
+            <circle cx="32" cy="12" r="1.2" fill="currentColor"/>
           </svg>
         )},
         { label: 'Shoes', cat: 'Shoes', icon: (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" width="36" height="36">
-            <path d="M3 17l2-8h5l2 4h7a2 2 0 0 1 0 4H3z"/>
-            <path d="M10 9V6a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v3"/>
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" width="40" height="40">
+            {/* Toe box */}
+            <path d="M4 28 Q4 32 10 32 L30 32"/>
+            {/* Insole / upper */}
+            <path d="M4 28 Q6 18 14 16 Q20 14 26 16 Q32 18 30 24 L30 32"/>
+            {/* Heel stem */}
+            <line x1="30" y1="32" x2="33" y2="36" strokeWidth="1.2"/>
+            {/* Heel base */}
+            <line x1="31" y1="36" x2="36" y2="36" strokeWidth="1.4"/>
+            {/* Vamp line */}
+            <path d="M4 28 Q10 24 18 24" strokeWidth="0.6"/>
           </svg>
         )},
       ];
