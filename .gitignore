@@ -1,0 +1,5 @@
+node_modules/
+velier.db
+*.db-journal
+.env
+.DS_Store

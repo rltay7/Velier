@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velier — Access everything. Own nothing.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Switzer:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --obsidian: #0d0b09;
+      --obsidian-2: #131109;
+      --obsidian-3: #1a1713;
+      --obsidian-4: #22201a;
+      --obsidian-5: #2e2b24;
+      --gold: hsl(41, 62%, 60%);
+      --gold-dim: hsl(41, 40%, 45%);
+      --gold-light: hsl(41, 70%, 75%);
+      --champagne: #e8dfc8;
+      --champagne-dim: #9e9484;
+      --white: #f5f0e8;
+      --border: rgba(200, 180, 130, 0.12);
+      --border-hover: rgba(200, 180, 130, 0.28);
+      --overlay: rgba(13, 11, 9, 0.7);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--obsidian);
+      color: var(--champagne);
+      font-family: 'Switzer', -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TYPOGRAPHY ── */
+    .display { font-family: 'Cormorant Garamond', Georgia, serif; }
+    h1, h2, h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 400; }
+    h1 { font-size: clamp(2.5rem, 6vw, 5rem); line-height: 1.05; letter-spacing: -0.01em; }
+    h2 { font-size: clamp(1.75rem, 3.5vw, 2.75rem); line-height: 1.15; }
+    h3 { font-size: clamp(1.25rem, 2vw, 1.6rem); line-height: 1.25; }
+    p { color: var(--champagne-dim); }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--obsidian); }
+    ::-webkit-scrollbar-thumb { background: var(--obsidian-5); border-radius: 3px; }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 3rem); }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+
+    /* ── NAVIGATION ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 1.25rem clamp(1rem, 4vw, 3rem);
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(13,11,9,0.95) 0%, transparent 100%);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 0.75rem;
+      text-decoration: none; color: var(--champagne);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 500; letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .nav-logo svg { width: 32px; height: 32px; }
+    .nav-links {
+      display: flex; align-items: center; gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none; color: var(--champagne-dim);
+      font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--champagne); }
+    .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-cta {
+      padding: 0.55rem 1.25rem;
+      background: transparent;
+      border: 1px solid var(--border-hover);
+      color: var(--champagne);
+      font-family: 'Switzer', sans-serif;
+      font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.2s; text-decoration: none;
+      display: inline-flex; align-items: center;
+    }
+    .nav-cta:hover { background: var(--obsidian-4); border-color: var(--gold-dim); color: var(--gold-light); }
+    .nav-cta.primary { background: var(--gold); border-color: var(--gold); color: var(--obsidian); font-weight: 600; }
+    .nav-cta.primary:hover { background: var(--gold-light); }
+
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px; }
+    .hamburger span { display: block; width: 22px; height: 1px; background: var(--champagne); transition: all 0.3s; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 0.75rem 2rem;
+      font-family: 'Switzer', sans-serif;
+      font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.25s; text-decoration: none;
+      border: 1px solid transparent;
+    }
+    .btn-gold { background: var(--gold); color: var(--obsidian); font-weight: 600; border-color: var(--gold); }
+    .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(200,160,60,0.25); }
+    .btn-outline { background: transparent; color: var(--champagne); border-color: var(--border-hover); }
+    .btn-outline:hover { border-color: var(--gold-dim); color: var(--gold-light); background: rgba(200,160,60,0.05); }
+    .btn-ghost { background: transparent; color: var(--champagne-dim); border-color: transparent; }
+    .btn-ghost:hover { color: var(--champagne); }
+    .btn-danger { background: transparent; color: #e05555; border-color: rgba(220,80,80,0.3); }
+    .btn-danger:hover { background: rgba(220,80,80,0.1); }
+    .btn-sm { padding: 0.5rem 1.25rem; font-size: 0.75rem; }
+    .btn-lg { padding: 1rem 2.5rem; font-size: 0.9rem; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--obsidian-2);
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .card:hover { border-color: var(--border-hover); transform: translateY(-3px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+    .card-image {
+      aspect-ratio: 4/5;
+      background: var(--obsidian-3);
+      overflow: hidden; position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .card-image svg { width: 48px; height: 48px; opacity: 0.2; }
+    .card-image .wishlist-btn {
+      position: absolute; top: 0.75rem; right: 0.75rem;
+      background: rgba(13,11,9,0.8); border: 1px solid var(--border);
+      width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s; backdrop-filter: blur(8px);
+    }
+    .card-image .wishlist-btn:hover, .card-image .wishlist-btn.active { border-color: var(--gold-dim); }
+    .card-image .wishlist-btn.active svg { fill: var(--gold); stroke: var(--gold); }
+    .card-image .category-badge {
+      position: absolute; bottom: 0.75rem; left: 0.75rem;
+      background: rgba(13,11,9,0.85); backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.6rem;
+      font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--champagne-dim);
+    }
+    .card-body { padding: 1rem 1.1rem 1.25rem; }
+    .card-brand { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.3rem; }
+    .card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: var(--champagne); margin-bottom: 0.35rem; line-height: 1.3; }
+    .card-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 0.6rem; }
+    .card-price { font-size: 0.9rem; color: var(--champagne); }
+    .card-price span { color: var(--champagne-dim); font-size: 0.75rem; }
+    .card-rating { display: flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; color: var(--champagne-dim); }
+    .card-rating .star { color: var(--gold); font-size: 0.7rem; }
+
+    /* ── LISTING ITEM VISUALS ── */
+    .item-visual {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem; user-select: none;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center;
+      padding: 8rem 2rem 5rem;
+      position: relative; overflow: hidden;
+      background: radial-gradient(ellipse at 50% 0%, rgba(200, 155, 50, 0.08) 0%, transparent 60%),
+                  var(--obsidian);
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 30m-28 0a28 28 0 1 0 56 0a28 28 0 1 0-56 0' fill='none' stroke='rgba(200,160,60,0.025)' stroke-width='1'/%3E%3C/svg%3E") center/60px;
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .hero-eyebrow::before, .hero-eyebrow::after {
+      content: ''; display: block; width: 40px; height: 1px; background: var(--gold-dim);
+    }
+    .hero h1 { max-width: 900px; margin-bottom: 1.25rem; }
+    .hero h1 em { font-style: italic; color: var(--gold); }
+    .hero-sub { max-width: 500px; margin: 0 auto 2.5rem; font-size: 1rem; color: var(--champagne-dim); line-height: 1.7; }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .hero-scroll {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--champagne-dim); animation: bounce 2s infinite;
+    }
+    .hero-scroll svg { width: 18px; height: 18px; }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ── SECTIONS ── */
+    .section { padding: 5rem 0; }
+    .section-sm { padding: 3rem 0; }
+    .section-header { text-align: center; margin-bottom: 3rem; }
+    .section-label { font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
+    .section-header h2 { margin-bottom: 0.75rem; }
+    .section-header p { max-width: 480px; margin: 0 auto; font-size: 0.95rem; }
+    .divider { height: 1px; background: var(--border); margin: 0; }
+
+    /* ── CATEGORY TILES ── */
+    .category-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
+    .category-tile {
+      aspect-ratio: 1;
+      background: var(--obsidian-3);
+      border: 1px solid var(--border);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem;
+      cursor: pointer; transition: all 0.3s; text-decoration: none; position: relative; overflow: hidden;
+    }
+    .category-tile::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 120%, rgba(200,155,50,0.08) 0%, transparent 70%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .category-tile:hover::before { opacity: 1; }
+    .category-tile:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+    .category-tile .cat-icon { font-size: 2.25rem; }
+    .category-tile .cat-label { font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--champagne-dim); }
+    .category-tile:hover .cat-label { color: var(--champagne); }
+
+    /* ── BRAND MARQUEE ── */
+    .brand-strip {
+      padding: 2rem 0;
+      background: var(--obsidian-2);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .brand-marquee {
+      display: flex; gap: 4rem;
+      animation: marquee 30s linear infinite;
+      white-space: nowrap; width: max-content;
+    }
+    .brand-marquee span {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--champagne-dim); padding: 0 2rem;
+    }
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    /* ── HOW IT WORKS ── */
+    .hiw-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+    .hiw-step { text-align: center; padding: 2.5rem 1.5rem; background: var(--obsidian-2); border: 1px solid var(--border); }
+    .hiw-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 4rem; font-weight: 300; color: var(--border-hover);
+      line-height: 1; margin-bottom: 1rem;
+    }
+    .hiw-step h3 { margin-bottom: 0.5rem; font-size: 1.2rem; }
+    .hiw-step p { font-size: 0.88rem; line-height: 1.65; }
+
+    /* ── LENDER CTA ── */
+    .lender-cta {
+      padding: 6rem clamp(1rem, 4vw, 3rem);
+      background: var(--obsidian-2);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+    }
+    .lender-cta h2 { margin-bottom: 1rem; }
+    .lender-cta p { margin-bottom: 2rem; font-size: 0.95rem; line-height: 1.7; }
+    .earnings-preview {
+      background: var(--obsidian-3); border: 1px solid var(--border);
+      padding: 2rem;
+    }
+    .earnings-preview h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--champagne); margin-bottom: 1.25rem; font-weight: 400; }
+    .earnings-row { display: flex; justify-content: space-between; align-items: baseline; padding: 0.6rem 0; border-bottom: 1px solid var(--border); }
+    .earnings-row:last-child { border-bottom: none; }
+    .earnings-row .label { font-size: 0.8rem; color: var(--champagne-dim); }
+    .earnings-row .value { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--gold); }
+
+    /* ── BROWSE PAGE ── */
+    .browse-layout { display: grid; grid-template-columns: 260px 1fr; gap: 2.5rem; align-items: start; }
+    .filter-sidebar { position: sticky; top: 5rem; }
+    .filter-section { margin-bottom: 2rem; }
+    .filter-label { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--champagne-dim); margin-bottom: 0.75rem; display: block; }
+    .filter-option {
+      display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0;
+      cursor: pointer; font-size: 0.85rem; color: var(--champagne-dim);
+      transition: color 0.2s; user-select: none;
+    }
+    .filter-option:hover { color: var(--champagne); }
+    .filter-option input { display: none; }
+    .filter-check {
+      width: 14px; height: 14px; border: 1px solid var(--border-hover);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .filter-check.checked { background: var(--gold); border-color: var(--gold); }
+    .filter-check.checked::after { content: '✓'; font-size: 9px; color: var(--obsidian); }
+    .browse-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+    .browse-count { font-size: 0.8rem; color: var(--champagne-dim); }
+    .sort-select {
+      background: var(--obsidian-3); border: 1px solid var(--border);
+      color: var(--champagne); padding: 0.5rem 1rem; font-size: 0.78rem;
+      font-family: 'Switzer', sans-serif; cursor: pointer; outline: none;
+    }
+    .filter-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+    .chip {
+      display: flex; align-items: center; gap: 0.4rem;
+      background: rgba(200,160,60,0.1); border: 1px solid rgba(200,160,60,0.25);
+      padding: 0.25rem 0.6rem; font-size: 0.72rem; letter-spacing: 0.06em;
+      color: var(--gold-light); cursor: pointer;
+    }
+    .chip:hover { background: rgba(200,160,60,0.18); }
+    .chip-x { font-size: 0.85rem; opacity: 0.7; }
+    .category-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; overflow-x: auto; }
+    .cat-tab {
+      padding: 0.65rem 1.25rem; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; color: var(--champagne-dim); border-bottom: 2px solid transparent;
+      white-space: nowrap; transition: all 0.2s; background: none; border-top: none; border-left: none; border-right: none;
+      font-family: 'Switzer', sans-serif;
+    }
+    .cat-tab:hover { color: var(--champagne); }
+    .cat-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+    /* ── LISTING DETAIL ── */
+    .listing-layout { display: grid; grid-template-columns: 1fr 420px; gap: 3rem; align-items: start; }
+    .gallery-main { aspect-ratio: 4/5; background: var(--obsidian-2); border: 1px solid var(--border); overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; }
+    .gallery-thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+    .gallery-thumb { aspect-ratio: 1; background: var(--obsidian-2); border: 1px solid var(--border); overflow: hidden; cursor: pointer; transition: border-color 0.2s; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
+    .gallery-thumb.active { border-color: var(--gold-dim); }
+    .listing-detail-right { position: sticky; top: 5rem; }
+    .listing-brand { font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.5rem; }
+    .listing-title-h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.6rem, 3vw, 2.4rem); margin-bottom: 0.75rem; font-weight: 400; line-height: 1.2; }
+    .listing-rating { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: var(--champagne-dim); margin-bottom: 1.5rem; }
+    .stars { color: var(--gold); letter-spacing: 0.05em; }
+    .listing-attrs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .attr-pill {
+      background: var(--obsidian-3); border: 1px solid var(--border);
+      padding: 0.6rem 0.875rem;
+    }
+    .attr-pill .attr-name { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--champagne-dim); margin-bottom: 0.15rem; }
+    .attr-pill .attr-val { font-size: 0.88rem; color: var(--champagne); }
+    .pricing-box { background: var(--obsidian-3); border: 1px solid var(--border); padding: 1.25rem; margin-bottom: 1.25rem; }
+    .pricing-box h4 { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--champagne); margin-bottom: 1rem; font-weight: 400; letter-spacing: 0.05em; }
+    .pricing-row { display: flex; justify-content: space-between; align-items: baseline; padding: 0.45rem 0; font-size: 0.85rem; }
+    .pricing-row .pl { color: var(--champagne-dim); }
+    .pricing-row .pv { color: var(--champagne); }
+    .pricing-total { border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 0.75rem; }
+    .pricing-total .pl { font-weight: 500; color: var(--champagne); }
+    .pricing-total .pv { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; color: var(--gold); }
+    .date-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .date-input { background: var(--obsidian-4); border: 1px solid var(--border); padding: 0.65rem 0.75rem; color: var(--champagne); font-family: 'Switzer', sans-serif; font-size: 0.82rem; width: 100%; outline: none; transition: border-color 0.2s; }
+    .date-input:focus { border-color: var(--gold-dim); }
+    .date-input::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
+    .owner-card { border-top: 1px solid var(--border); padding-top: 1.25rem; margin-top: 1.5rem; display: flex; align-items: center; gap: 0.875rem; }
+    .owner-avatar { width: 44px; height: 44px; background: var(--obsidian-5); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; color: var(--champagne-dim); letter-spacing: 0.05em; flex-shrink: 0; }
+    .owner-info h5 { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 400; color: var(--champagne); }
+    .owner-info small { font-size: 0.73rem; color: var(--champagne-dim); }
+    .verified-badge { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); margin-left: 0.4rem; }
+
+    /* ── BOOKING PAGE ── */
+    .booking-layout { display: grid; grid-template-columns: 1fr 380px; gap: 3rem; align-items: start; }
+    .booking-summary { background: var(--obsidian-2); border: 1px solid var(--border); padding: 1.5rem; position: sticky; top: 5rem; }
+    .booking-summary h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: var(--champagne); margin-bottom: 1.25rem; font-weight: 400; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-label { display: block; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--champagne-dim); margin-bottom: 0.5rem; }
+    .form-input, .form-textarea, .form-select {
+      width: 100%; background: var(--obsidian-3); border: 1px solid var(--border);
+      color: var(--champagne); padding: 0.75rem 0.875rem;
+      font-family: 'Switzer', sans-serif; font-size: 0.88rem; outline: none;
+      transition: border-color 0.2s; resize: vertical;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--gold-dim); }
+    .form-textarea { min-height: 100px; }
+    .payment-placeholder {
+      background: var(--obsidian-3); border: 1px dashed var(--border-hover);
+      padding: 2rem; text-align: center; color: var(--champagne-dim); font-size: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+    .payment-placeholder svg { width: 32px; height: 32px; opacity: 0.35; margin: 0 auto 0.75rem; display: block; }
+    .confirmation-state { text-align: center; padding: 4rem 2rem; }
+    .confirmation-state .check { width: 64px; height: 64px; background: rgba(200,155,50,0.12); border: 1px solid var(--gold-dim); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.75rem; }
+    .confirmation-state h2 { margin-bottom: 0.75rem; }
+    .confirmation-state p { max-width: 400px; margin: 0 auto 2rem; }
+
+    /* ── LIST AN ITEM WIZARD ── */
+    .wizard-steps { display: flex; align-items: center; justify-content: center; margin-bottom: 3rem; gap: 0; }
+    .wizard-step-item {
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .step-dot {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; color: var(--champagne-dim); transition: all 0.3s;
+    }
+    .step-dot.active { border-color: var(--gold); background: var(--gold); color: var(--obsidian); font-weight: 600; }
+    .step-dot.done { border-color: var(--gold-dim); background: rgba(200,155,50,0.15); color: var(--gold); }
+    .step-label { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--champagne-dim); }
+    .step-label.active { color: var(--champagne); }
+    .wizard-connector { width: 60px; height: 1px; background: var(--border); margin: 0 0.25rem; }
+    .wizard-connector.done { background: var(--gold-dim); }
+
+    /* ── EARNINGS ESTIMATOR ── */
+    .estimator {
+      background: var(--obsidian-3); border: 1px solid var(--border);
+      padding: 1.25rem; margin-bottom: 1.25rem;
+    }
+    .estimator h5 { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--champagne); margin-bottom: 1rem; font-weight: 400; }
+    .estimate-value { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; color: var(--gold); line-height: 1; }
+    .estimate-sub { font-size: 0.75rem; color: var(--champagne-dim); margin-top: 0.2rem; }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      padding: 8rem 0 3rem;
+      background: radial-gradient(ellipse at 50% -20%, rgba(200,155,50,0.06) 0%, transparent 60%);
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header .container { display: flex; flex-direction: column; gap: 0.5rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--champagne-dim); margin-bottom: 0.75rem; }
+    .breadcrumb a { color: var(--champagne-dim); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--champagne); }
+    .breadcrumb span { opacity: 0.5; }
+
+    /* ── LOADING ── */
+    .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5rem; gap: 1rem; }
+    .loading-ring { width: 40px; height: 40px; border: 1px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading p { font-size: 0.8rem; color: var(--champagne-dim); letter-spacing: 0.1em; }
+
+    /* ── SKELETON ── */
+    .skeleton { background: linear-gradient(90deg, var(--obsidian-3) 25%, var(--obsidian-4) 50%, var(--obsidian-3) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+      background: var(--obsidian-4); border: 1px solid var(--border-hover);
+      padding: 0.875rem 1.25rem; font-size: 0.85rem;
+      display: flex; align-items: center; gap: 0.75rem;
+      animation: slideUp 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* ── FOOTER ── */
+    .footer {
+      padding: 4rem 0 2rem;
+      background: var(--obsidian-2);
+      border-top: 1px solid var(--border);
+    }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+    .footer-brand .logo-wrap { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .footer-brand .logo-wrap svg { width: 28px; height: 28px; }
+    .footer-brand p { font-size: 0.85rem; max-width: 240px; line-height: 1.65; }
+    .footer-col h5 { font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; font-weight: 500; color: var(--champagne); margin-bottom: 1rem; letter-spacing: 0.08em; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .footer-col ul a { text-decoration: none; color: var(--champagne-dim); font-size: 0.82rem; transition: color 0.2s; }
+    .footer-col ul a:hover { color: var(--champagne); }
+    .footer-bottom { border-top: 1px solid var(--border); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .footer-bottom p { font-size: 0.75rem; color: var(--champagne-dim); }
+
+    /* ── MOBILE MENU ── */
+    .mobile-menu {
+      display: none; position: fixed; inset: 0; z-index: 99;
+      background: var(--obsidian);
+      flex-direction: column; padding: 5rem 2rem 2rem;
+      gap: 1.5rem;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 1.75rem; color: var(--champagne); text-decoration: none; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align: center; padding: 5rem 2rem; }
+    .empty-state h3 { margin-bottom: 0.5rem; font-size: 1.4rem; }
+    .empty-state p { font-size: 0.88rem; margin-bottom: 1.5rem; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1100px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .browse-layout { grid-template-columns: 1fr; }
+      .filter-sidebar { position: static; }
+      .listing-layout { grid-template-columns: 1fr; }
+      .listing-detail-right { position: static; }
+      .booking-layout { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .lender-cta { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .category-grid { grid-template-columns: repeat(3, 1fr); }
+      .hiw-steps { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+      .wizard-step-item .step-label { display: none; }
+      .hero-actions { flex-direction: column; align-items: center; }
+    }
+    @media (max-width: 480px) {
+      .grid-4 { grid-template-columns: 1fr; }
+      .category-grid { grid-template-columns: repeat(2, 1fr); }
+      .listing-attrs { grid-template-columns: 1fr; }
+      .date-inputs { grid-template-columns: 1fr; }
+      .nav-cta.primary { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useCallback, useRef } = React;
+
+    // ── VELIER LOGO SVG ──
+    const VelierLogo = ({ size = 32 }) => (
+      <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Velier">
+        {/* Cascading veil arcs */}
+        <path d="M4 8 Q20 18 36 8" stroke="hsl(41,62%,60%)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+        <path d="M7 13 Q20 22 33 13" stroke="hsl(41,62%,60%)" strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.7"/>
+        <path d="M10 18 Q20 26 30 18" stroke="hsl(41,62%,60%)" strokeWidth="0.8" fill="none" strokeLinecap="round" opacity="0.5"/>
+        {/* Almond eye form */}
+        <path d="M12 26 Q20 20 28 26 Q20 32 12 26Z" stroke="hsl(41,62%,60%)" strokeWidth="1" fill="none"/>
+        {/* Iris ring */}
+        <circle cx="20" cy="26" r="3.5" stroke="hsl(41,62%,60%)" strokeWidth="0.8" fill="none"/>
+        {/* Pupil */}
+        <circle cx="20" cy="26" r="1.5" fill="hsl(41,62%,60%)"/>
+        {/* Veil hem line */}
+        <line x1="6" y1="35" x2="34" y2="35" stroke="hsl(41,62%,60%)" strokeWidth="0.7" opacity="0.5"/>
+      </svg>
+    );
+
+    // ── ITEM VISUALS MAP ──
+    const ITEM_VISUALS = {
+      'bag-prada': '👜',
+      'bag-gucci': '💼',
+      'bag-chanel': '🎀',
+      'bag-bottega': '🤎',
+      'dress-valentino': '👗',
+      'watch-rolex': '⌚',
+      'watch-ap': '🕰️',
+      'jewel-cartier': '💛',
+      'bag-hermes': '🟤',
+      'bag-syl': '🖤',
+      'shoe-loub': '👠',
+      'dress-mcqueen': '🦢',
+    };
+
+    const getItemVisual = (images) => {
+      if (!images) return '✨';
+      const arr = typeof images === 'string' ? JSON.parse(images) : images;
+      const key = arr[0]?.replace(/-\d+$/, '') || '';
+      return ITEM_VISUALS[key] || '✨';
+    };
+
+    // ── ROUTER ──
+    const useHash = () => {
+      const [hash, setHash] = useState(window.location.hash || '#/');
+      useEffect(() => {
+        const onHash = () => setHash(window.location.hash || '#/');
+        window.addEventListener('hashchange', onHash);
+        return () => window.removeEventListener('hashchange', onHash);
+      }, []);
+      return hash;
+    };
+
+    const navigate = (path) => { window.location.hash = path; };
+
+    // ── TOAST ──
+    const Toast = ({ message, onClose }) => {
+      useEffect(() => {
+        const t = setTimeout(onClose, 3000);
+        return () => clearTimeout(t);
+      }, []);
+      return (
+        <div className="toast">
+          <span>✦</span>
+          <span>{message}</span>
+          <button onClick={onClose} style={{background:'none',border:'none',color:'var(--champagne-dim)',cursor:'pointer',fontSize:'1rem',marginLeft:'0.5rem'}}>×</button>
+        </div>
+      );
+    };
+
+    // ── NAV ──
+    const Nav = ({ wishlistCount }) => {
+      const [menuOpen, setMenuOpen] = useState(false);
+      const hash = useHash();
+      const isActive = (p) => hash.startsWith(p);
+
+      return (
+        <>
+          <nav className="nav">
+            <a href="#/" className="nav-logo" onClick={() => setMenuOpen(false)}>
+              <VelierLogo size={32} />
+              Velier
+            </a>
+            <ul className="nav-links">
+              <li><a href="#/browse" style={isActive('#/browse') ? {color:'var(--champagne)'} : {}}>Explore</a></li>
+              <li><a href="#/browse#bags" onClick={() => setTimeout(() => navigate('#/browse?category=Bags'), 10)}>Bags</a></li>
+              <li><a href="#/browse?category=Watches">Watches</a></li>
+              <li><a href="#/browse?category=Dresses">Dresses</a></li>
+              <li><a href="#/browse?category=Jewellery">Jewellery</a></li>
+            </ul>
+            <div className="nav-actions">
+              <a href="#/list" className="nav-cta">List an Item</a>
+              <a href="#/" className="nav-cta primary">Reserve</a>
+              <div className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
+                <span style={menuOpen ? {transform:'rotate(45deg) translate(4px, 4px)'} : {}}></span>
+                <span style={menuOpen ? {opacity:0} : {}}></span>
+                <span style={menuOpen ? {transform:'rotate(-45deg) translate(4px, -4px)'} : {}}></span>
+              </div>
+            </div>
+          </nav>
+          <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
+            <a href="#/" onClick={() => setMenuOpen(false)}>Home</a>
+            <a href="#/browse" onClick={() => setMenuOpen(false)}>Explore</a>
+            <a href="#/browse?category=Bags" onClick={() => setMenuOpen(false)}>Bags</a>
+            <a href="#/browse?category=Watches" onClick={() => setMenuOpen(false)}>Watches</a>
+            <a href="#/browse?category=Dresses" onClick={() => setMenuOpen(false)}>Dresses</a>
+            <a href="#/list" onClick={() => setMenuOpen(false)}>List an Item</a>
+          </div>
+        </>
+      );
+    };
+
+    // ── FOOTER ──
+    const Footer = () => (
+      <footer className="footer">
+        <div className="container">
+          <div className="footer-grid">
+            <div className="footer-brand">
+              <div className="logo-wrap">
+                <VelierLogo size={28} />
+                <span style={{fontFamily:'Cormorant Garamond',fontSize:'1.25rem',letterSpacing:'0.1em',textTransform:'uppercase'}}>Velier</span>
+              </div>
+              <p>The world's most refined peer-to-peer luxury rental platform. Access extraordinary pieces. Own nothing.</p>
+            </div>
+            <div className="footer-col">
+              <h5>Discover</h5>
+              <ul>
+                <li><a href="#/browse?category=Bags">Bags</a></li>
+                <li><a href="#/browse?category=Watches">Watches</a></li>
+                <li><a href="#/browse?category=Dresses">Dresses</a></li>
+                <li><a href="#/browse?category=Jewellery">Jewellery</a></li>
+                <li><a href="#/browse?category=Shoes">Shoes</a></li>
+              </ul>
+            </div>
+            <div className="footer-col">
+              <h5>Lend</h5>
+              <ul>
+                <li><a href="#/list">List an Item</a></li>
+                <li><a href="#/list">How It Works</a></li>
+                <li><a href="#/list">Pricing Guide</a></li>
+                <li><a href="#/list">Insurance</a></li>
+              </ul>
+            </div>
+            <div className="footer-col">
+              <h5>Company</h5>
+              <ul>
+                <li><a href="#/">About Velier</a></li>
+                <li><a href="#/">Trust & Safety</a></li>
+                <li><a href="#/">Press</a></li>
+                <li><a href="#/">Careers</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <p>© 2024 Velier. All rights reserved.</p>
+            <p style={{fontFamily:'Cormorant Garamond',fontStyle:'italic',fontSize:'0.9rem',color:'var(--gold-dim)'}}>Access everything. Own nothing.</p>
+            <p style={{display:'flex',gap:'1.5rem'}}>
+              <a href="#/" style={{color:'var(--champagne-dim)',textDecoration:'none',fontSize:'0.75rem'}}>Privacy</a>
+              <a href="#/" style={{color:'var(--champagne-dim)',textDecoration:'none',fontSize:'0.75rem'}}>Terms</a>
+            </p>
+          </div>
+        </div>
+      </footer>
+    );
+
+    // ── LISTING CARD ──
+    const ListingCard = ({ listing, wishlist, onWishlistToggle }) => {
+      const visual = getItemVisual(listing.images);
+      const inWishlist = wishlist.includes(listing.id);
+
+      return (
+        <div className="card" onClick={() => navigate(`#/listing/${listing.id}`)}>
+          <div className="card-image">
+            <div className="item-visual">{visual}</div>
+            <div className={`wishlist-btn ${inWishlist ? 'active' : ''}`}
+              onClick={(e) => { e.stopPropagation(); onWishlistToggle(listing.id); }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill={inWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+            </div>
+            <span className="category-badge">{listing.category}</span>
+          </div>
+          <div className="card-body">
+            <div className="card-brand">{listing.brand}</div>
+            <div className="card-title">{listing.title}</div>
+            <div className="card-meta">
+              <div className="card-price">
+                £{listing.daily_rate}<span>/day</span>
+              </div>
+              <div className="card-rating">
+                <span className="star">★</span>
+                {listing.rating}
+                <span>({listing.reviews})</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ── HOMEPAGE ──
+    const HomePage = ({ wishlist, onWishlistToggle, onToast }) => {
+      const [featured, setFeatured] = useState([]);
+      const [loading, setLoading] = useState(true);
+
+      useEffect(() => {
+        fetch('/api/listings?featured=true&limit=4')
+          .then(r => r.json()).then(data => { setFeatured(data); setLoading(false); })
+          .catch(() => setLoading(false));
+        window.scrollTo(0, 0);
+      }, []);
+
+      const categories = [
+        { icon: '👜', label: 'Bags', cat: 'Bags' },
+        { icon: '⌚', label: 'Watches', cat: 'Watches' },
+        { icon: '👗', label: 'Dresses', cat: 'Dresses' },
+        { icon: '💎', label: 'Jewellery', cat: 'Jewellery' },
+        { icon: '👠', label: 'Shoes', cat: 'Shoes' },
+      ];
+      const brands = ['Prada', 'Gucci', 'Chanel', 'Hermès', 'Rolex', 'Cartier', 'Valentino', 'Bottega Veneta', 'Audemars Piguet', 'Saint Laurent', 'Louboutin', 'Alexander McQueen'];
+
+      return (
+        <div>
+          {/* HERO */}
+          <section className="hero">
+            <div className="hero-eyebrow">The Velier Collection</div>
+            <h1>The world's finest<br/><em>luxury awaits you</em></h1>
+            <p className="hero-sub">Rent extraordinary pieces from Prada, Chanel, Rolex, and Hermès. Wear what was once unattainable.</p>
+            <div className="hero-actions">
+              <a href="#/browse" className="btn btn-gold btn-lg">Explore the Collection</a>
+              <a href="#/list" className="btn btn-outline btn-lg">List Your Pieces</a>
+            </div>
+            <div className="hero-scroll">
+              Discover
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+            </div>
+          </section>
+
+          {/* FEATURED */}
+          <section className="section">
+            <div className="container">
+              <div className="section-header">
+                <div className="section-label">Curated Selections</div>
+                <h2>Featured Pieces</h2>
+                <p>Handpicked from our most coveted lenders — verified, immaculate, extraordinary</p>
+              </div>
+              {loading ? (
+                <div className="grid-4">
+                  {[1,2,3,4].map(i => (
+                    <div key={i} style={{background:'var(--obsidian-2)',border:'1px solid var(--border)'}}>
+                      <div className="skeleton" style={{aspectRatio:'4/5'}}></div>
+                      <div style={{padding:'1rem'}}>
+                        <div className="skeleton" style={{height:10,marginBottom:8,width:'40%'}}></div>
+                        <div className="skeleton" style={{height:14,marginBottom:8,width:'80%'}}></div>
+                        <div className="skeleton" style={{height:10,width:'60%'}}></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid-4">
+                  {featured.map(l => (
+                    <ListingCard key={l.id} listing={l} wishlist={wishlist} onWishlistToggle={onWishlistToggle} />
+                  ))}
+                </div>
+              )}
+              <div style={{textAlign:'center',marginTop:'2.5rem'}}>
+                <a href="#/browse" className="btn btn-outline">View All Listings</a>
+              </div>
+            </div>
+          </section>
+
+          {/* CATEGORIES */}
+          <div className="divider"></div>
+          <section className="section">
+            <div className="container">
+              <div className="section-header">
+                <div className="section-label">Browse by Category</div>
+                <h2>Shop the Wardrobe</h2>
+              </div>
+              <div className="category-grid">
+                {categories.map(c => (
+                  <a key={c.cat} href={`#/browse?category=${c.cat}`} className="category-tile">
+                    <span className="cat-icon">{c.icon}</span>
+                    <span className="cat-label">{c.label}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* BRAND MARQUEE */}
+          <div className="brand-strip">
+            <div className="brand-marquee">
+              {[...brands, ...brands].map((b, i) => <span key={i}>{b}</span>)}
+            </div>
+          </div>
+
+          {/* HOW IT WORKS */}
+          <section className="section">
+            <div className="container">
+              <div className="section-header">
+                <div className="section-label">The Process</div>
+                <h2>How Velier Works</h2>
+                <p>Seamless, secure, and surprisingly simple</p>
+              </div>
+              <div className="hiw-steps">
+                <div className="hiw-step">
+                  <div className="hiw-num">01</div>
+                  <h3>Discover & Wish</h3>
+                  <p>Browse thousands of verified luxury pieces from private owners across Europe and beyond. Save favourites to your wishlist.</p>
+                </div>
+                <div className="hiw-step">
+                  <div className="hiw-num">02</div>
+                  <h3>Reserve & Connect</h3>
+                  <p>Select your dates, send a message to the owner, and confirm your booking. Our escrow payment system protects both parties.</p>
+                </div>
+                <div className="hiw-step">
+                  <div className="hiw-num">03</div>
+                  <h3>Wear & Return</h3>
+                  <p>Receive the piece, live extraordinarily, and return it with care. Reviews build trust on both sides of every transaction.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* LENDER CTA */}
+          <section style={{padding:'0'}}>
+            <div className="lender-cta container" style={{maxWidth:'100%'}}>
+              <div className="container" style={{padding:0}}>
+                <div className="lender-cta" style={{padding:'5rem 0'}}>
+                  <div>
+                    <div className="section-label" style={{marginBottom:'0.75rem'}}>For Owners</div>
+                    <h2>Your wardrobe<br/>is working capital</h2>
+                    <p>The pieces collecting dust in your wardrobe could be earning you hundreds every month. List with Velier and let the world borrow what you love.</p>
+                    <a href="#/list" className="btn btn-gold btn-lg">Start Earning Today</a>
+                  </div>
+                  <div className="earnings-preview">
+                    <h4>Estimated Monthly Earnings</h4>
+                    <div className="earnings-row"><span className="label">Chanel Classic Flap (3 rentals)</span><span className="value">£585</span></div>
+                    <div className="earnings-row"><span className="label">Rolex Datejust (4 rentals)</span><span className="value">£1,000</span></div>
+                    <div className="earnings-row"><span className="label">Hermès Birkin (2 rentals)</span><span className="value">£900</span></div>
+                    <div className="earnings-row" style={{paddingTop:'0.75rem',marginTop:'0.25rem',borderTop:'1px solid var(--border)'}}>
+                      <span className="label" style={{color:'var(--champagne)',fontWeight:500}}>Total Potential</span>
+                      <span className="value" style={{fontSize:'2rem'}}>£2,485<span style={{fontSize:'0.8rem',color:'var(--champagne-dim)'}}>/mo</span></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <Footer />
+        </div>
+      );
+    };
+
+    // ── BROWSE PAGE ──
+    const BrowsePage = ({ wishlist, onWishlistToggle }) => {
+      const hash = useHash();
+      const params = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
+      const initialCategory = params.get('category') || 'All';
+
+      const [listings, setListings] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [selectedBrands, setSelectedBrands] = useState([]);
+      const [activeCategory, setActiveCategory] = useState(initialCategory);
+      const [sort, setSort] = useState('featured');
+      const allBrands = ['Prada', 'Gucci', 'Chanel', 'Hermès', 'Bottega Veneta', 'Valentino', 'Rolex', 'Audemars Piguet', 'Cartier', 'Saint Laurent', 'Louboutin', 'Alexander McQueen'];
+      const categories = ['All', 'Bags', 'Watches', 'Dresses', 'Jewellery', 'Shoes'];
+
+      useEffect(() => {
+        setLoading(true);
+        let url = '/api/listings?';
+        if (activeCategory !== 'All') url += `category=${activeCategory}&`;
+        if (selectedBrands.length === 1) url += `brand=${selectedBrands[0]}&`;
+        url += `sort=${sort}`;
+        fetch(url)
+          .then(r => r.json())
+          .then(data => {
+            const filtered = selectedBrands.length > 1
+              ? data.filter(l => selectedBrands.includes(l.brand))
+              : data;
+            setListings(filtered);
+            setLoading(false);
+          })
+          .catch(() => setLoading(false));
+        window.scrollTo(0, 0);
+      }, [activeCategory, selectedBrands, sort]);
+
+      useEffect(() => {
+        const p = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
+        const cat = p.get('category') || 'All';
+        setActiveCategory(cat);
+      }, [hash]);
+
+      const toggleBrand = (brand) => {
+        setSelectedBrands(prev =>
+          prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
+        );
+      };
+
+      const removeChip = (brand) => setSelectedBrands(prev => prev.filter(b => b !== brand));
+
+      return (
+        <div>
+          <div className="page-header">
+            <div className="container">
+              <div className="breadcrumb"><a href="#/">Home</a><span>/</span><span>Explore</span></div>
+              <h1 style={{fontSize:'clamp(2rem,4vw,3.5rem)'}}>The Collection</h1>
+              <p style={{marginTop:'0.5rem'}}>Curated luxury from the world's most discerning private wardrobes</p>
+            </div>
+          </div>
+
+          <div className="container section">
+            {/* Category Tabs */}
+            <div className="category-tabs">
+              {categories.map(c => (
+                <button key={c} className={`cat-tab ${activeCategory === c ? 'active' : ''}`}
+                  onClick={() => setActiveCategory(c)}>
+                  {c}
+                </button>
+              ))}
+            </div>
+
+            <div className="browse-layout">
+              {/* Sidebar */}
+              <aside className="filter-sidebar">
+                <div className="filter-section">
+                  <span className="filter-label">Brand House</span>
+                  {allBrands.map(brand => (
+                    <label key={brand} className="filter-option" onClick={() => toggleBrand(brand)}>
+                      <div className={`filter-check ${selectedBrands.includes(brand) ? 'checked' : ''}`}></div>
+                      {brand}
+                    </label>
+                  ))}
+                </div>
+                {selectedBrands.length > 0 && (
+                  <button className="btn btn-ghost btn-sm" style={{paddingLeft:0}} onClick={() => setSelectedBrands([])}>
+                    Clear Filters
+                  </button>
+                )}
+              </aside>
+
+              {/* Listings */}
+              <div>
+                <div className="browse-header">
+                  <div>
+                    {selectedBrands.length > 0 && (
+                      <div className="filter-chips">
+                        {selectedBrands.map(b => (
+                          <span key={b} className="chip" onClick={() => removeChip(b)}>
+                            {b} <span className="chip-x">×</span>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <span className="browse-count">{listings.length} piece{listings.length !== 1 ? 's' : ''} available</span>
+                  </div>
+                  <select className="sort-select" value={sort} onChange={e => setSort(e.target.value)}>
+                    <option value="featured">Featured</option>
+                    <option value="price_asc">Price: Low to High</option>
+                    <option value="price_desc">Price: High to Low</option>
+                    <option value="rating">Highest Rated</option>
+                  </select>
+                </div>
+
+                {loading ? (
+                  <div className="loading"><div className="loading-ring"></div><p>Curating your selection…</p></div>
+                ) : listings.length === 0 ? (
+                  <div className="empty-state">
+                    <h3>No pieces found</h3>
+                    <p>Try adjusting your filters or browse all categories</p>
+                    <button className="btn btn-outline" onClick={() => { setSelectedBrands([]); setActiveCategory('All'); }}>
+                      Clear All Filters
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid-4">
+                    {listings.map(l => (
+                      <ListingCard key={l.id} listing={l} wishlist={wishlist} onWishlistToggle={onWishlistToggle} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          <Footer />
+        </div>
+      );
+    };
+
+    // ── LISTING DETAIL PAGE ──
+    const ListingDetailPage = ({ id, wishlist, onWishlistToggle, onToast }) => {
+      const [listing, setListing] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [activeImg, setActiveImg] = useState(0);
+      const [startDate, setStartDate] = useState('');
+      const [endDate, setEndDate] = useState('');
+      const [days, setDays] = useState(0);
+
+      useEffect(() => {
+        fetch(`/api/listings/${id}`)
+          .then(r => r.json()).then(data => { setListing(data); setLoading(false); })
+          .catch(() => setLoading(false));
+        window.scrollTo(0, 0);
+      }, [id]);
+
+      useEffect(() => {
+        if (startDate && endDate) {
+          const d1 = new Date(startDate), d2 = new Date(endDate);
+          const diff = Math.max(0, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)));
+          setDays(diff);
+        } else setDays(0);
+      }, [startDate, endDate]);
+
+      if (loading) return <div className="loading" style={{marginTop:'5rem'}}><div className="loading-ring"></div></div>;
+      if (!listing) return <div className="empty-state" style={{marginTop:'5rem'}}><h3>Piece Not Found</h3><p>This listing may no longer be available</p><a href="#/browse" className="btn btn-outline">Back to Collection</a></div>;
+
+      const inWishlist = wishlist.includes(listing.id);
+      const subtotal = days * listing.daily_rate;
+      const serviceFee = subtotal * 0.15;
+      const total = subtotal + serviceFee;
+      const visual = getItemVisual(listing.images);
+
+      const handleWishlist = () => {
+        onWishlistToggle(listing.id);
+        fetch(`/api/listings/${listing.id}/wishlist`, {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ action: inWishlist ? 'remove' : 'add' })
+        });
+        onToast(inWishlist ? 'Removed from wishlist' : 'Added to wishlist');
+      };
+
+      const thumbVisuals = ['large','detail','lifestyle'];
+
+      return (
+        <div>
+          <div className="page-header">
+            <div className="container">
+              <div className="breadcrumb">
+                <a href="#/">Home</a><span>/</span>
+                <a href="#/browse">Collection</a><span>/</span>
+                <span>{listing.brand}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="container section">
+            <div className="listing-layout">
+              {/* Gallery */}
+              <div>
+                <div className="gallery-main">
+                  <div style={{fontSize:'10rem', userSelect:'none'}}>{visual}</div>
+                </div>
+                <div className="gallery-thumbs">
+                  {[0,1,2].map(i => (
+                    <div key={i} className={`gallery-thumb ${activeImg === i ? 'active' : ''}`} onClick={() => setActiveImg(i)}>
+                      <span style={{fontSize:'2.5rem'}}>{visual}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Detail */}
+              <div className="listing-detail-right">
+                <div className="listing-brand">{listing.brand}</div>
+                <h1 className="listing-title-h1">{listing.title}</h1>
+                <div className="listing-rating">
+                  <span className="stars">{'★'.repeat(Math.round(listing.rating))}</span>
+                  <strong>{listing.rating}</strong>
+                  <span>({listing.reviews} reviews)</span>
+                  <span>·</span>
+                  <span>{listing.wishlist_count} saved</span>
+                </div>
+
+                <div className="listing-attrs">
+                  <div className="attr-pill"><div className="attr-name">Condition</div><div className="attr-val">{listing.condition}</div></div>
+                  <div className="attr-pill"><div className="attr-name">Colour</div><div className="attr-val">{listing.colour}</div></div>
+                  <div className="attr-pill"><div className="attr-name">Size</div><div className="attr-val">{listing.size}</div></div>
+                  <div className="attr-pill"><div className="attr-name">Category</div><div className="attr-val">{listing.category}</div></div>
+                </div>
+
+                <p style={{marginBottom:'1.5rem',fontSize:'0.88rem',lineHeight:1.75,color:'var(--champagne-dim)'}}>{listing.description}</p>
+
+                {/* Pricing calculator */}
+                <div className="pricing-box">
+                  <h4>Reserve This Piece</h4>
+                  <div className="date-inputs">
+                    <input type="date" className="date-input" value={startDate} onChange={e => setStartDate(e.target.value)} min={new Date().toISOString().split('T')[0]} placeholder="From" />
+                    <input type="date" className="date-input" value={endDate} onChange={e => setEndDate(e.target.value)} min={startDate || new Date().toISOString().split('T')[0]} placeholder="To" />
+                  </div>
+                  {days > 0 && (
+                    <>
+                      <div className="pricing-row"><span className="pl">£{listing.daily_rate}/day × {days} days</span><span className="pv">£{subtotal.toFixed(2)}</span></div>
+                      <div className="pricing-row"><span className="pl">Service fee (15%)</span><span className="pv">£{serviceFee.toFixed(2)}</span></div>
+                      <div className="pricing-row pricing-total"><span className="pl">Total</span><span className="pv">£{total.toFixed(2)}</span></div>
+                    </>
+                  )}
+                  {!days && <p style={{fontSize:'0.8rem',color:'var(--champagne-dim)',marginBottom:'0.5rem',textAlign:'center'}}>Select dates to calculate total</p>}
+                  <button className="btn btn-gold" style={{width:'100%',marginTop:'0.75rem'}}
+                    disabled={days === 0}
+                    onClick={() => navigate(`#/booking/${listing.id}?start=${startDate}&end=${endDate}&days=${days}&total=${total.toFixed(2)}`)}>
+                    Reserve This Piece
+                  </button>
+                  <button className="btn btn-outline" style={{width:'100%',marginTop:'0.5rem'}} onClick={handleWishlist}>
+                    {inWishlist ? '♥ Saved to Wishlist' : '♡ Add to Wishlist'}
+                  </button>
+                </div>
+
+                {/* Owner card */}
+                <div className="owner-card">
+                  <div className="owner-avatar">{listing.owner_avatar}</div>
+                  <div className="owner-info">
+                    <h5>{listing.owner_name}
+                      {listing.owner_verified ? <span className="verified-badge">✦ Verified</span> : null}
+                    </h5>
+                    <small>★ {listing.owner_rating} · {listing.owner_reviews} reviews · {listing.owner_location}</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <Footer />
+        </div>
+      );
+    };
+
+    // ── BOOKING PAGE ──
+    const BookingPage = ({ listingId, searchParams }) => {
+      const params = new URLSearchParams(searchParams);
+      const startDate = params.get('start') || '';
+      const endDate = params.get('end') || '';
+      const days = parseInt(params.get('days') || '0');
+      const total = parseFloat(params.get('total') || '0');
+
+      const [listing, setListing] = useState(null);
+      const [name, setName] = useState('');
+      const [email, setEmail] = useState('');
+      const [message, setMessage] = useState('');
+      const [confirmed, setConfirmed] = useState(false);
+      const [loading, setLoading] = useState(false);
+
+      useEffect(() => {
+        fetch(`/api/listings/${listingId}`).then(r => r.json()).then(setListing);
+        window.scrollTo(0, 0);
+      }, [listingId]);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!name || !email) return;
+        setLoading(true);
+        try {
+          const res = await fetch('/api/bookings', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+              listing_id: listingId, renter_name: name, renter_email: email,
+              message, start_date: startDate, end_date: endDate, total_amount: total
+            })
+          });
+          if (res.ok) setConfirmed(true);
+        } catch (err) { console.error(err); }
+        setLoading(false);
+      };
+
+      if (confirmed) return (
+        <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
+          <div className="confirmation-state">
+            <div className="check">✓</div>
+            <h2>Booking Confirmed</h2>
+            <p>Your reservation has been sent to the owner. You'll receive a confirmation to <strong>{email}</strong> once they accept.</p>
+            <p style={{marginBottom:'2rem',fontSize:'0.82rem',color:'var(--champagne-dim)'}}>Booking reference: VEL-{Date.now().toString().slice(-6)}</p>
+            <div style={{display:'flex',gap:'1rem',justifyContent:'center'}}>
+              <a href="#/" className="btn btn-outline">Return Home</a>
+              <a href="#/browse" className="btn btn-gold">Continue Browsing</a>
+            </div>
+          </div>
+        </div>
+      );
+
+      return (
+        <div>
+          <div className="page-header">
+            <div className="container">
+              <div className="breadcrumb"><a href="#/">Home</a><span>/</span><a href={`#/listing/${listingId}`}>Listing</a><span>/</span><span>Reserve</span></div>
+              <h1 style={{fontSize:'clamp(1.75rem,3vw,2.5rem)'}}>Complete Your Reservation</h1>
+            </div>
+          </div>
+
+          <div className="container section">
+            <div className="booking-layout">
+              <form onSubmit={handleSubmit}>
+                <h3 style={{marginBottom:'1.5rem',fontSize:'1.2rem'}}>Your Details</h3>
+
+                <div className="grid-2" style={{marginBottom:'1.25rem'}}>
+                  <div className="form-group" style={{marginBottom:0}}>
+                    <label className="form-label">Full Name</label>
+                    <input className="form-input" value={name} onChange={e => setName(e.target.value)} required placeholder="Your full name" />
+                  </div>
+                  <div className="form-group" style={{marginBottom:0}}>
+                    <label className="form-label">Email Address</label>
+                    <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="your@email.com" />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Message to Owner (optional)</label>
+                  <textarea className="form-textarea" value={message} onChange={e => setMessage(e.target.value)} placeholder="Introduce yourself and share the occasion…" />
+                </div>
+
+                <h3 style={{marginBottom:'1.25rem',marginTop:'2rem',fontSize:'1.2rem'}}>Payment</h3>
+                <div className="payment-placeholder">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                  Payment processing powered by Stripe — coming soon. No card required to reserve.
+                </div>
+
+                <button type="submit" className="btn btn-gold btn-lg" style={{width:'100%'}} disabled={loading || !name || !email}>
+                  {loading ? 'Processing…' : 'Confirm Reservation'}
+                </button>
+                <p style={{fontSize:'0.75rem',color:'var(--champagne-dim)',textAlign:'center',marginTop:'0.75rem'}}>
+                  Your reservation is not charged until the owner accepts. Free to cancel within 24 hours.
+                </p>
+              </form>
+
+              {/* Summary Sidebar */}
+              <div className="booking-summary">
+                <h4>Booking Summary</h4>
+                {listing && (
+                  <>
+                    <div style={{background:'var(--obsidian-3)',padding:'1rem',marginBottom:'1rem',display:'flex',gap:'0.875rem',alignItems:'center'}}>
+                      <div style={{fontSize:'2.5rem',width:'56px',height:'56px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                        {getItemVisual(listing.images)}
+                      </div>
+                      <div>
+                        <div style={{fontSize:'0.68rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.2rem'}}>{listing.brand}</div>
+                        <div style={{fontFamily:'Cormorant Garamond',fontSize:'0.95rem',color:'var(--champagne)'}}>{listing.title}</div>
+                      </div>
+                    </div>
+                    <div className="pricing-row"><span className="pl">Rental period</span><span className="pv">{days} day{days !== 1 ? 's' : ''}</span></div>
+                    <div className="pricing-row"><span className="pl">{startDate} → {endDate}</span></div>
+                    <div className="pricing-row"><span className="pl">Daily rate</span><span className="pv">£{listing.daily_rate}/day</span></div>
+                    <div className="pricing-row"><span className="pl">Subtotal</span><span className="pv">£{(days * listing.daily_rate).toFixed(2)}</span></div>
+                    <div className="pricing-row"><span className="pl">Service fee (15%)</span><span className="pv">£{(days * listing.daily_rate * 0.15).toFixed(2)}</span></div>
+                    <div className="pricing-row pricing-total"><span className="pl">Total</span><span className="pv">£{total.toFixed(2)}</span></div>
+                  </>
+                )}
+                <div style={{marginTop:'1rem',padding:'0.75rem',background:'rgba(200,155,50,0.05)',border:'1px solid var(--border)',fontSize:'0.75rem',color:'var(--champagne-dim)'}}>
+                  ✦ Protected by Velier's buyer guarantee
+                </div>
+              </div>
+            </div>
+          </div>
+          <Footer />
+        </div>
+      );
+    };
+
+    // ── LIST AN ITEM PAGE ──
+    const ListPage = () => {
+      const [step, setStep] = useState(1);
+      const [form, setForm] = useState({
+        title: '', brand: '', category: 'Bags', description: '',
+        daily_rate: '', condition: 'Excellent', colour: '', size: '',
+        owner_name: '', owner_email: ''
+      });
+      const [submitted, setSubmitted] = useState(false);
+
+      const brands = ['Prada', 'Gucci', 'Chanel', 'Hermès', 'Bottega Veneta', 'Valentino', 'Rolex', 'Audemars Piguet', 'Cartier', 'Saint Laurent', 'Louboutin', 'Alexander McQueen', 'Other'];
+      const categories = ['Bags', 'Watches', 'Dresses', 'Jewellery', 'Shoes', 'Other'];
+      const conditions = ['Like New', 'Excellent', 'Very Good', 'Good'];
+
+      const set = (k, v) => setForm(f => ({...f, [k]: v}));
+
+      const estimatedMonthly = form.daily_rate ? Math.round(parseFloat(form.daily_rate) * 3 * 0.80) : 0;
+
+      const handleSubmit = async () => {
+        try {
+          const res = await fetch('/api/submit-listing', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(form)
+          });
+          if (res.ok) setSubmitted(true);
+        } catch (err) { console.error(err); }
+      };
+
+      useEffect(() => { window.scrollTo(0, 0); }, []);
+
+      const steps = ['Details', 'Pricing', 'Photos', 'Review'];
+
+      if (submitted) return (
+        <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
+          <div className="confirmation-state">
+            <div className="check">✓</div>
+            <h2>Listing Submitted</h2>
+            <p>We'll review your piece and get it live on the platform within 24 hours. Our team will be in touch at <strong>{form.owner_email}</strong>.</p>
+            <div style={{display:'flex',gap:'1rem',justifyContent:'center',marginTop:'2rem'}}>
+              <a href="#/" className="btn btn-outline">Return Home</a>
+              <a href="#/browse" className="btn btn-gold">Browse the Collection</a>
+            </div>
+          </div>
+        </div>
+      );
+
+      return (
+        <div>
+          <div className="page-header">
+            <div className="container">
+              <div className="breadcrumb"><a href="#/">Home</a><span>/</span><span>List an Item</span></div>
+              <h1 style={{fontSize:'clamp(1.75rem,3vw,2.5rem)'}}>List Your Piece</h1>
+              <p style={{marginTop:'0.5rem'}}>Turn your wardrobe into income. Join thousands of lenders earning from their luxury pieces.</p>
+            </div>
+          </div>
+
+          <div className="container section" style={{maxWidth:'760px',margin:'0 auto'}}>
+            {/* Wizard Steps */}
+            <div className="wizard-steps">
+              {steps.map((s, i) => (
+                <React.Fragment key={s}>
+                  {i > 0 && <div className={`wizard-connector ${i < step ? 'done' : ''}`}></div>}
+                  <div className="wizard-step-item">
+                    <div className={`step-dot ${step === i+1 ? 'active' : step > i+1 ? 'done' : ''}`}>
+                      {step > i+1 ? '✓' : i+1}
+                    </div>
+                    <span className={`step-label ${step === i+1 ? 'active' : ''}`}>{s}</span>
+                  </div>
+                </React.Fragment>
+              ))}
+            </div>
+
+            {/* Step 1: Details */}
+            {step === 1 && (
+              <div>
+                <h3 style={{marginBottom:'1.5rem'}}>Item Details</h3>
+                <div className="form-group">
+                  <label className="form-label">Item Title *</label>
+                  <input className="form-input" value={form.title} onChange={e => set('title', e.target.value)} placeholder="e.g. Chanel Classic Double Flap Bag" />
+                </div>
+                <div className="grid-2">
+                  <div className="form-group">
+                    <label className="form-label">Brand *</label>
+                    <select className="form-select" value={form.brand} onChange={e => set('brand', e.target.value)}>
+                      <option value="">Select brand</option>
+                      {brands.map(b => <option key={b}>{b}</option>)}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Category *</label>
+                    <select className="form-select" value={form.category} onChange={e => set('category', e.target.value)}>
+                      {categories.map(c => <option key={c}>{c}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div className="grid-2">
+                  <div className="form-group">
+                    <label className="form-label">Colour</label>
+                    <input className="form-input" value={form.colour} onChange={e => set('colour', e.target.value)} placeholder="e.g. Black, Ivory" />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Size / Dimensions</label>
+                    <input className="form-input" value={form.size} onChange={e => set('size', e.target.value)} placeholder="e.g. Medium, UK 10, 30cm" />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Condition *</label>
+                  <div style={{display:'flex',gap:'0.5rem',flexWrap:'wrap'}}>
+                    {conditions.map(c => (
+                      <button key={c} type="button"
+                        className={`btn btn-sm ${form.condition === c ? 'btn-gold' : 'btn-outline'}`}
+                        onClick={() => set('condition', c)}>
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Description</label>
+                  <textarea className="form-textarea" value={form.description} onChange={e => set('description', e.target.value)} placeholder="Describe the piece — its history, provenance, any notable features…" style={{minHeight:'120px'}} />
+                </div>
+                <button className="btn btn-gold" style={{width:'100%'}} onClick={() => setStep(2)} disabled={!form.title || !form.brand}>
+                  Continue to Pricing →
+                </button>
+              </div>
+            )}
+
+            {/* Step 2: Pricing */}
+            {step === 2 && (
+              <div>
+                <h3 style={{marginBottom:'1.5rem'}}>Set Your Price</h3>
+                <div className="form-group">
+                  <label className="form-label">Daily Rental Rate (£) *</label>
+                  <input className="form-input" type="number" value={form.daily_rate} onChange={e => set('daily_rate', e.target.value)} placeholder="e.g. 95" min="1" />
+                </div>
+
+                {form.daily_rate && (
+                  <div className="estimator">
+                    <h5>Estimated Earnings</h5>
+                    <div className="estimate-value">£{estimatedMonthly}</div>
+                    <div className="estimate-sub">per month at 3 rentals/month (80% your share)</div>
+                    <div style={{height:'1px',background:'var(--border)',margin:'1rem 0'}}></div>
+                    <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.78rem',color:'var(--champagne-dim)'}}>
+                      <span>Daily rate</span><span>£{form.daily_rate}</span>
+                    </div>
+                    <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.78rem',color:'var(--champagne-dim)'}}>
+                      <span>Velier fee (20%)</span><span>£{(parseFloat(form.daily_rate) * 0.2).toFixed(2)}</span>
+                    </div>
+                    <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.78rem',color:'var(--gold)'}}>
+                      <span>Your daily earnings</span><span>£{(parseFloat(form.daily_rate) * 0.8).toFixed(2)}</span>
+                    </div>
+                  </div>
+                )}
+
+                <div style={{background:'var(--obsidian-3)',border:'1px solid var(--border)',padding:'1rem',marginBottom:'1.25rem',fontSize:'0.8rem',color:'var(--champagne-dim)'}}>
+                  <strong style={{color:'var(--champagne)',display:'block',marginBottom:'0.25rem'}}>Pricing Guide</strong>
+                  Bags: £50–£450/day · Watches: £100–£400/day · Dresses: £80–£200/day · Jewellery: £100–£200/day
+                </div>
+
+                <div style={{display:'flex',gap:'0.75rem'}}>
+                  <button className="btn btn-outline" onClick={() => setStep(1)}>← Back</button>
+                  <button className="btn btn-gold" style={{flex:1}} onClick={() => setStep(3)} disabled={!form.daily_rate}>Continue to Photos →</button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Photos */}
+            {step === 3 && (
+              <div>
+                <h3 style={{marginBottom:'1.5rem'}}>Upload Photos</h3>
+                <div style={{border:'2px dashed var(--border-hover)',padding:'3rem 2rem',textAlign:'center',marginBottom:'1.25rem',cursor:'pointer',transition:'all 0.2s'}}
+                  onMouseEnter={e => e.target.style.borderColor='var(--gold-dim)'}
+                  onMouseLeave={e => e.target.style.borderColor='var(--border-hover)'}>
+                  <div style={{fontSize:'2.5rem',marginBottom:'1rem'}}>📷</div>
+                  <h4 style={{fontFamily:'Cormorant Garamond',fontWeight:400,marginBottom:'0.5rem'}}>Drag & drop your photos here</h4>
+                  <p style={{fontSize:'0.82rem',marginBottom:'1rem'}}>Upload up to 8 high-quality photos. Include front, back, interior, and detail shots.</p>
+                  <button className="btn btn-outline btn-sm">Browse Files</button>
+                </div>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'0.5rem',marginBottom:'1.25rem'}}>
+                  {[1,2,3,4].map(i => (
+                    <div key={i} style={{aspectRatio:1,background:'var(--obsidian-3)',border:'1px dashed var(--border)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.5rem',color:'var(--champagne-dim)',opacity:0.5}}>+</div>
+                  ))}
+                </div>
+                <p style={{fontSize:'0.78rem',color:'var(--champagne-dim)',marginBottom:'1.5rem'}}>
+                  ✦ Professional photography tip: Natural light, neutral background, multiple angles. Higher quality photos get 3× more bookings.
+                </p>
+                <div style={{display:'flex',gap:'0.75rem'}}>
+                  <button className="btn btn-outline" onClick={() => setStep(2)}>← Back</button>
+                  <button className="btn btn-gold" style={{flex:1}} onClick={() => setStep(4)}>Continue to Review →</button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Review */}
+            {step === 4 && (
+              <div>
+                <h3 style={{marginBottom:'1.5rem'}}>Review & Submit</h3>
+                <div style={{background:'var(--obsidian-2)',border:'1px solid var(--border)',padding:'1.5rem',marginBottom:'1.5rem'}}>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem'}}>
+                    {[
+                      ['Title', form.title],['Brand', form.brand],['Category', form.category],
+                      ['Condition', form.condition],['Colour', form.colour],['Size', form.size],
+                      ['Daily Rate', form.daily_rate ? `£${form.daily_rate}` : '—']
+                    ].map(([k,v]) => (
+                      <div key={k}>
+                        <div style={{fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--champagne-dim)',marginBottom:'0.2rem'}}>{k}</div>
+                        <div style={{fontSize:'0.9rem',color:'var(--champagne)'}}>{v || '—'}</div>
+                      </div>
+                    ))}
+                  </div>
+                  {form.description && <div style={{marginTop:'1rem',paddingTop:'1rem',borderTop:'1px solid var(--border)'}}><div style={{fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--champagne-dim)',marginBottom:'0.4rem'}}>Description</div><p style={{fontSize:'0.85rem',lineHeight:1.65}}>{form.description}</p></div>}
+                </div>
+
+                <h3 style={{marginBottom:'1rem',fontSize:'1.1rem'}}>Your Details</h3>
+                <div className="grid-2" style={{marginBottom:'1.25rem'}}>
+                  <div className="form-group" style={{marginBottom:0}}>
+                    <label className="form-label">Your Name *</label>
+                    <input className="form-input" value={form.owner_name} onChange={e => set('owner_name', e.target.value)} placeholder="Your full name" />
+                  </div>
+                  <div className="form-group" style={{marginBottom:0}}>
+                    <label className="form-label">Email Address *</label>
+                    <input className="form-input" type="email" value={form.owner_email} onChange={e => set('owner_email', e.target.value)} placeholder="your@email.com" />
+                  </div>
+                </div>
+
+                <div style={{background:'rgba(200,155,50,0.05)',border:'1px solid rgba(200,155,50,0.15)',padding:'0.875rem',marginBottom:'1.25rem',fontSize:'0.78rem',color:'var(--champagne-dim)'}}>
+                  By submitting, you agree to Velier's Lender Terms and confirm this item belongs to you and is accurately described.
+                </div>
+
+                <div style={{display:'flex',gap:'0.75rem'}}>
+                  <button className="btn btn-outline" onClick={() => setStep(3)}>← Back</button>
+                  <button className="btn btn-gold" style={{flex:1}} onClick={handleSubmit} disabled={!form.owner_name || !form.owner_email}>
+                    Submit for Review
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+          <Footer />
+        </div>
+      );
+    };
+
+    // ── MAIN APP ──
+    const App = () => {
+      const hash = useHash();
+      const [wishlist, setWishlist] = useState(() => {
+        try { return JSON.parse(localStorage.getItem('velier_wishlist') || '[]'); } catch { return []; }
+      });
+      const [toast, setToast] = useState(null);
+
+      useEffect(() => {
+        localStorage.setItem('velier_wishlist', JSON.stringify(wishlist));
+      }, [wishlist]);
+
+      const handleWishlistToggle = useCallback((id) => {
+        setWishlist(prev =>
+          prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+        );
+      }, []);
+
+      const showToast = useCallback((msg) => {
+        setToast(msg);
+      }, []);
+
+      // Parse route
+      let page = 'home';
+      let listingId = null;
+      let bookingId = null;
+      let bookingSearch = '';
+
+      if (hash.startsWith('#/listing/')) {
+        page = 'listing';
+        listingId = hash.replace('#/listing/', '').split('?')[0];
+      } else if (hash.startsWith('#/booking/')) {
+        page = 'booking';
+        const rest = hash.replace('#/booking/', '');
+        bookingId = rest.split('?')[0];
+        bookingSearch = rest.includes('?') ? rest.split('?')[1] : '';
+      } else if (hash.startsWith('#/browse')) {
+        page = 'browse';
+      } else if (hash.startsWith('#/list')) {
+        page = 'list';
+      }
+
+      return (
+        <div>
+          <Nav wishlistCount={wishlist.length} />
+          <main style={{paddingTop: page === 'home' ? '0' : '0'}}>
+            {page === 'home' && <HomePage wishlist={wishlist} onWishlistToggle={handleWishlistToggle} onToast={showToast} />}
+            {page === 'browse' && <BrowsePage wishlist={wishlist} onWishlistToggle={handleWishlistToggle} />}
+            {page === 'listing' && <ListingDetailPage id={listingId} wishlist={wishlist} onWishlistToggle={handleWishlistToggle} onToast={showToast} />}
+            {page === 'booking' && <BookingPage listingId={bookingId} searchParams={bookingSearch} />}
+            {page === 'list' && <ListPage />}
+          </main>
+          {toast && <Toast message={toast} onClose={() => setToast(null)} />}
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
