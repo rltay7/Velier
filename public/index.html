@@ -615,8 +615,8 @@
             </a>
             <ul className="nav-links">
               <li><a href="#/browse" style={isActive('#/browse') ? {color:'var(--champagne)'} : {}}>Explore</a></li>
-              <li><a href="#/browse#bags" onClick={() => setTimeout(() => navigate('#/browse?category=Bags'), 10)}>Bags</a></li>
               <li><a href="#/browse?category=Watches">Watches</a></li>
+              <li><a href="#/browse#bags" onClick={() => setTimeout(() => navigate('#/browse?category=Bags'), 10)}>Bags</a></li>
               <li><a href="#/browse?category=Dresses">Dresses</a></li>
               <li><a href="#/browse?category=Jewellery">Jewellery</a></li>
             </ul>
@@ -633,8 +633,8 @@
           <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
             <a href="#/" onClick={() => setMenuOpen(false)}>Home</a>
             <a href="#/browse" onClick={() => setMenuOpen(false)}>Explore</a>
-            <a href="#/browse?category=Bags" onClick={() => setMenuOpen(false)}>Bags</a>
             <a href="#/browse?category=Watches" onClick={() => setMenuOpen(false)}>Watches</a>
+            <a href="#/browse?category=Bags" onClick={() => setMenuOpen(false)}>Bags</a>
             <a href="#/browse?category=Dresses" onClick={() => setMenuOpen(false)}>Dresses</a>
             <a href="#/list" onClick={() => setMenuOpen(false)}>List an Item</a>
           </div>
@@ -657,8 +657,8 @@
             <div className="footer-col">
               <h5>Discover</h5>
               <ul>
-                <li><a href="#/browse?category=Bags">Bags</a></li>
                 <li><a href="#/browse?category=Watches">Watches</a></li>
+                <li><a href="#/browse?category=Bags">Bags</a></li>
                 <li><a href="#/browse?category=Dresses">Dresses</a></li>
                 <li><a href="#/browse?category=Jewellery">Jewellery</a></li>
                 <li><a href="#/browse?category=Shoes">Shoes</a></li>
@@ -719,7 +719,7 @@
             {listing.location && <div style={{fontSize:'0.72rem',color:'var(--champagne-dim)',marginBottom:'0.4rem',letterSpacing:'0.04em'}}>{listing.location}</div>}
             <div className="card-meta">
               <div className="card-price">
-                £{listing.daily_rate}<span>/day</span>
+                ${listing.daily_rate}<span>/day</span>
               </div>
               <div className="card-rating">
                 <span className="star">★</span>
@@ -876,12 +876,12 @@
                   </div>
                   <div className="earnings-preview">
                     <h4>Estimated Monthly Earnings</h4>
-                    <div className="earnings-row"><span className="label">Chanel Classic Flap (3 rentals)</span><span className="value">£585</span></div>
-                    <div className="earnings-row"><span className="label">Rolex Datejust (4 rentals)</span><span className="value">£1,000</span></div>
-                    <div className="earnings-row"><span className="label">Hermès Birkin (2 rentals)</span><span className="value">£900</span></div>
+                    <div className="earnings-row"><span className="label">Chanel Classic Flap (3 rentals)</span><span className="value">$585</span></div>
+                    <div className="earnings-row"><span className="label">Rolex Datejust (4 rentals)</span><span className="value">$1,000</span></div>
+                    <div className="earnings-row"><span className="label">Hermès Birkin (2 rentals)</span><span className="value">$900</span></div>
                     <div className="earnings-row" style={{paddingTop:'0.75rem',marginTop:'0.25rem',borderTop:'1px solid var(--border)'}}>
                       <span className="label" style={{color:'var(--champagne)',fontWeight:500}}>Total Potential</span>
-                      <span className="value" style={{fontSize:'2rem'}}>£2,485<span style={{fontSize:'0.8rem',color:'var(--champagne-dim)'}}>/mo</span></span>
+                      <span className="value" style={{fontSize:'2rem'}}>$2,485<span style={{fontSize:'0.8rem',color:'var(--champagne-dim)'}}>/mo</span></span>
                     </div>
                   </div>
                 </div>
@@ -1132,9 +1132,9 @@
                   </div>
                   {days > 0 && (
                     <>
-                      <div className="pricing-row"><span className="pl">£{listing.daily_rate}/day × {days} days</span><span className="pv">£{subtotal.toFixed(2)}</span></div>
-                      <div className="pricing-row"><span className="pl">Service fee (15%)</span><span className="pv">£{serviceFee.toFixed(2)}</span></div>
-                      <div className="pricing-row pricing-total"><span className="pl">Total</span><span className="pv">£{total.toFixed(2)}</span></div>
+                      <div className="pricing-row"><span className="pl">${listing.daily_rate}/day × {days} days</span><span className="pv">${subtotal.toFixed(2)}</span></div>
+                      <div className="pricing-row"><span className="pl">Service fee (15%)</span><span className="pv">${serviceFee.toFixed(2)}</span></div>
+                      <div className="pricing-row pricing-total"><span className="pl">Total</span><span className="pv">${total.toFixed(2)}</span></div>
                     </>
                   )}
                   {!days && <p style={{fontSize:'0.8rem',color:'var(--champagne-dim)',marginBottom:'0.5rem',textAlign:'center'}}>Select dates to calculate total</p>}
@@ -1278,10 +1278,10 @@
                     </div>
                     <div className="pricing-row"><span className="pl">Rental period</span><span className="pv">{days} day{days !== 1 ? 's' : ''}</span></div>
                     <div className="pricing-row"><span className="pl">{startDate} → {endDate}</span></div>
-                    <div className="pricing-row"><span className="pl">Daily rate</span><span className="pv">£{listing.daily_rate}/day</span></div>
-                    <div className="pricing-row"><span className="pl">Subtotal</span><span className="pv">£{(days * listing.daily_rate).toFixed(2)}</span></div>
-                    <div className="pricing-row"><span className="pl">Service fee (15%)</span><span className="pv">£{(days * listing.daily_rate * 0.15).toFixed(2)}</span></div>
-                    <div className="pricing-row pricing-total"><span className="pl">Total</span><span className="pv">£{total.toFixed(2)}</span></div>
+                    <div className="pricing-row"><span className="pl">Daily rate</span><span className="pv">${listing.daily_rate}/day</span></div>
+                    <div className="pricing-row"><span className="pl">Subtotal</span><span className="pv">${(days * listing.daily_rate).toFixed(2)}</span></div>
+                    <div className="pricing-row"><span className="pl">Service fee (15%)</span><span className="pv">${(days * listing.daily_rate * 0.15).toFixed(2)}</span></div>
+                    <div className="pricing-row pricing-total"><span className="pl">Total</span><span className="pv">${total.toFixed(2)}</span></div>
                   </>
                 )}
                 <div style={{marginTop:'1rem',padding:'0.75rem',background:'rgba(200,155,50,0.05)',border:'1px solid var(--border)',fontSize:'0.75rem',color:'var(--champagne-dim)'}}>
@@ -1427,31 +1427,31 @@
               <div>
                 <h3 style={{marginBottom:'1.5rem'}}>Set Your Price</h3>
                 <div className="form-group">
-                  <label className="form-label">Daily Rental Rate (£) *</label>
+                  <label className="form-label">Daily Rental Rate ($) *</label>
                   <input className="form-input" type="number" value={form.daily_rate} onChange={e => set('daily_rate', e.target.value)} placeholder="e.g. 95" min="1" />
                 </div>
 
                 {form.daily_rate && (
                   <div className="estimator">
                     <h5>Estimated Earnings</h5>
-                    <div className="estimate-value">£{estimatedMonthly}</div>
+                    <div className="estimate-value">${estimatedMonthly}</div>
                     <div className="estimate-sub">per month at 3 rentals/month (80% your share)</div>
                     <div style={{height:'1px',background:'var(--border)',margin:'1rem 0'}}></div>
                     <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.78rem',color:'var(--champagne-dim)'}}>
-                      <span>Daily rate</span><span>£{form.daily_rate}</span>
+                      <span>Daily rate</span><span>${form.daily_rate}</span>
                     </div>
                     <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.78rem',color:'var(--champagne-dim)'}}>
-                      <span>Velier fee (20%)</span><span>£{(parseFloat(form.daily_rate) * 0.2).toFixed(2)}</span>
+                      <span>Velier fee (20%)</span><span>${(parseFloat(form.daily_rate) * 0.2).toFixed(2)}</span>
                     </div>
                     <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.78rem',color:'var(--gold)'}}>
-                      <span>Your daily earnings</span><span>£{(parseFloat(form.daily_rate) * 0.8).toFixed(2)}</span>
+                      <span>Your daily earnings</span><span>${(parseFloat(form.daily_rate) * 0.8).toFixed(2)}</span>
                     </div>
                   </div>
                 )}
 
                 <div style={{background:'var(--obsidian-3)',border:'1px solid var(--border)',padding:'1rem',marginBottom:'1.25rem',fontSize:'0.8rem',color:'var(--champagne-dim)'}}>
                   <strong style={{color:'var(--champagne)',display:'block',marginBottom:'0.25rem'}}>Pricing Guide</strong>
-                  Bags: £50–£450/day · Watches: £100–£400/day · Dresses: £80–£200/day · Jewellery: £100–£200/day
+                  Bags: $50–$450/day · Watches: $100–$400/day · Dresses: $80–$200/day · Jewellery: $100–$200/day
                 </div>
 
                 <div style={{display:'flex',gap:'0.75rem'}}>
@@ -1497,7 +1497,7 @@
                     {[
                       ['Title', form.title],['Brand', form.brand],['Category', form.category],
                       ['Condition', form.condition],['Colour', form.colour],['Size', form.size],
-                      ['Daily Rate', form.daily_rate ? `£${form.daily_rate}` : '—']
+                      ['Daily Rate', form.daily_rate ? `$${form.daily_rate}` : '—']
                     ].map(([k,v]) => (
                       <div key={k}>
                         <div style={{fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--champagne-dim)',marginBottom:'0.2rem'}}>{k}</div>
