@@ -228,15 +228,15 @@
     .hero-sub { max-width: 500px; margin: 0 auto 2.5rem; font-size: 1rem; color: var(--champagne-dim); line-height: 1.7; }
     .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
     .hero-scroll {
-      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
       display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
       font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
       color: var(--champagne-dim); animation: bounce 2s infinite;
+      margin-top: 2.5rem;
     }
     .hero-scroll svg { width: 18px; height: 18px; }
     @keyframes bounce {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50% { transform: translateX(-50%) translateY(6px); }
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px); }
     }
 
     /* ── SECTIONS ── */
