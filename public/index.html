@@ -383,6 +383,13 @@
     .pricing-total { border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 0.75rem; }
     .pricing-total .pl { font-weight: 500; color: var(--champagne); }
     .pricing-total .pv { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; color: var(--gold); }
+    .rate-schedule { margin-bottom: 1.25rem; border: 1px solid var(--border); }
+    .rate-schedule-title { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--champagne-dim); padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--border); }
+    .rate-row { display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 0.85rem; border-bottom: 1px solid var(--border); }
+    .rate-row:last-child { border-bottom: none; }
+    .rate-row-label { font-size: 0.82rem; color: var(--champagne-dim); }
+    .rate-row-price { font-size: 0.9rem; color: var(--champagne); font-family: 'Cormorant Garamond', serif; }
+    .rate-row-save { font-size: 0.68rem; color: var(--gold); letter-spacing: 0.05em; margin-left: 0.5rem; }
     .date-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem; }
     .date-input { background: var(--obsidian-4); border: 1px solid var(--border); padding: 0.65rem 0.75rem; color: var(--champagne); font-family: 'Switzer', sans-serif; font-size: 0.82rem; width: 100%; outline: none; transition: border-color 0.2s; }
     .date-input:focus { border-color: var(--gold-dim); }
@@ -1121,7 +1128,13 @@
       if (!listing) return <div className="empty-state" style={{marginTop:'5rem'}}><h3>Piece Not Found</h3><p>This listing may no longer be available</p><a href="#/browse" className="btn btn-outline">Back to Collection</a></div>;
 
       const inWishlist = wishlist.includes(listing.id);
-      const subtotal = days * listing.daily_rate;
+      const effectiveRate = listing && days >= 30 && listing.monthly_rate
+        ? listing.monthly_rate / 30
+        : listing && days >= 7 && listing.weekly_rate
+          ? listing.weekly_rate / 7
+          : listing ? listing.daily_rate : 0;
+      const subtotal = days * effectiveRate;
+      const rateLabel = days >= 30 ? 'monthly' : days >= 7 ? 'weekly' : 'daily';
       const serviceFee = subtotal * 0.15;
       const total = subtotal + serviceFee;
       const imgUrl = getItemVisual(listing);
@@ -1187,6 +1200,27 @@
 
                 <p style={{marginBottom:'1.5rem',fontSize:'0.88rem',lineHeight:1.75,color:'var(--champagne-dim)'}}>{listing.description}</p>
 
+                {/* Rate Schedule */}
+                <div className="rate-schedule">
+                  <div className="rate-schedule-title">Hire Rates</div>
+                  <div className="rate-row">
+                    <span className="rate-row-label">Daily</span>
+                    <span className="rate-row-price">${listing.daily_rate}<span style={{fontSize:'0.72rem',color:'var(--champagne-dim)',marginLeft:'2px'}}>/day</span></span>
+                  </div>
+                  <div className="rate-row">
+                    <span className="rate-row-label">Weekly <span className="rate-row-save">7+ days</span></span>
+                    <span className="rate-row-price">${listing.weekly_rate}<span style={{fontSize:'0.72rem',color:'var(--champagne-dim)',marginLeft:'2px'}}>/week</span>
+                      <span className="rate-row-save" style={{marginLeft:'0.4rem'}}>Save {Math.round((1 - listing.weekly_rate/(listing.daily_rate*7))*100)}%</span>
+                    </span>
+                  </div>
+                  <div className="rate-row">
+                    <span className="rate-row-label">Monthly <span className="rate-row-save">30+ days</span></span>
+                    <span className="rate-row-price">${listing.monthly_rate}<span style={{fontSize:'0.72rem',color:'var(--champagne-dim)',marginLeft:'2px'}}>/month</span>
+                      <span className="rate-row-save" style={{marginLeft:'0.4rem'}}>Save {Math.round((1 - listing.monthly_rate/(listing.daily_rate*30))*100)}%</span>
+                    </span>
+                  </div>
+                </div>
+
                 {/* Pricing calculator */}
                 <div className="pricing-box">
                   <h4>Reserve This Piece</h4>
@@ -1196,7 +1230,7 @@
                   </div>
                   {days > 0 && (
                     <>
-                      <div className="pricing-row"><span className="pl">${listing.daily_rate}/day × {days} days</span><span className="pv">${subtotal.toFixed(2)}</span></div>
+                      <div className="pricing-row"><span className="pl">${effectiveRate.toFixed(0)}/day ({rateLabel} rate) × {days} days</span><span className="pv">${subtotal.toFixed(2)}</span></div>
                       <div className="pricing-row"><span className="pl">Service fee (15%)</span><span className="pv">${serviceFee.toFixed(2)}</span></div>
                       <div className="pricing-row pricing-total"><span className="pl">Total</span><span className="pv">${total.toFixed(2)}</span></div>
                     </>
