@@ -1138,19 +1138,17 @@
           </svg>
         )},
         { label: 'Shoes', cat: 'Shoes', icon: (
-          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" width="40" height="40">
-            {/* Pointed toe */}
-            <path d="M3 24 C3 24 1.5 25.5 3 27"/>
-            {/* Bottom sole from toe to heel */}
-            <path d="M3 27 Q5 28.5 10 28.5 L28 28.5"/>
-            {/* Stiletto heel — thin vertical drop */}
-            <line x1="28" y1="28.5" x2="29.5" y2="36" strokeWidth="0.9"/>
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" width="40" height="40">
+            {/* Main upper — pointed toe, sweeping arch, ankle collar */}
+            <path d="M3 26 C3 26 2 27.5 3 29 Q6 31 12 31 L30 31" strokeWidth="1.1"/>
+            {/* Heel stem */}
+            <line x1="30" y1="31" x2="31.5" y2="37.5" strokeWidth="1.1"/>
             {/* Heel base */}
-            <line x1="28" y1="36" x2="33" y2="36" strokeWidth="1.3"/>
-            {/* Upper — sweeping arch from toe to ankle opening */}
-            <path d="M3 24 C5 16 12 11 21 10 C27 9.5 32 12 31 19 L31 28.5"/>
-            {/* Vamp line */}
-            <path d="M3 24 Q8 21 15 21" strokeWidth="0.6" opacity="0.55"/>
+            <line x1="30" y1="37.5" x2="36" y2="37.5" strokeWidth="1.6"/>
+            {/* Shoe upper body */}
+            <path d="M3 26 C4 17 13 10 23 9 C30 8.5 35 12 34 20 L34 31" strokeWidth="1.1"/>
+            {/* Ankle strap detail */}
+            <path d="M27 9.5 C30 7 34 9 34 12" strokeWidth="0.9"/>
           </svg>
         )},
       ];
