@@ -677,6 +677,7 @@
               <li><a href="#/browse#bags" onClick={() => setTimeout(() => navigate('#/browse?category=Bags'), 10)}>Bags</a></li>
               <li><a href="#/browse?category=Dresses">Dresses</a></li>
               <li><a href="#/browse?category=Jewellery">Jewellery</a></li>
+              <li><a href="#/trade" style={isActive('#/trade') ? {color:'var(--champagne)'} : {}}>Exchange</a></li>
               <li><a href="#how-it-works" onClick={(e) => { e.preventDefault(); navigate('#/'); setTimeout(() => { const el = document.getElementById('how-it-works'); if(el) el.scrollIntoView({behavior:'smooth'}); }, 50); }}>How It Works</a></li>
             </ul>
             <div className="nav-actions">
@@ -695,6 +696,7 @@
             <a href="#/browse?category=Watches" onClick={() => setMenuOpen(false)}>Watches</a>
             <a href="#/browse?category=Bags" onClick={() => setMenuOpen(false)}>Bags</a>
             <a href="#/browse?category=Dresses" onClick={() => setMenuOpen(false)}>Dresses</a>
+            <a href="#/trade" onClick={() => setMenuOpen(false)}>Exchange</a>
             <a href="#how-it-works" onClick={(e) => { e.preventDefault(); setMenuOpen(false); navigate('#/'); setTimeout(() => { const el = document.getElementById('how-it-works'); if(el) el.scrollIntoView({behavior:'smooth'}); }, 80); }}>How It Works</a>
             <a href="#/list" onClick={() => setMenuOpen(false)}>List an Item</a>
           </div>
