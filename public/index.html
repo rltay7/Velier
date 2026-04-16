@@ -263,6 +263,56 @@
     .category-tile .cat-label { font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--champagne-dim); }
     .category-tile:hover .cat-label { color: var(--champagne); }
 
+
+    /* ── TRADE PAGE ── */
+    .trade-hero { padding: 5rem 0 3rem; background: linear-gradient(180deg, var(--obsidian-2) 0%, var(--obsidian) 100%); border-bottom: 1px solid var(--border); text-align: center; }
+    .trade-hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 300; color: var(--champagne); margin-bottom: 0.75rem; }
+    .trade-hero p { color: var(--champagne-dim); max-width: 520px; margin: 0 auto 2rem; font-size: 0.9rem; line-height: 1.7; }
+    .trade-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+    .trade-card { background: var(--obsidian-2); border: 1px solid var(--border); padding: 1.5rem; transition: border-color 0.2s, transform 0.2s; }
+    .trade-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+    .trade-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .trade-badge { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold-dim); padding: 0.2rem 0.55rem; }
+    .trade-item-img { width: 100%; height: 180px; background: var(--obsidian-3); background-size: cover; background-position: center; margin-bottom: 1rem; }
+    .trade-item-title { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; color: var(--champagne); margin-bottom: 0.25rem; }
+    .trade-item-meta { font-size: 0.75rem; color: var(--champagne-dim); margin-bottom: 0.75rem; }
+    .trade-value { font-size: 0.8rem; color: var(--champagne-dim); margin-bottom: 1rem; }
+    .trade-value strong { color: var(--gold); font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; }
+    .trade-seeking { font-size: 0.75rem; color: var(--champagne-dim); padding: 0.6rem 0.75rem; border: 1px solid var(--border); margin-bottom: 1rem; line-height: 1.5; }
+    .trade-seeking span { color: var(--champagne); }
+    .trade-fee-info { background: var(--obsidian-3); border: 1px solid var(--border); padding: 1.25rem 1.5rem; margin-bottom: 2.5rem; }
+    .trade-fee-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center; }
+    .trade-fee-item .tfi-val { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; color: var(--gold); }
+    .trade-fee-item .tfi-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--champagne-dim); margin-top: 0.25rem; }
+
+    /* ── TRUST & SECURITY ── */
+    .trust-section { padding: 4rem 0; background: var(--obsidian-2); border-top: 1px solid var(--border); }
+    .trust-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+    .trust-card { padding: 1.5rem; border: 1px solid var(--border); background: var(--obsidian); }
+    .trust-icon { font-size: 1.4rem; margin-bottom: 0.75rem; opacity: 0.7; }
+    .trust-card h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: var(--champagne); margin-bottom: 0.4rem; font-weight: 400; }
+    .trust-card p { font-size: 0.78rem; color: var(--champagne-dim); line-height: 1.65; }
+
+    /* ── INSURANCE ── */
+    .insurance-box { margin-top: 1.25rem; border: 1px solid var(--border); }
+    .insurance-box-title { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--champagne-dim); padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.4rem; }
+    .insurance-tier { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+    .insurance-tier:last-child { border-bottom: none; }
+    .insurance-tier:hover { background: var(--obsidian-3); }
+    .insurance-tier input[type=radio] { accent-color: var(--gold); margin-top: 2px; flex-shrink: 0; }
+    .insurance-tier-body { flex: 1; }
+    .insurance-tier-name { font-size: 0.82rem; color: var(--champagne); margin-bottom: 0.15rem; }
+    .insurance-tier-desc { font-size: 0.72rem; color: var(--champagne-dim); line-height: 1.5; }
+    .insurance-tier-price { font-size: 0.78rem; color: var(--gold); margin-top: 0.2rem; }
+
+    /* ── ID VERIFICATION BADGE ── */
+    .verified-id-badge { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold-dim); padding: 0.2rem 0.6rem; margin-bottom: 1rem; }
+
+    @media (max-width: 600px) {
+      .trade-fee-grid { grid-template-columns: 1fr; }
+      .trust-grid { grid-template-columns: 1fr 1fr; }
+    }
+
     /* ── BRAND MARQUEE ── */
     .brand-strip {
       padding: 2rem 0;
@@ -667,6 +717,7 @@
             <div className="footer-col">
               <h5>Discover</h5>
               <ul>
+                <li><a href="#/trade">Exchange</a></li>
                 <li><a href="#/browse?category=Watches">Watches</a></li>
                 <li><a href="#/browse?category=Bags">Bags</a></li>
                 <li><a href="#/browse?category=Dresses">Dresses</a></li>
@@ -895,6 +946,50 @@
                     <span className="cat-label">{c.label}</span>
                   </a>
                 ))}
+              </div>
+            </div>
+          </section>
+
+
+          {/* TRUST & SECURITY */}
+          <section className="trust-section">
+            <div className="container">
+              <div className="section-header">
+                <div className="section-label">Protected from Day One</div>
+                <h2>Trust & Security</h2>
+                <p>Every transaction on Velier is backed by multiple layers of verification and protection</p>
+              </div>
+              <div className="trust-grid">
+                <div className="trust-card reveal">
+                  <div className="trust-icon">◈</div>
+                  <h4>ID Verification</h4>
+                  <p>All renters and traders must complete government-issued ID verification via our secure partner before any item is released. No exceptions.</p>
+                </div>
+                <div className="trust-card reveal reveal-delay-1">
+                  <div className="trust-icon">◇</div>
+                  <h4>Security Deposit</h4>
+                  <p>A refundable security deposit of 15–20% of the item's market value is held via Stripe and released automatically upon safe return.</p>
+                </div>
+                <div className="trust-card reveal reveal-delay-2">
+                  <div className="trust-icon">◉</div>
+                  <h4>Condition Reports</h4>
+                  <p>Timestamped photo condition reports are submitted by both parties before handover and on return — creating an irrefutable record.</p>
+                </div>
+                <div className="trust-card reveal reveal-delay-1">
+                  <div className="trust-icon">◈</div>
+                  <h4>Lender Insurance</h4>
+                  <p>Optional insurance covers accidental damage, theft, and loss during the hire period. Choose from three tiers when you list your item.</p>
+                </div>
+                <div className="trust-card reveal reveal-delay-2">
+                  <div className="trust-icon">◇</div>
+                  <h4>Escrow Payments</h4>
+                  <p>Funds are held in escrow until the item is confirmed delivered. Lenders are paid within 24 hours of the rental commencing.</p>
+                </div>
+                <div className="trust-card reveal">
+                  <div className="trust-icon">◉</div>
+                  <h4>Dispute Resolution</h4>
+                  <p>Our in-house concierge team mediates any disputes within 48 hours, with access to all condition reports, photos, and transaction history.</p>
+                </div>
               </div>
             </div>
           </section>
@@ -1198,6 +1293,7 @@
                   <div className="attr-pill"><div className="attr-name">Category</div><div className="attr-val">{listing.category}</div></div>
                 </div>
 
+                <div className="verified-id-badge">◈ ID Verification Required to Reserve</div>
                 <p style={{marginBottom:'1.5rem',fontSize:'0.88rem',lineHeight:1.75,color:'var(--champagne-dim)'}}>{listing.description}</p>
 
                 {/* Rate Schedule */}
@@ -1221,7 +1317,37 @@
                   </div>
                 </div>
 
-                {/* Pricing calculator */}
+
+                {/* Insurance */}
+                <div className="insurance-box">
+                  <div className="insurance-box-title">◈ Lender Insurance</div>
+                  <label className="insurance-tier">
+                    <input type="radio" name="insurance" value="none" defaultChecked />
+                    <div className="insurance-tier-body">
+                      <div className="insurance-tier-name">No Coverage</div>
+                      <div className="insurance-tier-desc">Security deposit only. Renter liable for damage beyond normal wear.</div>
+                      <div className="insurance-tier-price">Included</div>
+                    </div>
+                  </label>
+                  <label className="insurance-tier">
+                    <input type="radio" name="insurance" value="standard" />
+                    <div className="insurance-tier-body">
+                      <div className="insurance-tier-name">Standard Protection</div>
+                      <div className="insurance-tier-desc">Covers accidental damage up to item retail value. Excludes theft and loss.</div>
+                      <div className="insurance-tier-price">+8% of hire total</div>
+                    </div>
+                  </label>
+                  <label className="insurance-tier">
+                    <input type="radio" name="insurance" value="comprehensive" />
+                    <div className="insurance-tier-body">
+                      <div className="insurance-tier-name">Comprehensive Cover</div>
+                      <div className="insurance-tier-desc">Full coverage — accidental damage, theft, and loss. Peace of mind for high-value pieces.</div>
+                      <div className="insurance-tier-price">+14% of hire total</div>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Pricing calculator */
                 <div className="pricing-box">
                   <h4>Reserve This Piece</h4>
                   <div className="date-inputs">
@@ -1674,6 +1800,8 @@
         bookingSearch = rest.includes('?') ? rest.split('?')[1] : '';
       } else if (hash.startsWith('#/browse')) {
         page = 'browse';
+      } else if (hash.startsWith('#/trade')) {
+        page = 'trade';
       } else if (hash.startsWith('#/list')) {
         page = 'list';
       }
@@ -1687,6 +1815,7 @@
             {page === 'listing' && <ListingDetailPage id={listingId} wishlist={wishlist} onWishlistToggle={handleWishlistToggle} onToast={showToast} />}
             {page === 'booking' && <BookingPage listingId={bookingId} searchParams={bookingSearch} />}
             {page === 'list' && <ListPage />}
+            {page === 'trade' && <TradePage />}
           </main>
           {toast && <Toast message={toast} onClose={() => setToast(null)} />}
         </div>
