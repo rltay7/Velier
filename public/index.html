@@ -186,6 +186,7 @@
     .card-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 0.6rem; }
     .card-price { font-size: 0.9rem; color: var(--champagne); }
     .card-price span { color: var(--champagne-dim); font-size: 0.75rem; }
+    .card-retail { font-size: 0.68rem; color: var(--champagne-dim); letter-spacing: 0.04em; margin-top: 0.2rem; }
     .card-rating { display: flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; color: var(--champagne-dim); }
     .card-rating .star { color: var(--gold); font-size: 0.7rem; }
 
@@ -563,7 +564,9 @@
     .rate-row { display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 0.85rem; border-bottom: 1px solid var(--border); }
     .rate-row:last-child { border-bottom: none; }
     .rate-row-label { font-size: 0.82rem; color: var(--champagne-dim); }
-    .rate-row-price { font-size: 0.9rem; color: var(--champagne); font-family: 'Cormorant Garamond', serif; }
+    .rate-row-price { font-size: 1.15rem; color: var(--champagne); font-family: 'Cormorant Garamond', serif; font-weight: 500; }
+    .retail-value { font-size: 0.72rem; color: var(--champagne-dim); letter-spacing: 0.06em; margin-bottom: 1rem; }
+    .retail-value strong { color: var(--champagne); }
     .rate-row-save { font-size: 0.68rem; color: var(--gold); letter-spacing: 0.05em; margin-left: 0.5rem; }
     .date-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem; }
     .date-input { background: var(--obsidian-4); border: 1px solid var(--border); padding: 0.65rem 0.75rem; color: var(--champagne); font-family: 'Switzer', sans-serif; font-size: 0.82rem; width: 100%; outline: none; transition: border-color 0.2s; }
@@ -1212,6 +1215,7 @@
                 <span>({listing.reviews})</span>
               </div>
             </div>
+            {listing.retail_price && <div className="card-retail">RRP ${listing.retail_price?.toLocaleString()}</div>}
           </div>
         </div>
       );
@@ -1713,6 +1717,9 @@
                 <p style={{marginBottom:'1.5rem',fontSize:'0.88rem',lineHeight:1.75,color:'var(--champagne-dim)'}}>{listing.description}</p>
 
                 {/* Rate Schedule */}
+                {listing.retail_price && (
+                  <div className="retail-value">Retail value: <strong>${listing.retail_price?.toLocaleString()}</strong> — hire from <strong>${listing.daily_rate}/day</strong></div>
+                )}
                 <div className="rate-schedule">
                   <div className="rate-schedule-title">Hire Rates</div>
                   <div className="rate-row">
