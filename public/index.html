@@ -317,141 +317,122 @@
     /* ── SPLASH SCREEN ── */
     .splash {
       position: fixed; inset: 0; z-index: 9999;
-      background: #07060a;
+      background: #08070b;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 0.9s cubic-bezier(0.4,0,0.2,1), transform 0.9s cubic-bezier(0.4,0,0.2,1);
+      transition: opacity 1s cubic-bezier(0.4,0,0.2,1), transform 1s cubic-bezier(0.4,0,0.2,1);
+      overflow: hidden;
     }
-    .splash.exiting {
-      opacity: 0;
-      transform: scale(1.04);
+    .splash.exiting { opacity: 0; transform: scale(1.03); pointer-events: none; }
+
+    /* Canvas shimmer sits behind everything */
+    .splash-canvas {
+      position: absolute; inset: 0; width: 100%; height: 100%;
       pointer-events: none;
     }
-    .splash-symbol {
+
+    /* Icon container */
+    .splash-icon-wrap {
       position: relative;
-      width: 180px; height: 180px;
+      width: 220px; height: 220px;
       display: flex; align-items: center; justify-content: center;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2.8rem;
     }
-    .splash-symbol svg {
-      width: 160px; height: 160px;
-      filter: drop-shadow(0 0 18px rgba(200,155,50,0.15));
-    }
-    /* Light sweep across the icon */
-    .splash-symbol::after {
-      content: '';
-      position: absolute;
-      top: -20%; left: -60%;
-      width: 40%; height: 140%;
-      background: linear-gradient(105deg,
-        transparent 0%,
-        rgba(200,155,50,0.06) 30%,
-        rgba(255,235,180,0.22) 50%,
-        rgba(200,155,50,0.06) 70%,
-        transparent 100%
-      );
-      animation: lightSweep 3.2s cubic-bezier(0.4,0,0.2,1) infinite;
-      pointer-events: none;
-    }
-    @keyframes lightSweep {
-      0%   { left: -60%; opacity: 0; }
-      10%  { opacity: 1; }
-      90%  { opacity: 1; }
-      100% { left: 120%; opacity: 0; }
-    }
-    /* Decorative lines radiating */
-    .splash-lines {
+
+    /* Outer ring — slow pulse */
+    .splash-ring {
       position: absolute; inset: 0;
-      animation: splashRotate 18s linear infinite;
+      border-radius: 50%;
+      border: 1px solid rgba(200,155,50,0.12);
+      animation: ringPulse 4s ease-in-out infinite;
     }
-    @keyframes splashRotate {
+    .splash-ring-2 {
+      position: absolute; inset: 16px;
+      border-radius: 50%;
+      border: 1px solid rgba(200,155,50,0.07);
+      animation: ringPulse 4s ease-in-out infinite 0.6s;
+    }
+    @keyframes ringPulse {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50%       { opacity: 1;   transform: scale(1.015); }
+    }
+
+    /* Tick marks around the circle */
+    .splash-ticks {
+      position: absolute; inset: 0;
+      animation: tickRotate 40s linear infinite;
+    }
+    @keyframes tickRotate {
       from { transform: rotate(0deg); }
       to   { transform: rotate(360deg); }
     }
+
+    /* The main eye SVG */
+    .splash-eye {
+      position: relative; z-index: 2;
+      filter: drop-shadow(0 0 30px rgba(200,155,50,0.2)) drop-shadow(0 0 8px rgba(200,155,50,0.1));
+      animation: eyeGlow 3s ease-in-out infinite;
+    }
+    @keyframes eyeGlow {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(200,155,50,0.15)) drop-shadow(0 0 6px rgba(200,155,50,0.08)); }
+      50%       { filter: drop-shadow(0 0 40px rgba(200,155,50,0.3))  drop-shadow(0 0 14px rgba(200,155,50,0.18)); }
+    }
+
+    /* Text */
     .splash-wordmark {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 2.2rem;
-      font-weight: 700;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
+      font-size: 2.4rem; font-weight: 700;
+      letter-spacing: 0.4em; text-transform: uppercase;
       color: transparent;
-      -webkit-text-stroke: 0.7px rgba(255,255,255,0.9);
-      margin-bottom: 0.4rem;
-      animation: splashFadeUp 1.4s ease forwards;
-      opacity: 0;
-      animation-delay: 0.3s;
+      -webkit-text-stroke: 0.6px rgba(255,255,255,0.85);
+      margin-bottom: 0.5rem;
+      opacity: 0; animation: splashUp 1.2s ease forwards 0.4s;
     }
     .splash-tagline {
-      font-size: 0.68rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: rgba(200,155,50,0.6);
+      font-size: 0.63rem; letter-spacing: 0.28em; text-transform: uppercase;
+      color: rgba(200,155,50,0.55);
       margin-bottom: 3.5rem;
-      animation: splashFadeUp 1.4s ease forwards;
-      opacity: 0;
-      animation-delay: 0.6s;
+      opacity: 0; animation: splashUp 1.2s ease forwards 0.75s;
     }
-    @keyframes splashFadeUp {
-      from { opacity: 0; transform: translateY(14px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .splash-enter {
-      position: relative;
-      display: inline-flex; align-items: center; gap: 0.75rem;
-      font-size: 0.68rem; letter-spacing: 0.25em; text-transform: uppercase;
-      color: rgba(200,155,50,0.8);
-      background: none; border: 1px solid rgba(200,155,50,0.3);
-      padding: 0.85rem 2.2rem;
-      cursor: pointer;
-      overflow: hidden;
-      animation: splashFadeUp 1.4s ease forwards;
-      opacity: 0;
-      animation-delay: 1s;
-      transition: border-color 0.3s, color 0.3s;
-    }
-    .splash-enter::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(200,155,50,0.08), transparent);
-      transform: translateX(-100%);
-      transition: transform 0.5s ease;
-    }
-    .splash-enter:hover { border-color: rgba(200,155,50,0.7); color: rgba(200,155,50,1); }
-    .splash-enter:hover::before { transform: translateX(100%); }
-    .splash-enter-arrow {
-      display: inline-block;
-      animation: arrowPulse 1.5s ease-in-out infinite;
-    }
-    @keyframes arrowPulse {
-      0%, 100% { transform: translateX(0); opacity: 0.6; }
-      50%       { transform: translateX(5px); opacity: 1; }
-    }
-    /* Particle dots */
-    .splash-particles {
-      position: absolute; inset: 0; overflow: hidden; pointer-events: none;
-    }
-    .splash-particle {
-      position: absolute;
-      width: 1px; height: 1px;
-      background: rgba(200,155,50,0.5);
-      border-radius: 50%;
-      animation: particleFloat linear infinite;
-    }
-    @keyframes particleFloat {
-      0%   { transform: translateY(100vh) scale(0); opacity: 0; }
-      10%  { opacity: 1; }
-      90%  { opacity: 0.6; }
-      100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
-    }
-    /* Page entry animation */
-    .page-entering {
-      animation: pageReveal 0.8s cubic-bezier(0.4,0,0.2,1) forwards;
-    }
-    @keyframes pageReveal {
-      from { opacity: 0; transform: translateY(20px); }
+    @keyframes splashUp {
+      from { opacity: 0; transform: translateY(16px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── BRAND MARQUEE ── */
+    /* Enter button */
+    .splash-enter {
+      position: relative;
+      display: inline-flex; align-items: center; gap: 1rem;
+      font-size: 0.63rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: rgba(200,155,50,0.75);
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      opacity: 0; animation: splashUp 1.2s ease forwards 1.2s;
+      transition: color 0.3s;
+    }
+    .splash-enter::before, .splash-enter::after {
+      content: '';
+      display: block;
+      height: 1px;
+      background: rgba(200,155,50,0.3);
+      transition: width 0.4s ease, background 0.3s;
+      width: 32px;
+    }
+    .splash-enter:hover { color: rgba(200,155,50,1); }
+    .splash-enter:hover::before, .splash-enter:hover::after {
+      width: 52px;
+      background: rgba(200,155,50,0.7);
+    }
+
+    /* Page entry */
+    .page-entering { animation: pageReveal 0.9s cubic-bezier(0.4,0,0.2,1) forwards; }
+    @keyframes pageReveal {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+        /* ── BRAND MARQUEE ── */
     .brand-strip {
       padding: 2rem 0;
       background: var(--obsidian-2);
@@ -772,60 +753,129 @@
     // ── SPLASH SCREEN ──
     const SplashScreen = ({ onEnter }) => {
       const [exiting, setExiting] = React.useState(false);
+      const canvasRef = React.useRef(null);
+
+      // Canvas: animated radial shimmer that sweeps across the screen
+      React.useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let raf;
+        let t = 0;
+
+        const resize = () => {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        };
+        resize();
+        window.addEventListener('resize', resize);
+
+        const draw = () => {
+          const W = canvas.width, H = canvas.height;
+          ctx.clearRect(0, 0, W, H);
+
+          // Slow sweeping spotlight — moves left to right every ~5s
+          const cycle = 5000;
+          const progress = (Date.now() % cycle) / cycle; // 0→1
+          const cx = W * (-0.2 + progress * 1.4);
+          const cy = H * 0.5;
+          const radius = Math.max(W, H) * 0.65;
+
+          const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+          grad.addColorStop(0,   'rgba(200,155,50,0.055)');
+          grad.addColorStop(0.3, 'rgba(200,155,50,0.025)');
+          grad.addColorStop(0.7, 'rgba(200,155,50,0.006)');
+          grad.addColorStop(1,   'rgba(0,0,0,0)');
+
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, W, H);
+
+          // Second subtler counter-sweep, offset half cycle
+          const progress2 = ((Date.now() + cycle * 0.5) % cycle) / cycle;
+          const cx2 = W * (-0.2 + progress2 * 1.4);
+          const grad2 = ctx.createRadialGradient(cx2, cy * 0.4, 0, cx2, cy * 0.4, radius * 0.5);
+          grad2.addColorStop(0,   'rgba(255,240,200,0.03)');
+          grad2.addColorStop(0.5, 'rgba(200,155,50,0.01)');
+          grad2.addColorStop(1,   'rgba(0,0,0,0)');
+          ctx.fillStyle = grad2;
+          ctx.fillRect(0, 0, W, H);
+
+          raf = requestAnimationFrame(draw);
+        };
+        draw();
+
+        return () => {
+          cancelAnimationFrame(raf);
+          window.removeEventListener('resize', resize);
+        };
+      }, []);
 
       const handleEnter = () => {
         setExiting(true);
-        setTimeout(onEnter, 900);
+        setTimeout(onEnter, 1000);
       };
 
-      // Generate particles
-      const particles = Array.from({length: 28}, (_, i) => ({
-        id: i,
-        left: Math.random() * 100,
-        size: Math.random() * 3 + 1,
-        duration: Math.random() * 8 + 6,
-        delay: Math.random() * 8,
-      }));
+      // Tick mark positions (24 around circle)
+      const ticks = Array.from({length: 24}, (_, i) => {
+        const angle = (i / 24) * Math.PI * 2 - Math.PI / 2;
+        const isMajor = i % 6 === 0;
+        const r1 = isMajor ? 96 : 100;
+        const r2 = 108;
+        return {
+          x1: 110 + Math.cos(angle) * r1,
+          y1: 110 + Math.sin(angle) * r1,
+          x2: 110 + Math.cos(angle) * r2,
+          y2: 110 + Math.sin(angle) * r2,
+          major: isMajor,
+        };
+      });
 
       return (
         <div className={`splash${exiting ? ' exiting' : ''}`}>
-          {/* Floating particles */}
-          <div className="splash-particles">
-            {particles.map(p => (
-              <div key={p.id} className="splash-particle" style={{
-                left: `${p.left}%`,
-                width: `${p.size}px`,
-                height: `${p.size}px`,
-                animationDuration: `${p.duration}s`,
-                animationDelay: `${p.delay}s`,
-              }}/>
-            ))}
-          </div>
+          <canvas ref={canvasRef} className="splash-canvas" />
 
-          {/* Main icon */}
-          <div className="splash-symbol">
-            {/* Rotating decorative ring */}
-            <svg className="splash-lines" viewBox="0 0 200 200" style={{position:'absolute',inset:'-20px',width:'220px',height:'220px',opacity:0.12}}>
-              {Array.from({length:12}, (_,i) => {
-                const angle = (i / 12) * Math.PI * 2;
-                const x1 = 100 + Math.cos(angle) * 72;
-                const y1 = 100 + Math.sin(angle) * 72;
-                const x2 = 100 + Math.cos(angle) * 98;
-                const y2 = 100 + Math.sin(angle) * 98;
-                return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="hsl(41,62%,60%)" strokeWidth="0.8"/>;
-              })}
-              <circle cx="100" cy="100" r="72" stroke="hsl(41,62%,60%)" strokeWidth="0.4" fill="none" strokeDasharray="2 6"/>
-              <circle cx="100" cy="100" r="98" stroke="hsl(41,62%,60%)" strokeWidth="0.3" fill="none" strokeDasharray="1 8"/>
+          <div className="splash-icon-wrap">
+            {/* Pulsing rings */}
+            <div className="splash-ring"/>
+            <div className="splash-ring-2"/>
+
+            {/* Tick marks SVG — slow rotation */}
+            <svg className="splash-ticks" viewBox="0 0 220 220" style={{position:'absolute',inset:0,width:'220px',height:'220px'}}>
+              {ticks.map((tk, i) => (
+                <line key={i}
+                  x1={tk.x1} y1={tk.y1} x2={tk.x2} y2={tk.y2}
+                  stroke="rgba(200,155,50,0.35)"
+                  strokeWidth={tk.major ? 1.2 : 0.6}
+                />
+              ))}
+              <circle cx="110" cy="110" r="100" stroke="rgba(200,155,50,0.1)" strokeWidth="0.5" fill="none"/>
             </svg>
-            {/* The Velier eye icon — large */}
-            <svg width="160" height="160" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 8 Q20 18 36 8" stroke="hsl(41,62%,60%)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
-              <path d="M7 13 Q20 22 33 13" stroke="hsl(41,62%,60%)" strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.7"/>
-              <path d="M10 18 Q20 26 30 18" stroke="hsl(41,62%,60%)" strokeWidth="0.8" fill="none" strokeLinecap="round" opacity="0.5"/>
-              <path d="M12 26 Q20 20 28 26 Q20 32 12 26Z" stroke="hsl(41,62%,60%)" strokeWidth="1" fill="none"/>
-              <circle cx="20" cy="26" r="3.5" stroke="hsl(41,62%,60%)" strokeWidth="0.8" fill="none"/>
-              <circle cx="20" cy="26" r="1.5" fill="hsl(41,62%,60%)"/>
-              <line x1="6" y1="35" x2="34" y2="35" stroke="hsl(41,62%,60%)" strokeWidth="0.7" opacity="0.5"/>
+
+            {/* Clean geometric eye — redesigned */}
+            <svg className="splash-eye" width="120" height="120" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Veil arcs — evenly spaced, clean curves */}
+              <path d="M10 22 Q50 42 90 22" stroke="hsl(41,62%,60%)" strokeWidth="1.4" strokeLinecap="round" fill="none"/>
+              <path d="M16 33 Q50 50 84 33" stroke="hsl(41,62%,60%)" strokeWidth="1.1" strokeLinecap="round" fill="none" opacity="0.65"/>
+              <path d="M24 43 Q50 57 76 43" stroke="hsl(41,62%,60%)" strokeWidth="0.8" strokeLinecap="round" fill="none" opacity="0.4"/>
+
+              {/* Eye — perfect almond using cubic bezier for precision */}
+              <path d="M20 65 C32 52 68 52 80 65 C68 78 32 78 20 65 Z"
+                stroke="hsl(41,62%,60%)" strokeWidth="1.2" fill="none" strokeLinejoin="round"/>
+
+              {/* Iris circle */}
+              <circle cx="50" cy="65" r="9" stroke="hsl(41,62%,60%)" strokeWidth="1" fill="none"/>
+
+              {/* Pupil — filled */}
+              <circle cx="50" cy="65" r="3.5" fill="hsl(41,62%,60%)"/>
+
+              {/* Subtle inner iris detail */}
+              <circle cx="50" cy="65" r="6" stroke="hsl(41,62%,60%)" strokeWidth="0.4" fill="none" opacity="0.4"/>
+
+              {/* Hem line */}
+              <line x1="14" y1="88" x2="86" y2="88" stroke="hsl(41,62%,60%)" strokeWidth="0.6" opacity="0.35"/>
+              {/* Corner dots */}
+              <circle cx="14" cy="88" r="1" fill="hsl(41,62%,60%)" opacity="0.4"/>
+              <circle cx="86" cy="88" r="1" fill="hsl(41,62%,60%)" opacity="0.4"/>
             </svg>
           </div>
 
@@ -834,13 +884,12 @@
 
           <button className="splash-enter" onClick={handleEnter}>
             Enter
-            <span className="splash-enter-arrow">→</span>
           </button>
         </div>
       );
     };
 
-    // ── ROUTER ──
+        // ── ROUTER ──
     const useHash = () => {
       const [hash, setHash] = useState(window.location.hash || '#/');
       useEffect(() => {
