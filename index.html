@@ -406,35 +406,77 @@
       100% { background-position: 0 0; }
     }
 
-    /* ── 3. SCROLL REVEAL WITH INERTIA ── */
-    .reveal {
-      opacity: 0;
-      transform: translateY(36px);
-      transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1),
-                  transform 0.9s cubic-bezier(0.16,1,0.3,1);
+    /* ══════════════════════════════════════════════════
+       AP CURTAIN REVEAL — text rises behind a mask
+       No opacity. Pure vertical translate under overflow:hidden.
+       Easing: cubic-bezier(0.76,0,0.24,1) — weighted, mechanical.
+    ══════════════════════════════════════════════════ */
+
+    /* ── Curtain wrapper — clips the text ── */
+    .curtain-wrap {
+      display: block;
+      overflow: hidden;
+      line-height: 1.15;
     }
-    .reveal.revealed {
-      opacity: 1;
+    /* Inline variant for within a paragraph or heading line */
+    .curtain-wrap-inline {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: bottom;
+      line-height: 1.2;
+    }
+
+    /* ── The inner element that slides up ── */
+    .curtain-inner {
+      display: block;
+      transform: translateY(108%);
+      transition: transform 1.1s cubic-bezier(0.76,0,0.24,1);
+      will-change: transform;
+    }
+    .curtain-wrap-inline .curtain-inner {
+      display: inline-block;
+    }
+
+    /* ── Triggered state ── */
+    .curtain-wrap.curtain-revealed .curtain-inner,
+    .curtain-wrap-inline.curtain-revealed .curtain-inner {
       transform: translateY(0);
     }
+
+    /* ── Stagger delays ── */
+    .curtain-d1 .curtain-inner { transition-delay: 0.08s; }
+    .curtain-d2 .curtain-inner { transition-delay: 0.18s; }
+    .curtain-d3 .curtain-inner { transition-delay: 0.28s; }
+    .curtain-d4 .curtain-inner { transition-delay: 0.42s; }
+    .curtain-d5 .curtain-inner { transition-delay: 0.56s; }
+
+    /* ── 3. LEGACY SCROLL REVEAL (non-text elements — cards, sections) ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.85s cubic-bezier(0.76,0,0.24,1),
+                  transform 0.85s cubic-bezier(0.76,0,0.24,1);
+    }
+    .reveal.revealed { opacity: 1; transform: translateY(0); }
     .reveal-delay-1 { transition-delay: 0.1s; }
     .reveal-delay-2 { transition-delay: 0.2s; }
     .reveal-delay-3 { transition-delay: 0.3s; }
     .reveal-delay-4 { transition-delay: 0.45s; }
-    /* Respect reduced motion — accessibility */
-    @media (prefers-reduced-motion: reduce) {
-      .reveal { opacity: 1; transform: none; transition: none; }
-    }
 
-    /* ── 4. WORD-BY-WORD HERO REVEAL ── */
+    /* ── 4. HERO WORD REVEAL — now uses curtain, keep class for compat ── */
     .hero-word {
       display: inline-block;
-      opacity: 0;
-      transform: translateY(22px);
-      animation: wordReveal 0.75s cubic-bezier(0.16,1,0.3,1) forwards;
+      overflow: hidden;
+      vertical-align: bottom;
     }
-    @keyframes wordReveal {
-      to { opacity: 1; transform: translateY(0); }
+    .hero-word .curtain-inner {
+      display: inline-block;
+    }
+
+    /* ── Reduced motion — skip all transforms ── */
+    @media (prefers-reduced-motion: reduce) {
+      .curtain-inner { transform: none !important; transition: none !important; }
+      .reveal { opacity: 1; transform: none; transition: none; }
     }
 
     /* ── 5. KINETIC NAVBAR ── */
@@ -1630,15 +1672,21 @@
             <HeroCinema />
             <div className="hero-video-overlay"></div>
             <div className="hero-eyebrow">The Velier Collection</div>
-            <h1 aria-label="The world's finest luxury awaits you">
-              {["The", "world's", "finest"].map((w, i) => (
-                <span key={w} className="hero-word" style={{animationDelay: `${0.2 + i * 0.13}s`, marginRight:'0.28em'}}>{w}</span>
+            <h1 aria-label="The world's finest luxury awaits you" style={{lineHeight:'1.08'}}>
+              {[["The",1],["world's",2],["finest",3]].map(([w,d]) => (
+                <span key={w} className={`curtain-wrap-inline curtain-d${d}`} style={{marginRight:'0.28em'}}>
+                  <span className="curtain-inner">{w}</span>
+                </span>
               ))}
               <br/>
-              {[["luxury", true], ["awaits", false], ["you", false]].map(([w, em], i) => (
+              {[["luxury",4,true],["awaits",5,false],["you",5,false]].map(([w,d,em]) => (
                 em
-                  ? <em key={w}><span className="hero-word" style={{animationDelay: `${0.59 + i * 0.13}s`, marginRight:'0.28em'}}>{w}</span></em>
-                  : <span key={w} className="hero-word" style={{animationDelay: `${0.59 + i * 0.13}s`, marginRight:'0.28em'}}>{w}</span>
+                  ? <em key={w}><span className={`curtain-wrap-inline curtain-d${d}`} style={{marginRight:'0.28em',fontStyle:'inherit'}}>
+                      <span className="curtain-inner" style={{fontStyle:'italic'}}>{w}</span>
+                    </span></em>
+                  : <span key={w} className={`curtain-wrap-inline curtain-d${d}`} style={{marginRight:'0.28em'}}>
+                      <span className="curtain-inner">{w}</span>
+                    </span>
               ))}
             </h1>
             <p className="hero-sub">Rent extraordinary pieces from Prada, Chanel, Rolex, and Hermès. Wear what was once unattainable.</p>
@@ -3551,57 +3599,81 @@
           });
         }
 
-        // ── 2. SCROLL REVEAL WITH INERTIA ──
-        // Single persistent observer — mobile-safe thresholds
-        const revealObserver = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('revealed');
-              revealObserver.unobserve(entry.target);
-            }
-          });
-        }, {
-          threshold: 0.05,         // Only 5% visible needed — works on small mobile screens
-          rootMargin: '0px 0px 0px 0px'  // No negative margin — safe for all viewports
-        });
+        // ── 2. CURTAIN TEXT REVEAL (AP-style) + SCROLL REVEAL ──
 
-        const observeRevealEls = () => {
-          // Elements that already have .reveal in HTML (hardcoded)
-          document.querySelectorAll('.reveal:not(.revealed)').forEach(el => revealObserver.observe(el));
-          // Dynamically add .reveal to section-level elements that don't have it yet
+        // ── Wrap headings in curtain structure ──
+        const wrapCurtains = () => {
+          // Target h2 and h3 elements that haven't been wrapped yet
           document.querySelectorAll(
-            '.section-header:not(.reveal), .hiw-step:not(.reveal), .category-card:not(.reveal), .trust-card:not(.reveal), .lender-cta:not(.reveal)'
-          ).forEach(el => {
-            el.classList.add('reveal');
-            revealObserver.observe(el);
+            'h2:not(.curtain-done), h3:not(.curtain-done), .section-label:not(.curtain-done)'
+          ).forEach((el, idx) => {
+            // Skip elements already inside a curtain-wrap or in hero/splash
+            if (el.closest('.hero') || el.closest('.splash-screen') || el.closest('.curtain-wrap')) return;
+            el.classList.add('curtain-done');
+            // Wrap contents
+            const text = el.innerHTML;
+            const delay = (idx % 3); // 0,1,2 cycling delay
+            const delayClass = ['','curtain-d1','curtain-d2'][delay];
+            el.innerHTML = `<span class="curtain-wrap ${delayClass}" style="display:block;overflow:hidden"><span class="curtain-inner" style="display:block">${text}</span></span>`;
           });
         };
 
-        // Initial observe — delay to let React paint first
-        setTimeout(observeRevealEls, 300);
+        // ── Single IntersectionObserver for both curtain + legacy reveal ──
+        const mainObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const el = entry.target;
+            // Curtain wraps
+            if (el.classList.contains('curtain-wrap')) {
+              el.classList.add('curtain-revealed');
+            }
+            // Legacy reveal (cards, sections)
+            if (el.classList.contains('reveal')) {
+              el.classList.add('revealed');
+            }
+            mainObserver.unobserve(el);
+          });
+        }, { threshold: 0.05, rootMargin: '0px 0px 0px 0px' });
 
-        // Re-observe after route changes
-        window.addEventListener('hashchange', () => setTimeout(observeRevealEls, 400));
-
-        // Debounced MutationObserver — re-observe after React finishes rendering
-        let revealTimer;
-        const mo2 = new MutationObserver(() => {
-          clearTimeout(revealTimer);
-          revealTimer = setTimeout(observeRevealEls, 200);
-        });
-        mo2.observe(document.body, { childList: true, subtree: true });
-
-        // Also immediately reveal elements already in viewport (above the fold)
-        const immediateReveal = () => {
-          document.querySelectorAll('.reveal:not(.revealed)').forEach(el => {
+        const observeAll = () => {
+          wrapCurtains();
+          // Observe curtain wraps
+          document.querySelectorAll('.curtain-wrap:not(.curtain-revealed)').forEach(el => mainObserver.observe(el));
+          // Observe legacy reveal elements
+          document.querySelectorAll('.reveal:not(.revealed)').forEach(el => mainObserver.observe(el));
+          // Dynamically add .reveal to cards/steps
+          document.querySelectorAll(
+            '.hiw-step:not(.reveal), .category-tile:not(.reveal), .trust-card:not(.reveal), .card:not(.reveal)'
+          ).forEach(el => {
+            el.classList.add('reveal');
+            mainObserver.observe(el);
+          });
+          // Immediately reveal above-the-fold
+          document.querySelectorAll('.curtain-wrap:not(.curtain-revealed), .reveal:not(.revealed)').forEach(el => {
             const rect = el.getBoundingClientRect();
             if (rect.top < window.innerHeight && rect.bottom > 0) {
+              el.classList.add('curtain-revealed');
               el.classList.add('revealed');
             }
           });
         };
-        setTimeout(immediateReveal, 350);
-        window.addEventListener('hashchange', () => setTimeout(immediateReveal, 450));
+
+        // Trigger hero curtains immediately (they're in viewport)
+        const triggerHeroCurtains = () => {
+          document.querySelectorAll('.hero .curtain-wrap-inline').forEach(el => {
+            el.classList.add('curtain-revealed');
+          });
+        };
+
+        setTimeout(() => { wrapCurtains(); observeAll(); triggerHeroCurtains(); }, 350);
+        window.addEventListener('hashchange', () => setTimeout(observeAll, 400));
+
+        let revealTimer;
+        const mo2 = new MutationObserver(() => {
+          clearTimeout(revealTimer);
+          revealTimer = setTimeout(observeAll, 220);
+        });
+        mo2.observe(document.body, { childList: true, subtree: true });
 
         // ── 5. KINETIC NAVBAR ──
         const nav = document.querySelector('.nav');
@@ -3636,6 +3708,10 @@
         sessionStorage.setItem('velier_entered', '1');
         setShowSplash(false);
         window.dispatchEvent(new Event('velier_entered'));
+        // Trigger hero curtain reveals after splash fades out
+        setTimeout(() => {
+          document.querySelectorAll('.hero .curtain-wrap-inline').forEach(el => el.classList.add('curtain-revealed'));
+        }, 300);
       };
 
       useEffect(() => {
