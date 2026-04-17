@@ -1969,20 +1969,21 @@
 
       // Upload a single file to Supabase Storage
       const uploadPhoto = async (file) => {
-        const ext = file.name.split('.').pop();
-        const userId = user?.id || 'guest';
-        const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const authHeader = token ? `Bearer ${token}` : `Bearer ${SUPABASE_ANON_KEY}`;
-        const res = await fetch(`${SUPABASE_URL}/storage/v1/object/listing-images/${path}`, {
+        const res = await fetch('/api/upload', {
           method: 'POST',
-          headers: { 'Authorization': authHeader, 'Content-Type': file.type },
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'x-filename': file.name,
+            'x-content-type': file.type,
+          },
           body: file,
         });
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
-          throw new Error(err.message || 'Upload failed');
+          throw new Error(err.error || 'Upload failed');
         }
-        return `${SUPABASE_URL}/storage/v1/object/public/listing-images/${path}`;
+        const { url } = await res.json();
+        return url;
       };
 
       const handleFileSelect = async (files) => {

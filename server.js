@@ -311,6 +311,31 @@ app.delete('/api/listings/:id', requireAuth, async (req, res) => {
 });
 
 // Wishlist (keep in-memory for seed listings)
+// Proxy photo upload to Supabase Storage using service role key (avoids user JWT expiry issues)
+app.post('/api/upload', requireAuth, express.raw({ type: '*/*', limit: '20mb' }), async (req, res) => {
+  try {
+    const filename = req.headers['x-filename'] || `${Date.now()}.jpg`;
+    const contentType = req.headers['x-content-type'] || req.headers['content-type'] || 'image/jpeg';
+    const path = `${req.user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}-${filename}`;
+    const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/listing-images/${path}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+        'Content-Type': contentType,
+      },
+      body: req.body,
+    });
+    if (!uploadRes.ok) {
+      const err = await uploadRes.json().catch(() => ({}));
+      return res.status(400).json({ error: err.message || 'Upload failed' });
+    }
+    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/listing-images/${path}`;
+    res.json({ url: publicUrl });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.post('/api/listings/:id/wishlist', (req, res) => {
   const listing = seedListings.find(l => l.id === parseInt(req.params.id));
   if (!listing) return res.status(404).json({ error: 'Not found' });
