@@ -335,6 +335,111 @@
     .fee-calc-row.total span:last-child { color: var(--gold); font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; }
     @media (max-width: 600px) { .trade-form-grid { grid-template-columns: 1fr; } .duration-options { flex-direction: column; } }
 
+
+    /* ══════════════════════════════════════════════════════
+       TIER 1 LUXURY ANIMATIONS
+    ══════════════════════════════════════════════════════ */
+
+    /* ── 1. CUSTOM MAGNETIC CURSOR ── */
+    * { cursor: none !important; }
+    @media (hover: none) { * { cursor: auto !important; } }
+    .velier-cursor {
+      position: fixed; top: 0; left: 0; z-index: 999999;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: rgba(200,155,50,0.85);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: width 0.25s cubic-bezier(0.25,0,0,1),
+                  height 0.25s cubic-bezier(0.25,0,0,1),
+                  background 0.25s ease,
+                  opacity 0.3s ease;
+      mix-blend-mode: normal;
+    }
+    .velier-cursor-ring {
+      position: fixed; top: 0; left: 0; z-index: 999998;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(200,155,50,0.35);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: width 0.4s cubic-bezier(0.25,0,0,1),
+                  height 0.4s cubic-bezier(0.25,0,0,1),
+                  border-color 0.3s ease,
+                  opacity 0.3s ease;
+    }
+    .velier-cursor.hovering { width: 6px; height: 6px; background: rgba(200,155,50,1); }
+    .velier-cursor-ring.hovering { width: 52px; height: 52px; border-color: rgba(200,155,50,0.6); }
+    .velier-cursor.clicking { width: 14px; height: 14px; }
+    .velier-cursor-ring.clicking { width: 28px; height: 28px; }
+
+    /* ── 2. FILM GRAIN OVERLAY ── */
+    .film-grain {
+      position: fixed; inset: 0; z-index: 99997;
+      pointer-events: none;
+      opacity: 0.032;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 192px 192px;
+      animation: grainShift 0.85s steps(1) infinite;
+    }
+    @keyframes grainShift {
+      0%   { background-position: 0 0; }
+      10%  { background-position: -48px -32px; }
+      20%  { background-position: 64px -16px; }
+      30%  { background-position: -32px 48px; }
+      40%  { background-position: 80px 32px; }
+      50%  { background-position: -64px 16px; }
+      60%  { background-position: 32px -48px; }
+      70%  { background-position: -80px 64px; }
+      80%  { background-position: 48px -64px; }
+      90%  { background-position: -16px 80px; }
+      100% { background-position: 0 0; }
+    }
+
+    /* ── 3. SCROLL REVEAL WITH INERTIA ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(36px);
+      transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.9s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.45s; }
+
+    /* ── 4. WORD-BY-WORD HERO REVEAL ── */
+    .hero-word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(22px);
+      animation: wordReveal 0.75s cubic-bezier(0.16,1,0.3,1) forwards;
+    }
+    @keyframes wordReveal {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── 5. KINETIC NAVBAR ── */
+    .nav {
+      transition: padding 0.5s cubic-bezier(0.25,0,0,1),
+                  background 0.5s ease,
+                  border-color 0.5s ease,
+                  opacity 0.4s ease !important;
+    }
+    .nav.scrolled {
+      padding-top: 0.7rem !important;
+      padding-bottom: 0.7rem !important;
+      background: rgba(8,7,10,0.88) !important;
+      border-bottom-color: rgba(200,155,50,0.18) !important;
+      backdrop-filter: blur(28px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+    }
+
     /* ── TRUST & SECURITY ── */
     .trust-section { padding: 4rem 0; background: var(--obsidian-2); border-top: 1px solid var(--border); }
     .trust-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
@@ -1504,7 +1609,17 @@
             <HeroCinema />
             <div className="hero-video-overlay"></div>
             <div className="hero-eyebrow">The Velier Collection</div>
-            <h1>The world's finest<br/><em>luxury awaits you</em></h1>
+            <h1 aria-label="The world's finest luxury awaits you">
+              {["The", "world's", "finest"].map((w, i) => (
+                <span key={w} className="hero-word" style={{animationDelay: `${0.2 + i * 0.13}s`, marginRight:'0.28em'}}>{w}</span>
+              ))}
+              <br/>
+              {[["luxury", true], ["awaits", false], ["you", false]].map(([w, em], i) => (
+                em
+                  ? <em key={w}><span className="hero-word" style={{animationDelay: `${0.59 + i * 0.13}s`, marginRight:'0.28em'}}>{w}</span></em>
+                  : <span key={w} className="hero-word" style={{animationDelay: `${0.59 + i * 0.13}s`, marginRight:'0.28em'}}>{w}</span>
+              ))}
+            </h1>
             <p className="hero-sub">Rent extraordinary pieces from Prada, Chanel, Rolex, and Hermès. Wear what was once unattainable.</p>
             <div className="hero-actions">
               <a href="#/browse" className="btn btn-gold btn-lg">Explore the Collection</a>
@@ -3343,6 +3458,121 @@
     };
 
     // ── MAIN APP ──
+    // ── LUXURY EFFECTS ──────────────────────────────────────────────
+    const LuxuryEffects = () => {
+      React.useEffect(() => {
+        // Skip on touch devices
+        const isTouch = window.matchMedia('(hover: none)').matches;
+
+        // ── 1. MAGNETIC CURSOR ──
+        if (!isTouch) {
+          const dot  = document.getElementById('velier-cursor-dot');
+          const ring = document.getElementById('velier-cursor-ring');
+          let mx = -100, my = -100;
+          let rx = -100, ry = -100;
+
+          const onMove = (e) => {
+            mx = e.clientX; my = e.clientY;
+            dot.style.left  = mx + 'px';
+            dot.style.top   = my + 'px';
+          };
+          document.addEventListener('mousemove', onMove);
+
+          // Ring follows with lerp lag
+          const lerpRing = () => {
+            rx += (mx - rx) * 0.12;
+            ry += (my - ry) * 0.12;
+            ring.style.left = rx + 'px';
+            ring.style.top  = ry + 'px';
+            requestAnimationFrame(lerpRing);
+          };
+          lerpRing();
+
+          // Hover states
+          const addHover = () => {
+            dot.classList.add('hovering');
+            ring.classList.add('hovering');
+          };
+          const removeHover = () => {
+            dot.classList.remove('hovering');
+            ring.classList.remove('hovering');
+          };
+          const addClick = () => {
+            dot.classList.add('clicking');
+            ring.classList.add('clicking');
+          };
+          const removeClick = () => {
+            dot.classList.remove('clicking');
+            ring.classList.remove('clicking');
+          };
+
+          const interactables = 'a, button, [role="button"], input, select, textarea, label, .listing-card, .trade-card, .category-card';
+          const attachHoverDelegation = () => {
+            document.querySelectorAll(interactables).forEach(el => {
+              el.addEventListener('mouseenter', addHover);
+              el.addEventListener('mouseleave', removeHover);
+            });
+          };
+          attachHoverDelegation();
+          // Re-attach when DOM changes (React re-renders)
+          const mo = new MutationObserver(() => attachHoverDelegation());
+          mo.observe(document.body, { childList: true, subtree: true });
+
+          document.addEventListener('mousedown', addClick);
+          document.addEventListener('mouseup', removeClick);
+
+          // Hide when leaving window
+          document.addEventListener('mouseleave', () => {
+            dot.style.opacity = '0'; ring.style.opacity = '0';
+          });
+          document.addEventListener('mouseenter', () => {
+            dot.style.opacity = '1'; ring.style.opacity = '1';
+          });
+        }
+
+        // ── 2. SCROLL REVEAL WITH INERTIA ──
+        const revealEls = () => {
+          document.querySelectorAll('.section-header, .hiw-step, .category-card, .listing-card, .trade-card, .trust-item, .lender-cta, .section-label').forEach((el, i) => {
+            if (!el.classList.contains('reveal')) {
+              el.classList.add('reveal');
+            }
+          });
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+                observer.unobserve(entry.target);
+              }
+            });
+          }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+          document.querySelectorAll('.reveal:not(.revealed)').forEach(el => observer.observe(el));
+        };
+        revealEls();
+        // Re-run on navigation
+        window.addEventListener('hashchange', () => setTimeout(revealEls, 200));
+        const mo2 = new MutationObserver(() => revealEls());
+        mo2.observe(document.body, { childList: true, subtree: true });
+
+        // ── 5. KINETIC NAVBAR ──
+        const nav = document.querySelector('.nav');
+        const onScroll = () => {
+          if (nav) {
+            if (window.scrollY > 40) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+          }
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        return () => {
+          document.removeEventListener('mousemove', () => {});
+          window.removeEventListener('scroll', onScroll);
+          window.removeEventListener('hashchange', () => {});
+        };
+      }, []);
+      return null;
+    };
+    // ─────────────────────────────────────────────────────────────────
+
     const App = () => {
       const hash = useHash();
       const [wishlist, setWishlist] = useState(() => {
@@ -3400,6 +3630,10 @@
 
       return (
         <>
+          <LuxuryEffects />
+          <div id="velier-cursor-dot" className="velier-cursor" aria-hidden="true"></div>
+          <div id="velier-cursor-ring" className="velier-cursor-ring" aria-hidden="true"></div>
+          <div className="film-grain" aria-hidden="true"></div>
           {showSplash && <SplashScreen onEnter={handleEnter} />}
           {page !== 'admin' && <Nav wishlistCount={wishlist.length} />}
           <div className={!showSplash ? 'page-entering' : ''}>
@@ -3422,18 +3656,6 @@
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<AuthProvider><App /></AuthProvider>);
   </script>
-  <script>
-    // Scroll Reveal
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('visible');
-      });
-    }, { threshold: 0.1 });
-    function initReveal() {
-      document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-    }
-    initReveal();
-    new MutationObserver(initReveal).observe(document.body, { childList: true, subtree: true });
-  </script>
+
 </body>
 </html>
