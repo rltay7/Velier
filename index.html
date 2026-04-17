@@ -13,7 +13,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Velier" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <title>Velier — Access everything. Own nothing.</title>
+  <title>Velier — Your designer collection, without the full investment.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&display=swap" rel="stylesheet" />
@@ -232,15 +232,15 @@
     .hero > *:not(.hero-video-wrap):not(.hero-video-overlay) { position: relative; z-index: 2; }
     .hero-eyebrow {
       font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase;
-      color: var(--gold); margin-bottom: 1.5rem;
+      color: hsl(41,62%,68%); margin-bottom: 1.5rem;
       display: flex; align-items: center; gap: 0.75rem;
     }
     .hero-eyebrow::before, .hero-eyebrow::after {
-      content: ''; display: block; width: 40px; height: 1px; background: var(--gold-dim);
+      content: ''; display: block; width: 40px; height: 1px; background: hsl(41,50%,50%);
     }
-    .hero h1 { max-width: 900px; margin-bottom: 1.25rem; }
-    .hero h1 em { font-style: italic; color: var(--gold); }
-    .hero-sub { max-width: 500px; margin: 0 auto 2.5rem; font-size: 1rem; color: var(--champagne-dim); line-height: 1.7; }
+    .hero h1 { max-width: 900px; margin-bottom: 1.25rem; color: #f0ece4; }
+    .hero h1 em { font-style: italic; color: var(--gold-light); }
+    .hero-sub { max-width: 520px; margin: 0 auto 2.5rem; font-size: 1.05rem; color: rgba(232,223,200,0.82); line-height: 1.75; }
     .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
     .hero-scroll {
       display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
@@ -1301,7 +1301,7 @@
           </div>
 
           <div className="splash-wordmark">Velier</div>
-          <div className="splash-tagline">Access everything · Own nothing</div>
+          <div className="splash-tagline">Your designer collection, without the full investment.</div>
 
           <button className="splash-enter" onClick={handleEnter}>
             Enter
@@ -1430,7 +1430,7 @@
                 <VelierLogo size={28} />
                 <span style={{fontFamily:'Cormorant Garamond',fontSize:'1.25rem',fontWeight:'300',letterSpacing:'0.35em',textTransform:'uppercase',color:'#ffffff'}}>Velier</span>
               </div>
-              <p>The world's most refined peer-to-peer luxury rental platform. Access extraordinary pieces. Own nothing.</p>
+              <p>Expand your designer collection — Rolex, Hermès, Chanel, Prada — and pay only a fraction of the price.</p>
             </div>
             <div className="footer-col">
               <h5>Discover</h5>
@@ -1464,7 +1464,7 @@
           </div>
           <div className="footer-bottom">
             <p>© 2024 Velier. All rights reserved.</p>
-            <p style={{fontFamily:'Cormorant Garamond',fontStyle:'italic',fontSize:'0.9rem',color:'var(--gold-dim)'}}>Access everything. Own nothing.</p>
+            <p style={{fontFamily:'Cormorant Garamond',fontStyle:'italic',fontSize:'0.9rem',color:'var(--gold-dim)'}}>Your designer collection, without the full investment.</p>
             <p style={{display:'flex',gap:'1.5rem'}}>
               <a href="#/" style={{color:'var(--champagne-dim)',textDecoration:'none',fontSize:'0.75rem'}}>Privacy</a>
               <a href="#/" style={{color:'var(--champagne-dim)',textDecoration:'none',fontSize:'0.75rem'}}>Terms</a>
@@ -1689,7 +1689,7 @@
                     </span>
               ))}
             </h1>
-            <p className="hero-sub">Rent extraordinary pieces from Prada, Chanel, Rolex, and Hermès. Wear what was once unattainable.</p>
+            <p className="hero-sub">Build your designer collection — Rolex, Hermès, Chanel, and beyond — at a fraction of the price of ownership.</p>
             <div className="hero-actions">
               <a href="#/browse" className="btn btn-gold btn-lg">Explore the Collection</a>
               <a href="#/list" className="btn btn-outline btn-lg">List Your Pieces</a>
