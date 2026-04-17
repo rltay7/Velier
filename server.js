@@ -284,14 +284,19 @@ app.post('/api/submit-listing', requireAuth, async (req, res) => {
 
 // Update listing
 app.patch('/api/listings/:id', requireAuth, async (req, res) => {
+  // Strip any fields that shouldn't be updated directly
+  const { id, owner_id, created_at, ...allowed } = req.body;
+  console.log('[PATCH listing]', req.params.id, 'user:', req.user.id, 'body:', allowed);
   const { data, error } = await supabase
     .from('listings')
-    .update(req.body)
+    .update(allowed)
     .eq('id', req.params.id)
     .eq('owner_id', req.user.id)
-    .select().single();
+    .select();
+  console.log('[PATCH listing result]', data, error);
   if (error) return res.status(400).json({ error: error.message });
-  res.json(data);
+  if (!data || data.length === 0) return res.status(404).json({ error: 'Listing not found or not owned by you' });
+  res.json(data[0]);
 });
 
 // Delete (deactivate) listing

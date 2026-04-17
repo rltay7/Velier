@@ -2404,7 +2404,8 @@
           setSaveMsg('Saved');
           setTimeout(() => { setEditListing(null); setSaveMsg(''); }, 800);
         } else {
-          setSaveMsg('Save failed — please try again');
+          const err = await res.json().catch(() => ({}));
+          setSaveMsg(err.error || 'Save failed — please try again');
         }
       };
 
