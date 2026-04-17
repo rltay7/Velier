@@ -266,7 +266,7 @@ app.get('/api/dashboard/requests', requireAuth, async (req, res) => {
 
 // Submit a new listing (authenticated)
 app.post('/api/submit-listing', requireAuth, async (req, res) => {
-  const { title, brand, category, description, daily_rate, condition, colour, size, location } = req.body;
+  const { title, brand, category, description, daily_rate, condition, colour, size, location, image } = req.body;
   if (!title || !brand) return res.status(400).json({ error: 'Missing required fields' });
   const weekly_rate = Math.round(parseFloat(daily_rate) * 5.5);
   const monthly_rate = Math.round(parseFloat(daily_rate) * 18);
@@ -276,6 +276,7 @@ app.post('/api/submit-listing', requireAuth, async (req, res) => {
     daily_rate: parseFloat(daily_rate),
     weekly_rate, monthly_rate,
     condition, colour, size, location,
+    image: image || null,
     is_active: true,
   }).select().single();
   if (error) return res.status(400).json({ error: error.message });
