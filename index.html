@@ -742,6 +742,18 @@
   <script type="text/babel">
     const { useState, useEffect, useCallback, useRef, createContext, useContext } = React;
 
+      // ── Supabase direct listing fetcher ──────────────────────────────
+      const SB_URL = 'https://gwcesifbgjlwsnchzjwi.supabase.co';
+      const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3Y2VzaWZiZ2psd3NuY2h6andpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzMjkzNjIsImV4cCI6MjA5MTkwNTM2Mn0.-Abj4om252fDFQQiKELAwTQURkhV1IpVrxKVPzycesU';
+      async function sbFetch(path) {
+        const r = await fetch(SB_URL + path, {
+          headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+        });
+        return r.json();
+      }
+      // ─────────────────────────────────────────────────────────────────
+
+
     // ── AUTH CONTEXT ──
     const AuthContext = createContext(null);
 
@@ -1310,8 +1322,8 @@
       const [loading, setLoading] = useState(true);
 
       useEffect(() => {
-        fetch('/api/listings?featured=true&limit=4')
-          .then(r => r.json()).then(data => { setFeatured(data); setLoading(false); })
+        sbFetch('/rest/v1/listings?is_active=eq.true&order=rating.desc&limit=8')
+          .then(data => { setFeatured(Array.isArray(data) ? data : []); setLoading(false); })
           .catch(() => setLoading(false));
         window.scrollTo(0, 0);
       }, []);
@@ -1577,16 +1589,15 @@
 
       useEffect(() => {
         setLoading(true);
-        let url = '/api/listings?';
-        if (activeCategory !== 'All') url += `category=${activeCategory}&`;
-        if (selectedBrands.length === 1) url += `brand=${selectedBrands[0]}&`;
-        url += `sort=${sort}`;
-        fetch(url)
-          .then(r => r.json())
+        let path = '/rest/v1/listings?is_active=eq.true&order=rating.desc';
+        if (activeCategory && activeCategory !== 'All') path += `&category=eq.${encodeURIComponent(activeCategory)}`;
+        if (selectedBrands.length === 1) path += `&brand=eq.${encodeURIComponent(selectedBrands[0])}`;
+        sbFetch(path)
           .then(data => {
+            const items = Array.isArray(data) ? data : [];
             const filtered = selectedBrands.length > 1
-              ? data.filter(l => selectedBrands.includes(l.brand))
-              : data;
+              ? items.filter(l => selectedBrands.includes(l.brand))
+              : items;
             setListings(filtered);
             setLoading(false);
           })
@@ -1706,8 +1717,8 @@
       const [days, setDays] = useState(0);
 
       useEffect(() => {
-        fetch(`/api/listings/${id}`)
-          .then(r => r.json()).then(data => { setListing(data); setLoading(false); })
+        sbFetch(`/rest/v1/listings?id=eq.${id}&limit=1`)
+          .then(data => { setListing(Array.isArray(data) && data.length > 0 ? data[0] : null); setLoading(false); })
           .catch(() => setLoading(false));
         window.scrollTo(0, 0);
       }, [id]);
@@ -1910,7 +1921,7 @@
       const [loading, setLoading] = useState(false);
 
       useEffect(() => {
-        fetch(`/api/listings/${listingId}`).then(r => r.json()).then(setListing);
+        sbFetch(`/rest/v1/listings?id=eq.${listingId}&limit=1`).then(data => setListing(Array.isArray(data) && data.length > 0 ? data[0] : null));
         window.scrollTo(0, 0);
       }, [listingId]);
 
