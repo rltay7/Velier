@@ -301,6 +301,34 @@
     .trade-fee-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center; }
     .trade-fee-item .tfi-val { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; color: var(--gold); }
     .trade-fee-item .tfi-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--champagne-dim); margin-top: 0.25rem; }
+    .trade-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+    .trade-tab { padding: 0.65rem 1.5rem; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--champagne-dim); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.2s, border-color 0.2s; background: none; border-top: none; border-left: none; border-right: none; }
+    .trade-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+    .trade-tab:hover:not(.active) { color: var(--champagne); }
+    .trade-filters { display: flex; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap; }
+    .trade-filter-btn { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.35rem 0.85rem; border: 1px solid var(--border); color: var(--champagne-dim); background: none; cursor: pointer; transition: all 0.2s; }
+    .trade-filter-btn.active, .trade-filter-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+    .trade-duration-badge { display: inline-block; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; border: 1px solid var(--border); color: var(--champagne-dim); padding: 0.15rem 0.4rem; margin: 0 0.2rem 0.3rem 0; }
+    .trade-form-wrap { background: var(--obsidian-2); border: 1px solid var(--border); padding: 2rem; max-width: 680px; margin: 0 auto; }
+    .trade-form-wrap h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 300; color: var(--champagne); margin-bottom: 0.4rem; }
+    .trade-form-wrap .form-note { font-size: 0.78rem; color: var(--champagne-dim); margin-bottom: 1.75rem; line-height: 1.6; }
+    .trade-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .propose-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .propose-modal { background: var(--obsidian-2); border: 1px solid var(--border); padding: 2rem; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; }
+    .propose-modal h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 300; color: var(--champagne); margin-bottom: 0.3rem; }
+    .propose-target-card { background: var(--obsidian-3); border: 1px solid var(--border); padding: 0.85rem 1rem; margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center; }
+    .propose-target-img { width: 56px; height: 56px; background-size: cover; background-position: center; flex-shrink: 0; }
+    .propose-target-info { flex: 1; }
+    .propose-target-title { font-size: 0.85rem; color: var(--champagne); margin-bottom: 0.1rem; }
+    .propose-target-val { font-size: 0.75rem; color: var(--gold); }
+    .duration-options { display: flex; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .duration-btn { flex: 1; min-width: 100px; padding: 0.65rem 0.5rem; border: 1px solid var(--border); background: none; color: var(--champagne-dim); font-size: 0.78rem; letter-spacing: 0.08em; cursor: pointer; text-align: center; transition: all 0.2s; }
+    .duration-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(180,145,90,0.07); }
+    .fee-calc-box { background: var(--obsidian-3); border: 1px solid var(--border); padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+    .fee-calc-row { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--champagne-dim); padding: 0.25rem 0; }
+    .fee-calc-row.total { border-top: 1px solid var(--border); margin-top: 0.4rem; padding-top: 0.6rem; color: var(--champagne); font-size: 0.85rem; }
+    .fee-calc-row.total span:last-child { color: var(--gold); font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; }
+    @media (max-width: 600px) { .trade-form-grid { grid-template-columns: 1fr; } .duration-options { flex-direction: column; } }
 
     /* ── TRUST & SECURITY ── */
     .trust-section { padding: 4rem 0; background: var(--obsidian-2); border-top: 1px solid var(--border); }
@@ -750,11 +778,12 @@
       // ── Supabase direct listing fetcher ──────────────────────────────
       const SB_URL = 'https://gwcesifbgjlwsnchzjwi.supabase.co';
       const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3Y2VzaWZiZ2psd3NuY2h6andpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzMjkzNjIsImV4cCI6MjA5MTkwNTM2Mn0.-Abj4om252fDFQQiKELAwTQURkhV1IpVrxKVPzycesU';
-      async function sbFetch(path) {
-        const r = await fetch(SB_URL + path, {
-          headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
-        });
-        return r.json();
+      async function sbFetch(path, opts = {}) {
+        const headers = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'return=representation' };
+        const r = await fetch(SB_URL + path, { ...opts, headers });
+        if (!r.ok) { const err = await r.text(); throw new Error(err); }
+        const text = await r.text();
+        return text ? JSON.parse(text) : null;
       }
       // ─────────────────────────────────────────────────────────────────
 
@@ -2365,70 +2394,322 @@
 
 
     // ── TRADE PAGE ──
-    const trades = [
-      { id: 1, title: 'Rolex Submariner Date', brand: 'Rolex', value: 14500, image: 'https://img.chrono24.com/images/uhren/32585129-b02ufm80eqd2mvz1mqzbqvcl-ExtraLarge.jpg', condition: 'Excellent', seeking: 'Patek Philippe Aquanaut 5167 or Audemars Piguet Royal Oak 41mm', owner: 'James R.', location: 'London, UK' },
-      { id: 2, title: 'Hermès Birkin 30 Biscuit Togo', brand: 'Hermès', value: 22000, image: 'https://mightychic.com/wp-content/uploads/2023/12/hermes-birkin-30-biscuit-bag-for-sale-on-mightychic.jpg', condition: 'Excellent', seeking: 'Chanel Classic Double Flap or Hermès Kelly 28', owner: 'Isabelle M.', location: 'Paris, France' },
-      { id: 3, title: 'Patek Philippe Calatrava 5127R', brand: 'Patek Philippe', value: 28000, image: 'https://cdn.swisswatchexpo.com/productphotos/10/11/patek-philippe-calatrava-rose-gold-automatic-mens-watch-5127r-65252_8fb2d.jpg', condition: 'Like New', seeking: 'Patek Philippe Nautilus 5711 or Perpetual Calendar', owner: 'Thomas K.', location: 'Geneva, Switzerland' },
-      { id: 4, title: 'Chanel Classic Double Flap Ivory', brand: 'Chanel', value: 9800, image: 'https://madisonavenuecouture.com/cdn/shop/files/C-V-230601-3-01_1024x1024.jpg?v=1690559192', condition: 'Very Good', seeking: 'Saint Laurent Le 5 à 7 Large or Bottega Veneta Cassette', owner: 'Sofia L.', location: 'Milan, Italy' },
-      { id: 5, title: 'Audemars Piguet Royal Oak 41mm', brand: 'Audemars Piguet', value: 32000, image: 'https://img.chrono24.com/images/uhren/38363070-j9iuygz0p39berthgowhnlm7-ExtraLarge.jpg', condition: 'Excellent', seeking: 'Patek Philippe Nautilus 5711 or Rolex Daytona White Gold', owner: 'Henrik S.', location: 'Stockholm, Sweden' },
-      { id: 6, title: 'Valentino VLogo Fuchsia Gown', brand: 'Valentino', value: 4200, image: 'https://a.1stdibscdn.com/archivesE/upload/366869/v_11197031460738547313/_MG_0562_copy_org_master.jpg?width=1200', condition: 'Excellent', seeking: 'Alexander McQueen gown or Givenchy couture piece', owner: 'Amara D.', location: 'Dubai, UAE' },
-    ];
+    const TRADE_DURATIONS = ['1 week', '1 month', '3 months'];
+    const TRADE_FEE_RATE = 0.025;
+
+    const ProposeModal = ({ listing, onClose }) => {
+      const { user } = useAuth();
+      const [duration, setDuration] = React.useState('1 month');
+      const [form, setForm] = React.useState({ title: '', brand: '', value: '', image: '', message: '' });
+      const [submitting, setSubmitting] = React.useState(false);
+      const [done, setDone] = React.useState(false);
+
+      const myVal = parseFloat(form.value) || 0;
+      const theirVal = listing ? listing.estimated_value : 0;
+      const avgVal = (myVal + theirVal) / 2;
+      const fee = avgVal * TRADE_FEE_RATE;
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!form.title || !form.brand || !form.value) return;
+        setSubmitting(true);
+        try {
+          const payload = {
+            trade_listing_id: listing.id,
+            proposer_id: user ? user.id : null,
+            proposer_item_title: form.title,
+            proposer_item_brand: form.brand,
+            proposer_item_value: parseFloat(form.value),
+            proposer_item_image: form.image || null,
+            proposer_message: form.message || null,
+            duration: duration,
+            service_fee: fee
+          };
+          await sbFetch('/rest/v1/trade_proposals', { method: 'POST', body: JSON.stringify(payload) });
+          setDone(true);
+        } catch(err) {
+          window.dispatchEvent(new CustomEvent('velier-toast', {detail: 'Failed to submit proposal. Please try again.'}));
+        }
+        setSubmitting(false);
+      };
+
+      if (!listing) return null;
+
+      return (
+        <div className="propose-overlay" onClick={(e) => { if(e.target === e.currentTarget) onClose(); }}>
+          <div className="propose-modal">
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'1.25rem'}}>
+              <div>
+                <div className="section-label" style={{marginBottom:'0.3rem'}}>Temporary Swap</div>
+                <h3>Propose an Exchange</h3>
+              </div>
+              <button onClick={onClose} style={{background:'none',border:'none',color:'var(--champagne-dim)',fontSize:'1.2rem',cursor:'pointer',padding:'0.25rem'}}>×</button>
+            </div>
+
+            {done ? (
+              <div style={{textAlign:'center',padding:'2rem 0'}}>
+                <div style={{fontFamily:'Cormorant Garamond, serif',fontSize:'2rem',color:'var(--gold)',marginBottom:'0.75rem'}}>◈</div>
+                <div style={{color:'var(--champagne)',fontSize:'1rem',marginBottom:'0.5rem'}}>Proposal Sent</div>
+                <p style={{color:'var(--champagne-dim)',fontSize:'0.82rem',lineHeight:'1.7'}}>Your swap proposal has been submitted. The owner will be notified and can accept, counter, or decline.</p>
+                <button className="btn btn-gold" style={{marginTop:'1.5rem'}} onClick={onClose}>Close</button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <div className="propose-target-card">
+                  <div className="propose-target-img" style={{backgroundImage:`url(${listing.image})`,backgroundSize:'cover',backgroundPosition:'center'}}></div>
+                  <div className="propose-target-info">
+                    <div className="propose-target-title">{listing.title}</div>
+                    <div style={{fontSize:'0.72rem',color:'var(--champagne-dim)',marginBottom:'0.2rem'}}>{listing.brand} · {listing.condition}</div>
+                    <div className="propose-target-val">${listing.estimated_value.toLocaleString()}</div>
+                  </div>
+                </div>
+
+                <div className="section-label" style={{marginBottom:'0.75rem'}}>Your Item</div>
+                <div className="form-group">
+                  <label className="form-label">Item Title *</label>
+                  <input className="form-input" placeholder="e.g. Omega Speedmaster Professional" value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} required />
+                </div>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem'}}>
+                  <div className="form-group">
+                    <label className="form-label">Brand *</label>
+                    <input className="form-input" placeholder="e.g. Omega" value={form.brand} onChange={e=>setForm(f=>({...f,brand:e.target.value}))} required />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Estimated Value (AUD) *</label>
+                    <input className="form-input" type="number" min="1" placeholder="e.g. 8500" value={form.value} onChange={e=>setForm(f=>({...f,value:e.target.value}))} required />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Image URL (optional)</label>
+                  <input className="form-input" placeholder="https://..." value={form.image} onChange={e=>setForm(f=>({...f,image:e.target.value}))} />
+                </div>
+
+                <div className="section-label" style={{margin:'1.25rem 0 0.75rem'}}>Swap Duration</div>
+                <div className="duration-options">
+                  {TRADE_DURATIONS.map(d => (
+                    <button key={d} type="button" className={`duration-btn${duration===d?' active':''}`} onClick={() => setDuration(d)}>{d}</button>
+                  ))}
+                </div>
+
+                <div className="section-label" style={{marginBottom:'0.75rem'}}>Fee Summary</div>
+                <div className="fee-calc-box">
+                  <div className="fee-calc-row"><span>Their item value</span><span>${theirVal.toLocaleString()}</span></div>
+                  <div className="fee-calc-row"><span>Your item value</span><span>{myVal > 0 ? '$'+myVal.toLocaleString() : '—'}</span></div>
+                  <div className="fee-calc-row"><span>Average value</span><span>{avgVal > 0 ? '$'+Math.round(avgVal).toLocaleString() : '—'}</span></div>
+                  <div className="fee-calc-row total"><span>Velier service fee (2.5%)</span><span>{fee > 0 ? '$'+Math.round(fee).toLocaleString() : '—'}</span></div>
+                  <div style={{fontSize:'0.68rem',color:'var(--champagne-dim)',marginTop:'0.5rem',lineHeight:'1.5'}}>Fee applies per party. Charged on swap confirmation.</div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Message to Owner (optional)</label>
+                  <textarea className="form-input" rows="2" placeholder="Introduce yourself and your item..." value={form.message} onChange={e=>setForm(f=>({...f,message:e.target.value}))} style={{resize:'vertical'}}></textarea>
+                </div>
+
+                <button type="submit" className="btn btn-gold" style={{width:'100%',marginTop:'0.5rem'}} disabled={submitting}>
+                  {submitting ? 'Submitting...' : 'Submit Proposal'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    const TradeListForm = ({ onSuccess }) => {
+      const { user, setAuthModal } = useAuth();
+      const [form, setForm] = React.useState({ title:'', brand:'', category:'Watches', description:'', image:'', estimated_value:'', condition:'Excellent', location:'', seeking:'' });
+      const [submitting, setSubmitting] = React.useState(false);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!user) { setAuthModal('login'); return; }
+        setSubmitting(true);
+        try {
+          const payload = {
+            owner_id: user.id,
+            title: form.title,
+            brand: form.brand,
+            category: form.category,
+            description: form.description,
+            image: form.image || null,
+            estimated_value: parseFloat(form.estimated_value),
+            condition: form.condition,
+            location: form.location || null,
+            seeking: form.seeking,
+            available_durations: ['1 week','1 month','3 months']
+          };
+          await sbFetch('/rest/v1/trade_listings', { method: 'POST', body: JSON.stringify(payload) });
+          window.dispatchEvent(new CustomEvent('velier-toast', {detail:'Trade listing published.'}));
+          onSuccess && onSuccess();
+        } catch(err) {
+          window.dispatchEvent(new CustomEvent('velier-toast', {detail:'Failed to publish listing.'}));
+        }
+        setSubmitting(false);
+      };
+
+      return (
+        <div className="trade-form-wrap">
+          <h3>List Your Item for Swap</h3>
+          <p className="form-note">Post your luxury piece and specify what you'd like in return. Members can propose a temporary swap for 1 week, 1 month, or 3 months. Velier charges a 2.5% service fee based on the average item value.</p>
+          <form onSubmit={handleSubmit}>
+            <div className="trade-form-grid">
+              <div className="form-group">
+                <label className="form-label">Item Title *</label>
+                <input className="form-input" placeholder="e.g. Rolex Submariner" value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Brand *</label>
+                <input className="form-input" placeholder="e.g. Rolex" value={form.brand} onChange={e=>setForm(f=>({...f,brand:e.target.value}))} required />
+              </div>
+            </div>
+            <div className="trade-form-grid">
+              <div className="form-group">
+                <label className="form-label">Category *</label>
+                <select className="form-input" value={form.category} onChange={e=>setForm(f=>({...f,category:e.target.value}))}>
+                  {['Watches','Bags','Dresses','Jewellery','Shoes'].map(c=><option key={c}>{c}</option>)}
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Condition *</label>
+                <select className="form-input" value={form.condition} onChange={e=>setForm(f=>({...f,condition:e.target.value}))}>
+                  {['Like New','Excellent','Very Good','Good'].map(c=><option key={c}>{c}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Description *</label>
+              <textarea className="form-input" rows="3" placeholder="Describe the item, its history, and anything notable..." value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} required style={{resize:'vertical'}}></textarea>
+            </div>
+            <div className="trade-form-grid">
+              <div className="form-group">
+                <label className="form-label">Estimated Value (AUD) *</label>
+                <input className="form-input" type="number" min="1" placeholder="e.g. 12000" value={form.estimated_value} onChange={e=>setForm(f=>({...f,estimated_value:e.target.value}))} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Location</label>
+                <input className="form-input" placeholder="e.g. Melbourne, VIC" value={form.location} onChange={e=>setForm(f=>({...f,location:e.target.value}))} />
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Image URL (optional)</label>
+              <input className="form-input" placeholder="https://..." value={form.image} onChange={e=>setForm(f=>({...f,image:e.target.value}))} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">What are you seeking in return? *</label>
+              <input className="form-input" placeholder="e.g. Patek Philippe Nautilus or Hermès Kelly 28" value={form.seeking} onChange={e=>setForm(f=>({...f,seeking:e.target.value}))} required />
+            </div>
+            <button type="submit" className="btn btn-gold" style={{width:'100%',marginTop:'0.5rem'}} disabled={submitting}>
+              {submitting ? 'Publishing...' : user ? 'Publish Trade Listing' : 'Sign In to List'}
+            </button>
+          </form>
+        </div>
+      );
+    };
 
     const TradePage = () => {
+      const [tab, setTab] = React.useState('browse');
+      const [listings, setListings] = React.useState([]);
+      const [loading, setLoading] = React.useState(true);
+      const [filterCat, setFilterCat] = React.useState('All');
+      const [proposeTarget, setProposeTarget] = React.useState(null);
+
+      const loadListings = async () => {
+        setLoading(true);
+        try {
+          const data = await sbFetch('/rest/v1/trade_listings?is_active=eq.true&order=created_at.desc');
+          setListings(data || []);
+        } catch(e) { setListings([]); }
+        setLoading(false);
+      };
+
+      React.useEffect(() => { loadListings(); }, []);
+
+      const categories = ['All', ...Array.from(new Set((listings||[]).map(l=>l.category)))];
+      const filtered = filterCat === 'All' ? listings : listings.filter(l=>l.category===filterCat);
+
       return (
         <div>
+          {proposeTarget && <ProposeModal listing={proposeTarget} onClose={() => setProposeTarget(null)} />}
           <div className="trade-hero">
             <div className="container">
-              <div className="section-label" style={{marginBottom:'1rem'}}>New on Velier</div>
-              <h1>Asset Exchange</h1>
-              <p>Trade luxury pieces peer-to-peer. List your item, set what you're seeking, and exchange with verified members — at a fraction of resale friction.</p>
-              <a href="#/list" className="btn btn-gold" style={{display:'inline-block'}}>List an Item for Trade</a>
+              <div className="section-label" style={{marginBottom:'1rem'}}>Velier Exchange</div>
+              <h1>Temporary Trades</h1>
+              <p>Swap luxury pieces with verified members for a set period — 1 week, 1 month, or 3 months. Velier facilitates, insures, and charges a 2.5% service fee on the average item value.</p>
             </div>
           </div>
           <div className="container section">
             <div className="trade-fee-info">
-              <div className="section-label" style={{marginBottom:'1rem',textAlign:'center'}}>How Trades Work</div>
+              <div className="section-label" style={{marginBottom:'1rem',textAlign:'center'}}>How It Works</div>
               <div className="trade-fee-grid">
                 <div className="trade-fee-item">
                   <div className="tfi-val">2.5%</div>
-                  <div className="tfi-label">Trade fee per party<br/>(capped at $500)</div>
+                  <div className="tfi-label">Service fee per party<br/>of average item value</div>
+                </div>
+                <div className="trade-fee-item">
+                  <div className="tfi-val">3</div>
+                  <div className="tfi-label">Swap durations<br/>1 week · 1 month · 3 months</div>
                 </div>
                 <div className="trade-fee-item">
                   <div className="tfi-val">◈</div>
-                  <div className="tfi-label">ID Verification<br/>required for all trades</div>
-                </div>
-                <div className="trade-fee-item">
-                  <div className="tfi-val">48h</div>
-                  <div className="tfi-label">Escrow window<br/>for condition confirmation</div>
+                  <div className="tfi-label">ID verified members<br/>only — all swaps escrow-backed</div>
                 </div>
               </div>
             </div>
-            <div className="section-header" style={{marginBottom:'2rem'}}>
-              <div className="section-label">Available Trades</div>
-              <h2>Browse Exchange Listings</h2>
+
+            <div className="trade-tabs">
+              <button className={`trade-tab${tab==='browse'?' active':''}`} onClick={() => setTab('browse')}>Browse Swaps</button>
+              <button className={`trade-tab${tab==='list'?' active':''}`} onClick={() => setTab('list')}>List Your Item</button>
             </div>
-            <div className="trade-grid">
-              {trades.map(t => (
-                <div key={t.id} className="trade-card">
-                  <div className="trade-card-header">
-                    <span style={{fontSize:'0.7rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--champagne-dim)'}}>{t.owner} · {t.location}</span>
-                    <span className="trade-badge">Trade</span>
-                  </div>
-                  <div className="trade-item-img" style={{backgroundImage:`url(${t.image})`,backgroundSize:'cover',backgroundPosition:'center'}}></div>
-                  <div className="trade-item-title">{t.title}</div>
-                  <div className="trade-item-meta">{t.brand} · {t.condition}</div>
-                  <div className="trade-value">Estimated Value: <strong>${t.value.toLocaleString()}</strong></div>
-                  <div className="trade-seeking">
-                    <span style={{fontSize:'0.65rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--champagne-dim)',display:'block',marginBottom:'0.25rem'}}>Seeking</span>
-                    <span>{t.seeking}</span>
-                  </div>
-                  <button className="btn btn-gold" style={{width:'100%',fontSize:'0.78rem'}}
-                    onClick={() => window.dispatchEvent(new CustomEvent('velier-toast', {detail:'Trade enquiry sent. The lender will be notified.'}))}>
-                    Propose a Trade
-                  </button>
+
+            {tab === 'browse' && (
+              <div>
+                <div className="trade-filters">
+                  {categories.map(c => (
+                    <button key={c} className={`trade-filter-btn${filterCat===c?' active':''}`} onClick={() => setFilterCat(c)}>{c}</button>
+                  ))}
                 </div>
-              ))}
-            </div>
+                {loading ? (
+                  <div style={{textAlign:'center',padding:'4rem 0',color:'var(--champagne-dim)'}}>Loading listings...</div>
+                ) : filtered.length === 0 ? (
+                  <div style={{textAlign:'center',padding:'4rem 0',color:'var(--champagne-dim)'}}>
+                    <div style={{fontFamily:'Cormorant Garamond,serif',fontSize:'1.5rem',color:'var(--champagne)',marginBottom:'0.5rem'}}>No listings yet</div>
+                    <p style={{fontSize:'0.85rem'}}>Be the first to list an item for swap.</p>
+                    <button className="btn btn-gold" style={{marginTop:'1rem'}} onClick={() => setTab('list')}>List Your Item</button>
+                  </div>
+                ) : (
+                  <div className="trade-grid">
+                    {filtered.map(t => (
+                      <div key={t.id} className="trade-card">
+                        <div className="trade-card-header">
+                          <span style={{fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--champagne-dim)'}}>{t.location || 'Australia'}</span>
+                          <span className="trade-badge">Swap</span>
+                        </div>
+                        <div className="trade-item-img" style={{backgroundImage:t.image?`url(${t.image})`:'none',backgroundSize:'cover',backgroundPosition:'center'}}></div>
+                        <div className="trade-item-title">{t.title}</div>
+                        <div className="trade-item-meta">{t.brand} · {t.condition}</div>
+                        <div className="trade-value">Estimated Value: <strong>${Number(t.estimated_value).toLocaleString()}</strong></div>
+                        <div className="trade-seeking">
+                          <span style={{fontSize:'0.62rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--champagne-dim)',display:'block',marginBottom:'0.25rem'}}>Seeking</span>
+                          <span style={{color:'var(--champagne)'}}>{t.seeking}</span>
+                        </div>
+                        <div style={{marginBottom:'1rem'}}>
+                          {(t.available_durations||['1 week','1 month','3 months']).map(d => (
+                            <span key={d} className="trade-duration-badge">{d}</span>
+                          ))}
+                        </div>
+                        <button className="btn btn-gold" style={{width:'100%',fontSize:'0.78rem'}} onClick={() => setProposeTarget(t)}>
+                          Propose a Swap
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {tab === 'list' && (
+              <TradeListForm onSuccess={() => { loadListings(); setTab('browse'); }} />
+            )}
           </div>
           <Footer />
         </div>
