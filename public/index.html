@@ -1228,10 +1228,10 @@
 
     // ── HERO CINEMA ──
     const HERO_CLIPS = [
-      'https://videos.pexels.com/video-files/8798283/8798283-uhd_2732_1440_25fps.mp4',
-      'https://videos.pexels.com/video-files/6230464/6230464-hd_1920_1080_24fps.mp4',
-      'https://videos.pexels.com/video-files/11667737/11667737-uhd_2560_1440_24fps.mp4',
-      'https://videos.pexels.com/video-files/34738710/14726377_2560_1440_30fps.mp4',
+      'https://videos.pexels.com/video-files/11667737/11667737-uhd_2560_1440_24fps.mp4', // Omega watch
+      'https://videos.pexels.com/video-files/6230464/6230464-hd_1920_1080_24fps.mp4',   // Rolex slow-mo
+      'https://videos.pexels.com/video-files/8798283/8798283-uhd_2732_1440_25fps.mp4',   // Woman with bag
+      'https://videos.pexels.com/video-files/34738710/14726377_2560_1440_30fps.mp4',     // Luxury boutique
     ];
 
     const HeroCinema = () => {
@@ -1258,7 +1258,7 @@
             }, 1800);
             return prev;
           });
-        }, 9000);
+        }, 6000);
         return () => clearInterval(interval);
       }, []);
 
