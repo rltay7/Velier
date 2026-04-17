@@ -1,0 +1,3066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velier — Access everything. Own nothing.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Switzer:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --obsidian: #0d0b09;
+      --obsidian-2: #131109;
+      --obsidian-3: #1a1713;
+      --obsidian-4: #22201a;
+      --obsidian-5: #2e2b24;
+      --gold: hsl(41, 62%, 60%);
+      --gold-dim: hsl(41, 40%, 45%);
+      --gold-light: hsl(41, 70%, 75%);
+      --champagne: #e8dfc8;
+      --champagne-dim: #9e9484;
+      --white: #f5f0e8;
+      --border: rgba(200, 180, 130, 0.12);
+      --border-hover: rgba(200, 180, 130, 0.28);
+      --overlay: rgba(13, 11, 9, 0.7);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--obsidian);
+      color: var(--champagne);
+      font-family: 'Switzer', -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TYPOGRAPHY ── */
+    .display { font-family: 'Cormorant Garamond', Georgia, serif; }
+    h1, h2, h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 400; }
+    h1 { font-size: clamp(2.5rem, 6vw, 5rem); line-height: 1.05; letter-spacing: -0.01em; }
+    h2 { font-size: clamp(1.75rem, 3.5vw, 2.75rem); line-height: 1.15; }
+    h3 { font-size: clamp(1.25rem, 2vw, 1.6rem); line-height: 1.25; }
+    p { color: var(--champagne-dim); }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--obsidian); }
+    ::-webkit-scrollbar-thumb { background: var(--obsidian-5); border-radius: 3px; }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 3rem); }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+
+    /* ── NAVIGATION ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 10000;
+      padding: 1.25rem clamp(1rem, 4vw, 3rem);
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(8,7,10,0.55);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border-bottom: 1px solid rgba(200,155,50,0.08);
+      transition: opacity 0.4s ease;
+    }
+    .nav.splash-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 0.75rem;
+      text-decoration: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.45rem; font-weight: 300; letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: #ffffff;
+      -webkit-text-stroke: none;
+      text-stroke: none;
+    }
+    .nav-logo svg { width: 32px; height: 32px; }
+    .nav-links {
+      display: flex; align-items: center; gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none; color: var(--champagne-dim);
+      font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--champagne); }
+    .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-cta, button.nav-cta {
+      padding: 0.55rem 1.25rem;
+      background: transparent;
+      border: 1px solid var(--border-hover);
+      color: var(--champagne);
+      font-family: 'Switzer', sans-serif;
+      font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.2s; text-decoration: none;
+      display: inline-flex; align-items: center;
+      border-radius: 0;
+    }
+    .nav-cta:hover { background: var(--obsidian-4); border-color: var(--gold-dim); color: var(--gold-light); }
+    .nav-cta.primary { background: var(--gold); border-color: var(--gold); color: var(--obsidian); font-weight: 600; }
+    .nav-cta.primary:hover { background: var(--gold-light); }
+
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px; }
+    .hamburger span { display: block; width: 22px; height: 1px; background: var(--champagne); transition: all 0.3s; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 0.75rem 2rem;
+      font-family: 'Switzer', sans-serif;
+      font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.25s; text-decoration: none;
+      border: 1px solid transparent;
+    }
+    .btn-gold { background: var(--gold); color: var(--obsidian); font-weight: 600; border-color: var(--gold); }
+    .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(200,160,60,0.25); }
+    .btn-outline { background: transparent; color: var(--champagne); border-color: var(--border-hover); }
+    .btn-outline:hover { border-color: var(--gold-dim); color: var(--gold-light); background: rgba(200,160,60,0.05); }
+    .btn-ghost { background: transparent; color: var(--champagne-dim); border-color: transparent; }
+    .btn-ghost:hover { color: var(--champagne); }
+    .btn-danger { background: transparent; color: #e05555; border-color: rgba(220,80,80,0.3); }
+    .btn-danger:hover { background: rgba(220,80,80,0.1); }
+    .btn-sm { padding: 0.5rem 1.25rem; font-size: 0.75rem; }
+    .btn-lg { padding: 1rem 2.5rem; font-size: 0.9rem; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--obsidian-2);
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .card:hover { border-color: var(--border-hover); transform: translateY(-3px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+    .card-image {
+      aspect-ratio: 4/5;
+      background: var(--obsidian-3);
+      overflow: hidden; position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .card-image svg { width: 48px; height: 48px; opacity: 0.2; }
+    .card-image .wishlist-btn {
+      position: absolute; top: 0.75rem; right: 0.75rem;
+      background: rgba(13,11,9,0.8); border: 1px solid var(--border);
+      width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s; backdrop-filter: blur(8px);
+    }
+    .card-image .wishlist-btn:hover, .card-image .wishlist-btn.active { border-color: var(--gold-dim); }
+    .card-image .wishlist-btn.active svg { fill: var(--gold); stroke: var(--gold); }
+    .card-image .category-badge {
+      position: absolute; bottom: 0.75rem; left: 0.75rem;
+      background: rgba(13,11,9,0.85); backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.6rem;
+      font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--champagne-dim);
+    }
+    .card-body { padding: 1rem 1.1rem 1.25rem; }
+    .card-brand { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.3rem; }
+    .card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: var(--champagne); margin-bottom: 0.35rem; line-height: 1.3; }
+    .card-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 0.6rem; }
+    .card-price { font-size: 0.9rem; color: var(--champagne); }
+    .card-price span { color: var(--champagne-dim); font-size: 0.75rem; }
+    .card-retail { font-size: 0.68rem; color: var(--champagne-dim); letter-spacing: 0.04em; margin-top: 0.2rem; }
+    .card-rating { display: flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; color: var(--champagne-dim); }
+    .card-rating .star { color: var(--gold); font-size: 0.7rem; }
+
+    /* ── LISTING ITEM VISUALS ── */
+    .item-visual {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem; user-select: none;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center;
+      padding: 8rem 2rem 5rem;
+      position: relative; overflow: hidden;
+      background: var(--obsidian);
+    }
+    .hero-video-wrap {
+      position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+    }
+    .hero-video {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 1.8s ease-in-out;
+    }
+    .hero-video.active { opacity: 0.6; }
+    .hero-video-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(13,11,9,0.2) 0%, rgba(13,11,9,0.45) 50%, rgba(13,11,9,0.92) 100%);
+      pointer-events: none; z-index: 1;
+    }
+    .hero > *:not(.hero-video-wrap):not(.hero-video-overlay) { position: relative; z-index: 2; }
+    .hero-eyebrow {
+      font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .hero-eyebrow::before, .hero-eyebrow::after {
+      content: ''; display: block; width: 40px; height: 1px; background: var(--gold-dim);
+    }
+    .hero h1 { max-width: 900px; margin-bottom: 1.25rem; }
+    .hero h1 em { font-style: italic; color: var(--gold); }
+    .hero-sub { max-width: 500px; margin: 0 auto 2.5rem; font-size: 1rem; color: var(--champagne-dim); line-height: 1.7; }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .hero-scroll {
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--champagne-dim); animation: bounce 2s infinite;
+      margin-top: 2.5rem;
+    }
+    .hero-scroll svg { width: 18px; height: 18px; }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px); }
+    }
+
+    /* ── SECTIONS ── */
+    .section { padding: 5rem 0; }
+    .section-sm { padding: 3rem 0; }
+    .section-header { text-align: center; margin-bottom: 3rem; }
+    .section-label { font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
+    .section-header h2 { margin-bottom: 0.75rem; }
+    .section-header p { max-width: 480px; margin: 0 auto; font-size: 0.95rem; }
+    .divider { height: 1px; background: var(--border); margin: 0; }
+
+    /* ── CATEGORY TILES ── */
+    .category-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
+    .category-tile {
+      aspect-ratio: 1;
+      background: var(--obsidian-3);
+      border: 1px solid var(--border);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem;
+      cursor: pointer; transition: all 0.3s; text-decoration: none; position: relative; overflow: hidden;
+    }
+    .category-tile::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 120%, rgba(200,155,50,0.08) 0%, transparent 70%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .category-tile:hover::before { opacity: 1; }
+    .category-tile:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+    .category-tile .cat-icon { width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; color: var(--champagne-dim); transition: color 0.3s; }
+    .category-tile:hover .cat-icon { color: var(--champagne); }
+    .category-tile .cat-label { font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--champagne-dim); }
+    .category-tile:hover .cat-label { color: var(--champagne); }
+
+
+    /* ── TRADE PAGE ── */
+    .trade-hero { padding: 5rem 0 3rem; background: linear-gradient(180deg, var(--obsidian-2) 0%, var(--obsidian) 100%); border-bottom: 1px solid var(--border); text-align: center; }
+    .trade-hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 300; color: var(--champagne); margin-bottom: 0.75rem; }
+    .trade-hero p { color: var(--champagne-dim); max-width: 520px; margin: 0 auto 2rem; font-size: 0.9rem; line-height: 1.7; }
+    .trade-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+    .trade-card { background: var(--obsidian-2); border: 1px solid var(--border); padding: 1.5rem; transition: border-color 0.2s, transform 0.2s; }
+    .trade-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+    .trade-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .trade-badge { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold-dim); padding: 0.2rem 0.55rem; }
+    .trade-item-img { width: 100%; height: 180px; background: var(--obsidian-3); background-size: cover; background-position: center; margin-bottom: 1rem; }
+    .trade-item-title { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; color: var(--champagne); margin-bottom: 0.25rem; }
+    .trade-item-meta { font-size: 0.75rem; color: var(--champagne-dim); margin-bottom: 0.75rem; }
+    .trade-value { font-size: 0.8rem; color: var(--champagne-dim); margin-bottom: 1rem; }
+    .trade-value strong { color: var(--gold); font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; }
+    .trade-seeking { font-size: 0.75rem; color: var(--champagne-dim); padding: 0.6rem 0.75rem; border: 1px solid var(--border); margin-bottom: 1rem; line-height: 1.5; }
+    .trade-seeking span { color: var(--champagne); }
+    .trade-fee-info { background: var(--obsidian-3); border: 1px solid var(--border); padding: 1.25rem 1.5rem; margin-bottom: 2.5rem; }
+    .trade-fee-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center; }
+    .trade-fee-item .tfi-val { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; color: var(--gold); }
+    .trade-fee-item .tfi-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--champagne-dim); margin-top: 0.25rem; }
+
+    /* ── TRUST & SECURITY ── */
+    .trust-section { padding: 4rem 0; background: var(--obsidian-2); border-top: 1px solid var(--border); }
+    .trust-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+    .trust-card { padding: 1.5rem; border: 1px solid var(--border); background: var(--obsidian); }
+    .trust-icon { font-size: 1.4rem; margin-bottom: 0.75rem; opacity: 0.7; }
+    .trust-card h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: var(--champagne); margin-bottom: 0.4rem; font-weight: 400; }
+    .trust-card p { font-size: 0.78rem; color: var(--champagne-dim); line-height: 1.65; }
+
+    /* ── INSURANCE ── */
+    .insurance-box { margin-top: 1.25rem; border: 1px solid var(--border); }
+    .insurance-box-title { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--champagne-dim); padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.4rem; }
+    .insurance-tier { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+    .insurance-tier:last-child { border-bottom: none; }
+    .insurance-tier:hover { background: var(--obsidian-3); }
+    .insurance-tier input[type=radio] { accent-color: var(--gold); margin-top: 2px; flex-shrink: 0; }
+    .insurance-tier-body { flex: 1; }
+    .insurance-tier-name { font-size: 0.82rem; color: var(--champagne); margin-bottom: 0.15rem; }
+    .insurance-tier-desc { font-size: 0.72rem; color: var(--champagne-dim); line-height: 1.5; }
+    .insurance-tier-price { font-size: 0.78rem; color: var(--gold); margin-top: 0.2rem; }
+
+    /* ── ID VERIFICATION BADGE ── */
+    .verified-id-badge { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold-dim); padding: 0.2rem 0.6rem; margin-bottom: 1rem; }
+
+    @media (max-width: 600px) {
+      .trade-fee-grid { grid-template-columns: 1fr; }
+      .trust-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+
+    /* ── SPLASH SCREEN ── */
+    .splash {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #08070b;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 1s cubic-bezier(0.4,0,0.2,1), transform 1s cubic-bezier(0.4,0,0.2,1);
+      overflow: hidden;
+    }
+    .splash.exiting { opacity: 0; transform: scale(1.03); pointer-events: none; }
+
+    /* Canvas shimmer sits behind everything */
+    .splash-canvas {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      pointer-events: none;
+    }
+
+    /* Icon container */
+    .splash-icon-wrap {
+      position: relative;
+      width: 220px; height: 220px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 2.8rem;
+    }
+
+    /* Outer ring — slow pulse */
+    .splash-ring {
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(200,155,50,0.12);
+      animation: ringPulse 4s ease-in-out infinite;
+    }
+    .splash-ring-2 {
+      position: absolute; inset: 16px;
+      border-radius: 50%;
+      border: 1px solid rgba(200,155,50,0.07);
+      animation: ringPulse 4s ease-in-out infinite 0.6s;
+    }
+    @keyframes ringPulse {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50%       { opacity: 1;   transform: scale(1.015); }
+    }
+
+    /* Tick marks around the circle */
+    .splash-ticks {
+      position: absolute; inset: 0;
+      animation: tickRotate 40s linear infinite;
+    }
+    @keyframes tickRotate {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* The main eye SVG */
+    .splash-eye {
+      position: relative; z-index: 2;
+      filter: drop-shadow(0 0 30px rgba(200,155,50,0.2)) drop-shadow(0 0 8px rgba(200,155,50,0.1));
+      animation: eyeGlow 3s ease-in-out infinite;
+    }
+    @keyframes eyeGlow {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(200,155,50,0.15)) drop-shadow(0 0 6px rgba(200,155,50,0.08)); }
+      50%       { filter: drop-shadow(0 0 40px rgba(200,155,50,0.3))  drop-shadow(0 0 14px rgba(200,155,50,0.18)); }
+    }
+
+    /* Text */
+    .splash-wordmark {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem; font-weight: 300;
+      letter-spacing: 0.35em; text-transform: uppercase;
+      color: #ffffff;
+      -webkit-text-stroke: none;
+      margin-bottom: 0.5rem;
+      opacity: 0; animation: splashUp 1.2s ease forwards 0.4s;
+    }
+    .splash-tagline {
+      font-size: 0.63rem; letter-spacing: 0.28em; text-transform: uppercase;
+      color: rgba(200,155,50,0.55);
+      margin-bottom: 3.5rem;
+      opacity: 0; animation: splashUp 1.2s ease forwards 0.75s;
+    }
+    @keyframes splashUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Enter button */
+    .splash-enter {
+      position: relative;
+      display: inline-flex; align-items: center; gap: 1rem;
+      font-size: 0.63rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: rgba(200,155,50,0.75);
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      opacity: 0; animation: splashUp 1.2s ease forwards 1.2s;
+      transition: color 0.3s;
+    }
+    .splash-enter::before, .splash-enter::after {
+      content: '';
+      display: block;
+      height: 1px;
+      background: rgba(200,155,50,0.3);
+      transition: width 0.4s ease, background 0.3s;
+      width: 32px;
+    }
+    .splash-enter:hover { color: rgba(200,155,50,1); }
+    .splash-enter:hover::before, .splash-enter:hover::after {
+      width: 52px;
+      background: rgba(200,155,50,0.7);
+    }
+
+    /* Page entry */
+    .page-entering { animation: pageReveal 0.9s cubic-bezier(0.4,0,0.2,1) forwards; }
+    @keyframes pageReveal {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+        /* ── BRAND MARQUEE ── */
+    .brand-strip {
+      padding: 2rem 0;
+      background: var(--obsidian-2);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .brand-marquee {
+      display: flex; gap: 4rem;
+      animation: marquee 30s linear infinite;
+      white-space: nowrap; width: max-content;
+    }
+    .brand-marquee span {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--champagne-dim); padding: 0 2rem;
+    }
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    /* ── HOW IT WORKS ── */
+    .hiw-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+    .hiw-step { text-align: center; padding: 2.5rem 1.5rem; background: var(--obsidian-2); border: 1px solid var(--border); }
+    .hiw-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 4rem; font-weight: 300; color: var(--border-hover);
+      line-height: 1; margin-bottom: 1rem;
+    }
+    .hiw-step h3 { margin-bottom: 0.5rem; font-size: 1.2rem; }
+    .hiw-step p { font-size: 0.88rem; line-height: 1.65; }
+
+    /* ── LENDER CTA ── */
+    .lender-cta {
+      padding: 6rem clamp(1rem, 4vw, 3rem);
+      background: var(--obsidian-2);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+    }
+    .lender-cta h2 { margin-bottom: 1rem; }
+    .lender-cta p { margin-bottom: 2rem; font-size: 0.95rem; line-height: 1.7; }
+    .earnings-preview {
+      background: var(--obsidian-3); border: 1px solid var(--border);
+      padding: 2rem;
+    }
+    .earnings-preview h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--champagne); margin-bottom: 1.25rem; font-weight: 400; }
+    .earnings-row { display: flex; justify-content: space-between; align-items: baseline; padding: 0.6rem 0; border-bottom: 1px solid var(--border); }
+    .earnings-row:last-child { border-bottom: none; }
+    .earnings-row .label { font-size: 0.8rem; color: var(--champagne-dim); }
+    .earnings-row .value { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--gold); }
+
+    /* ── BROWSE PAGE ── */
+    .browse-layout { display: grid; grid-template-columns: 260px 1fr; gap: 2.5rem; align-items: start; }
+    .filter-sidebar { position: sticky; top: 5rem; }
+    .filter-section { margin-bottom: 2rem; }
+    .filter-label { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--champagne-dim); margin-bottom: 0.75rem; display: block; }
+    .filter-option {
+      display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0;
+      cursor: pointer; font-size: 0.85rem; color: var(--champagne-dim);
+      transition: color 0.2s; user-select: none;
+    }
+    .filter-option:hover { color: var(--champagne); }
+    .filter-option input { display: none; }
+    .filter-check {
+      width: 14px; height: 14px; border: 1px solid var(--border-hover);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .filter-check.checked { background: var(--gold); border-color: var(--gold); }
+    .filter-check.checked::after { content: '✓'; font-size: 9px; color: var(--obsidian); }
+    .browse-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+    .browse-count { font-size: 0.8rem; color: var(--champagne-dim); }
+    .sort-select {
+      background: var(--obsidian-3); border: 1px solid var(--border);
+      color: var(--champagne); padding: 0.5rem 1rem; font-size: 0.78rem;
+      font-family: 'Switzer', sans-serif; cursor: pointer; outline: none;
+    }
+    .filter-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+    .chip {
+      display: flex; align-items: center; gap: 0.4rem;
+      background: rgba(200,160,60,0.1); border: 1px solid rgba(200,160,60,0.25);
+      padding: 0.25rem 0.6rem; font-size: 0.72rem; letter-spacing: 0.06em;
+      color: var(--gold-light); cursor: pointer;
+    }
+    .chip:hover { background: rgba(200,160,60,0.18); }
+    .chip-x { font-size: 0.85rem; opacity: 0.7; }
+    .category-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; overflow-x: auto; }
+    .cat-tab {
+      padding: 0.65rem 1.25rem; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; color: var(--champagne-dim); border-bottom: 2px solid transparent;
+      white-space: nowrap; transition: all 0.2s; background: none; border-top: none; border-left: none; border-right: none;
+      font-family: 'Switzer', sans-serif;
+    }
+    .cat-tab:hover { color: var(--champagne); }
+    .cat-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+    /* ── LISTING DETAIL ── */
+    .listing-layout { display: grid; grid-template-columns: 1fr 420px; gap: 3rem; align-items: start; }
+    .gallery-main { aspect-ratio: 4/5; background: var(--obsidian-2); border: 1px solid var(--border); overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; }
+    .gallery-thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+    .gallery-thumb { aspect-ratio: 1; background: var(--obsidian-2); border: 1px solid var(--border); overflow: hidden; cursor: pointer; transition: border-color 0.2s; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
+    .gallery-thumb.active { border-color: var(--gold-dim); }
+    .listing-detail-right { position: sticky; top: 5rem; }
+    .listing-brand { font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.5rem; }
+    .listing-title-h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.6rem, 3vw, 2.4rem); margin-bottom: 0.75rem; font-weight: 400; line-height: 1.2; }
+    .listing-rating { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: var(--champagne-dim); margin-bottom: 1.5rem; }
+    .stars { color: var(--gold); letter-spacing: 0.05em; }
+    .listing-attrs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .attr-pill {
+      background: var(--obsidian-3); border: 1px solid var(--border);
+      padding: 0.6rem 0.875rem;
+    }
+    .attr-pill .attr-name { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--champagne-dim); margin-bottom: 0.15rem; }
+    .attr-pill .attr-val { font-size: 0.88rem; color: var(--champagne); }
+    .pricing-box { background: var(--obsidian-3); border: 1px solid var(--border); padding: 1.25rem; margin-bottom: 1.25rem; }
+    .pricing-box h4 { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--champagne); margin-bottom: 1rem; font-weight: 400; letter-spacing: 0.05em; }
+    .pricing-row { display: flex; justify-content: space-between; align-items: baseline; padding: 0.45rem 0; font-size: 0.85rem; }
+    .pricing-row .pl { color: var(--champagne-dim); }
+    .pricing-row .pv { color: var(--champagne); }
+    .pricing-total { border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 0.75rem; }
+    .pricing-total .pl { font-weight: 500; color: var(--champagne); }
+    .pricing-total .pv { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; color: var(--gold); }
+    .rate-schedule { margin-bottom: 1.25rem; border: 1px solid var(--border); }
+    .rate-schedule-title { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--champagne-dim); padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--border); }
+    .rate-row { display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 0.85rem; border-bottom: 1px solid var(--border); }
+    .rate-row:last-child { border-bottom: none; }
+    .rate-row-label { font-size: 0.82rem; color: var(--champagne-dim); }
+    .rate-row-price { font-size: 1.15rem; color: var(--champagne); font-family: 'Cormorant Garamond', serif; font-weight: 500; }
+    .retail-value { font-size: 0.72rem; color: var(--champagne-dim); letter-spacing: 0.06em; margin-bottom: 1rem; }
+    .retail-value strong { color: var(--champagne); }
+    .rate-row-save { font-size: 0.68rem; color: var(--gold); letter-spacing: 0.05em; margin-left: 0.5rem; }
+    .date-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .date-input { background: var(--obsidian-4); border: 1px solid var(--border); padding: 0.65rem 0.75rem; color: var(--champagne); font-family: 'Switzer', sans-serif; font-size: 0.82rem; width: 100%; outline: none; transition: border-color 0.2s; }
+    .date-input:focus { border-color: var(--gold-dim); }
+    .date-input::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
+    .owner-card { border-top: 1px solid var(--border); padding-top: 1.25rem; margin-top: 1.5rem; display: flex; align-items: center; gap: 0.875rem; }
+    .owner-avatar { width: 44px; height: 44px; background: var(--obsidian-5); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; color: var(--champagne-dim); letter-spacing: 0.05em; flex-shrink: 0; }
+    .owner-info h5 { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 400; color: var(--champagne); }
+    .owner-info small { font-size: 0.73rem; color: var(--champagne-dim); }
+    .verified-badge { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); margin-left: 0.4rem; }
+
+    /* ── BOOKING PAGE ── */
+    .booking-layout { display: grid; grid-template-columns: 1fr 380px; gap: 3rem; align-items: start; }
+    .booking-summary { background: var(--obsidian-2); border: 1px solid var(--border); padding: 1.5rem; position: sticky; top: 5rem; }
+    .booking-summary h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: var(--champagne); margin-bottom: 1.25rem; font-weight: 400; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-label { display: block; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--champagne-dim); margin-bottom: 0.5rem; }
+    .form-input, .form-textarea, .form-select {
+      width: 100%; background: var(--obsidian-3); border: 1px solid var(--border);
+      color: var(--champagne); padding: 0.75rem 0.875rem;
+      font-family: 'Switzer', sans-serif; font-size: 0.88rem; outline: none;
+      transition: border-color 0.2s; resize: vertical;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--gold-dim); }
+    .form-textarea { min-height: 100px; }
+    .payment-placeholder {
+      background: var(--obsidian-3); border: 1px dashed var(--border-hover);
+      padding: 2rem; text-align: center; color: var(--champagne-dim); font-size: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+    .payment-placeholder svg { width: 32px; height: 32px; opacity: 0.35; margin: 0 auto 0.75rem; display: block; }
+    .confirmation-state { text-align: center; padding: 4rem 2rem; }
+    .confirmation-state .check { width: 64px; height: 64px; background: rgba(200,155,50,0.12); border: 1px solid var(--gold-dim); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.75rem; }
+    .confirmation-state h2 { margin-bottom: 0.75rem; }
+    .confirmation-state p { max-width: 400px; margin: 0 auto 2rem; }
+
+    /* ── LIST AN ITEM WIZARD ── */
+    .wizard-steps { display: flex; align-items: center; justify-content: center; margin-bottom: 3rem; gap: 0; }
+    .wizard-step-item {
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .step-dot {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; color: var(--champagne-dim); transition: all 0.3s;
+    }
+    .step-dot.active { border-color: var(--gold); background: var(--gold); color: var(--obsidian); font-weight: 600; }
+    .step-dot.done { border-color: var(--gold-dim); background: rgba(200,155,50,0.15); color: var(--gold); }
+    .step-label { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--champagne-dim); }
+    .step-label.active { color: var(--champagne); }
+    .wizard-connector { width: 60px; height: 1px; background: var(--border); margin: 0 0.25rem; }
+    .wizard-connector.done { background: var(--gold-dim); }
+
+    /* ── EARNINGS ESTIMATOR ── */
+    .estimator {
+      background: var(--obsidian-3); border: 1px solid var(--border);
+      padding: 1.25rem; margin-bottom: 1.25rem;
+    }
+    .estimator h5 { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--champagne); margin-bottom: 1rem; font-weight: 400; }
+    .estimate-value { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; color: var(--gold); line-height: 1; }
+    .estimate-sub { font-size: 0.75rem; color: var(--champagne-dim); margin-top: 0.2rem; }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      padding: 8rem 0 3rem;
+      background: radial-gradient(ellipse at 50% -20%, rgba(200,155,50,0.06) 0%, transparent 60%);
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header .container { display: flex; flex-direction: column; gap: 0.5rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--champagne-dim); margin-bottom: 0.75rem; }
+    .breadcrumb a { color: var(--champagne-dim); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--champagne); }
+    .breadcrumb span { opacity: 0.5; }
+
+    /* ── LOADING ── */
+    .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5rem; gap: 1rem; }
+    .loading-ring { width: 40px; height: 40px; border: 1px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading p { font-size: 0.8rem; color: var(--champagne-dim); letter-spacing: 0.1em; }
+
+    /* ── SKELETON ── */
+    .skeleton { background: linear-gradient(90deg, var(--obsidian-3) 25%, var(--obsidian-4) 50%, var(--obsidian-3) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+      background: var(--obsidian-4); border: 1px solid var(--border-hover);
+      padding: 0.875rem 1.25rem; font-size: 0.85rem;
+      display: flex; align-items: center; gap: 0.75rem;
+      animation: slideUp 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* ── FOOTER ── */
+    .footer {
+      padding: 4rem 0 2rem;
+      background: var(--obsidian-2);
+      border-top: 1px solid var(--border);
+    }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+    .footer-brand .logo-wrap { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .footer-brand .logo-wrap svg { width: 28px; height: 28px; }
+    .footer-brand p { font-size: 0.85rem; max-width: 240px; line-height: 1.65; }
+    .footer-col h5 { font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; font-weight: 500; color: var(--champagne); margin-bottom: 1rem; letter-spacing: 0.08em; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .footer-col ul a { text-decoration: none; color: var(--champagne-dim); font-size: 0.82rem; transition: color 0.2s; }
+    .footer-col ul a:hover { color: var(--champagne); }
+    .footer-bottom { border-top: 1px solid var(--border); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .footer-bottom p { font-size: 0.75rem; color: var(--champagne-dim); }
+
+    /* ── MOBILE MENU ── */
+    .mobile-menu {
+      display: none; position: fixed; inset: 0; z-index: 99;
+      background: var(--obsidian);
+      flex-direction: column; padding: 5rem 2rem 2rem;
+      gap: 1.5rem;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 1.75rem; color: var(--champagne); text-decoration: none; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align: center; padding: 5rem 2rem; }
+    .empty-state h3 { margin-bottom: 0.5rem; font-size: 1.4rem; }
+    .empty-state p { font-size: 0.88rem; margin-bottom: 1.5rem; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1100px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .browse-layout { grid-template-columns: 1fr; }
+      .filter-sidebar { position: static; }
+      .listing-layout { grid-template-columns: 1fr; }
+      .listing-detail-right { position: static; }
+      .booking-layout { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .lender-cta { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .category-grid { grid-template-columns: repeat(3, 1fr); }
+      .hiw-steps { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+      .wizard-step-item .step-label { display: none; }
+      .hero-actions { flex-direction: column; align-items: center; }
+    }
+    @media (max-width: 480px) {
+      .grid-4 { grid-template-columns: 1fr; }
+      .category-grid { grid-template-columns: repeat(2, 1fr); }
+      .listing-attrs { grid-template-columns: 1fr; }
+      .date-inputs { grid-template-columns: 1fr; }
+      .nav-cta.primary { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useCallback, useRef, createContext, useContext } = React;
+
+    // ── AUTH CONTEXT ──
+    const AuthContext = createContext(null);
+
+    const AuthProvider = ({ children }) => {
+      const [user, setUser] = useState(() => {
+        try { return JSON.parse(localStorage.getItem('velier_user') || 'null'); } catch { return null; }
+      });
+      const [token, setToken] = useState(() => localStorage.getItem('velier_token') || null);
+      const [authModal, setAuthModal] = useState(null); // 'login' | 'signup' | null
+
+      const login = async (email, password) => {
+        const res = await fetch('/api/auth/signin', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Login failed');
+        localStorage.setItem('velier_token', data.access_token);
+        localStorage.setItem('velier_user', JSON.stringify(data.user));
+        setToken(data.access_token);
+        setUser(data.user);
+        setAuthModal(null);
+        return data.user;
+      };
+
+      const signup = async (email, password, full_name) => {
+        const res = await fetch('/api/auth/signup', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ email, password, full_name })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Signup failed');
+        // Auto-login after signup
+        return login(email, password);
+      };
+
+      const logout = () => {
+        localStorage.removeItem('velier_token');
+        localStorage.removeItem('velier_user');
+        setToken(null);
+        setUser(null);
+        window.location.hash = '#/';
+      };
+
+      const requireAuth = (cb) => {
+        if (user) { cb(); }
+        else { setAuthModal('login'); }
+      };
+
+      return (
+        <AuthContext.Provider value={{ user, token, login, signup, logout, requireAuth, authModal, setAuthModal }}>
+          {children}
+          {authModal && <AuthModal />}
+        </AuthContext.Provider>
+      );
+    };
+
+    const useAuth = () => useContext(AuthContext);
+
+    // ── AUTH MODAL ──
+    const AuthModal = () => {
+      const { login, signup, authModal, setAuthModal } = useAuth();
+      const [mode, setMode] = useState(authModal);
+      const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+      const [fullName, setFullName] = useState('');
+      const [error, setError] = useState('');
+      const [loading, setLoading] = useState(false);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError(''); setLoading(true);
+        try {
+          if (mode === 'login') { await login(email, password); }
+          else { await signup(email, password, fullName); }
+        } catch (err) { setError(err.message); }
+        finally { setLoading(false); }
+      };
+
+      return (
+        <div style={{position:'fixed',inset:0,zIndex:99999,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(0,0,0,0.75)',backdropFilter:'blur(8px)'}} onClick={() => setAuthModal(null)}>
+          <div style={{background:'#131109',border:'1px solid rgba(200,168,75,0.2)',borderRadius:'2px',padding:'2.5rem',width:'100%',maxWidth:'420px',margin:'1rem'}} onClick={e => e.stopPropagation()}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'2rem'}}>
+              <h2 style={{fontFamily:'Cormorant Garamond',fontSize:'1.8rem',fontWeight:400,color:'var(--champagne)'}}>{mode === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
+              <button onClick={() => setAuthModal(null)} style={{background:'none',border:'none',color:'var(--champagne-dim)',fontSize:'1.5rem',cursor:'pointer',lineHeight:1}}>×</button>
+            </div>
+            {error && <div style={{background:'rgba(200,60,60,0.15)',border:'1px solid rgba(200,60,60,0.3)',borderRadius:'2px',padding:'0.75rem 1rem',marginBottom:'1.25rem',color:'#e88',fontSize:'0.85rem'}}>{error}</div>}
+            <form onSubmit={handleSubmit}>
+              {mode === 'signup' && (
+                <div style={{marginBottom:'1.25rem'}}>
+                  <label style={{display:'block',color:'var(--champagne-dim)',fontSize:'0.75rem',letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'0.5rem'}}>Full Name</label>
+                  <input value={fullName} onChange={e=>setFullName(e.target.value)} required placeholder="Your full name"
+                    style={{width:'100%',background:'#1a1713',border:'1px solid rgba(200,168,75,0.15)',borderRadius:'2px',padding:'0.75rem 1rem',color:'var(--champagne)',fontSize:'0.95rem',outline:'none'}}/>
+                </div>
+              )}
+              <div style={{marginBottom:'1.25rem'}}>
+                <label style={{display:'block',color:'var(--champagne-dim)',fontSize:'0.75rem',letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'0.5rem'}}>Email</label>
+                <input type="email" value={email} onChange={e=>setEmail(e.target.value)} required placeholder="your@email.com"
+                  style={{width:'100%',background:'#1a1713',border:'1px solid rgba(200,168,75,0.15)',borderRadius:'2px',padding:'0.75rem 1rem',color:'var(--champagne)',fontSize:'0.95rem',outline:'none'}}/>
+              </div>
+              <div style={{marginBottom:'1.75rem'}}>
+                <label style={{display:'block',color:'var(--champagne-dim)',fontSize:'0.75rem',letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'0.5rem'}}>Password</label>
+                <input type="password" value={password} onChange={e=>setPassword(e.target.value)} required placeholder="Min. 6 characters"
+                  style={{width:'100%',background:'#1a1713',border:'1px solid rgba(200,168,75,0.15)',borderRadius:'2px',padding:'0.75rem 1rem',color:'var(--champagne)',fontSize:'0.95rem',outline:'none'}}/>
+              </div>
+              <button type="submit" disabled={loading}
+                style={{width:'100%',background:'var(--gold)',border:'none',borderRadius:'2px',padding:'0.9rem',color:'var(--obsidian)',fontWeight:600,fontSize:'0.9rem',letterSpacing:'0.08em',textTransform:'uppercase',cursor:loading?'not-allowed':'pointer',opacity:loading?0.7:1}}>
+                {loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Account'}
+              </button>
+            </form>
+            <p style={{textAlign:'center',marginTop:'1.5rem',color:'var(--champagne-dim)',fontSize:'0.85rem'}}>
+              {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
+              <button onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); }}
+                style={{background:'none',border:'none',color:'var(--gold)',cursor:'pointer',fontSize:'0.85rem',textDecoration:'underline'}}>
+                {mode === 'login' ? 'Create one' : 'Sign in'}
+              </button>
+            </p>
+          </div>
+        </div>
+      );
+    };
+
+    // ── VELIER LOGO SVG ──
+    const VelierLogo = ({ size = 32 }) => (
+      <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Velier">
+        {/* Cascading veil arcs */}
+        <path d="M4 8 Q20 18 36 8" stroke="hsl(41,62%,60%)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+        <path d="M7 13 Q20 22 33 13" stroke="hsl(41,62%,60%)" strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.7"/>
+        <path d="M10 18 Q20 26 30 18" stroke="hsl(41,62%,60%)" strokeWidth="0.8" fill="none" strokeLinecap="round" opacity="0.5"/>
+        {/* Almond eye form */}
+        <path d="M12 26 Q20 20 28 26 Q20 32 12 26Z" stroke="hsl(41,62%,60%)" strokeWidth="1" fill="none"/>
+        {/* Iris ring */}
+        <circle cx="20" cy="26" r="3.5" stroke="hsl(41,62%,60%)" strokeWidth="0.8" fill="none"/>
+        {/* Pupil */}
+        <circle cx="20" cy="26" r="1.5" fill="hsl(41,62%,60%)"/>
+        {/* Veil hem line */}
+        <line x1="6" y1="35" x2="34" y2="35" stroke="hsl(41,62%,60%)" strokeWidth="0.7" opacity="0.5"/>
+      </svg>
+    );
+
+    // ── ITEM VISUALS MAP ──
+    const getItemVisual = (listing) => listing?.image || null;
+
+
+    // ── SPLASH SCREEN ──
+    const SplashScreen = ({ onEnter }) => {
+      const [exiting, setExiting] = React.useState(false);
+      const canvasRef = React.useRef(null);
+
+      // Canvas: animated radial shimmer that sweeps across the screen
+      React.useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let raf;
+        let t = 0;
+
+        const resize = () => {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        };
+        resize();
+        window.addEventListener('resize', resize);
+
+        const draw = () => {
+          const W = canvas.width, H = canvas.height;
+          ctx.clearRect(0, 0, W, H);
+
+          // Slow sweeping spotlight — moves left to right every ~5s
+          const cycle = 5000;
+          const progress = (Date.now() % cycle) / cycle; // 0→1
+          const cx = W * (-0.2 + progress * 1.4);
+          const cy = H * 0.5;
+          const radius = Math.max(W, H) * 0.65;
+
+          const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+          grad.addColorStop(0,   'rgba(200,155,50,0.055)');
+          grad.addColorStop(0.3, 'rgba(200,155,50,0.025)');
+          grad.addColorStop(0.7, 'rgba(200,155,50,0.006)');
+          grad.addColorStop(1,   'rgba(0,0,0,0)');
+
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, W, H);
+
+          // Second subtler counter-sweep, offset half cycle
+          const progress2 = ((Date.now() + cycle * 0.5) % cycle) / cycle;
+          const cx2 = W * (-0.2 + progress2 * 1.4);
+          const grad2 = ctx.createRadialGradient(cx2, cy * 0.4, 0, cx2, cy * 0.4, radius * 0.5);
+          grad2.addColorStop(0,   'rgba(255,240,200,0.03)');
+          grad2.addColorStop(0.5, 'rgba(200,155,50,0.01)');
+          grad2.addColorStop(1,   'rgba(0,0,0,0)');
+          ctx.fillStyle = grad2;
+          ctx.fillRect(0, 0, W, H);
+
+          raf = requestAnimationFrame(draw);
+        };
+        draw();
+
+        return () => {
+          cancelAnimationFrame(raf);
+          window.removeEventListener('resize', resize);
+        };
+      }, []);
+
+      const handleEnter = () => {
+        setExiting(true);
+        setTimeout(onEnter, 1000);
+      };
+
+      // Tick mark positions (24 around circle)
+      const ticks = Array.from({length: 24}, (_, i) => {
+        const angle = (i / 24) * Math.PI * 2 - Math.PI / 2;
+        const isMajor = i % 6 === 0;
+        const r1 = isMajor ? 96 : 100;
+        const r2 = 108;
+        return {
+          x1: 110 + Math.cos(angle) * r1,
+          y1: 110 + Math.sin(angle) * r1,
+          x2: 110 + Math.cos(angle) * r2,
+          y2: 110 + Math.sin(angle) * r2,
+          major: isMajor,
+        };
+      });
+
+      return (
+        <div className={`splash${exiting ? ' exiting' : ''}`}>
+          <canvas ref={canvasRef} className="splash-canvas" />
+
+          <div className="splash-icon-wrap">
+            {/* Pulsing rings */}
+            <div className="splash-ring"/>
+            <div className="splash-ring-2"/>
+
+            {/* Tick marks SVG — slow rotation */}
+            <svg className="splash-ticks" viewBox="0 0 220 220" style={{position:'absolute',inset:0,width:'220px',height:'220px'}}>
+              {ticks.map((tk, i) => (
+                <line key={i}
+                  x1={tk.x1} y1={tk.y1} x2={tk.x2} y2={tk.y2}
+                  stroke="rgba(200,155,50,0.35)"
+                  strokeWidth={tk.major ? 1.2 : 0.6}
+                />
+              ))}
+              <circle cx="110" cy="110" r="100" stroke="rgba(200,155,50,0.1)" strokeWidth="0.5" fill="none"/>
+            </svg>
+
+            {/* Clean geometric eye — redesigned */}
+            <svg className="splash-eye" width="120" height="120" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Veil arcs — evenly spaced, clean curves */}
+              <path d="M10 22 Q50 42 90 22" stroke="hsl(41,62%,60%)" strokeWidth="1.4" strokeLinecap="round" fill="none"/>
+              <path d="M16 33 Q50 50 84 33" stroke="hsl(41,62%,60%)" strokeWidth="1.1" strokeLinecap="round" fill="none" opacity="0.65"/>
+              <path d="M24 43 Q50 57 76 43" stroke="hsl(41,62%,60%)" strokeWidth="0.8" strokeLinecap="round" fill="none" opacity="0.4"/>
+
+              {/* Eye — perfect almond using cubic bezier for precision */}
+              <path d="M20 65 C32 52 68 52 80 65 C68 78 32 78 20 65 Z"
+                stroke="hsl(41,62%,60%)" strokeWidth="1.2" fill="none" strokeLinejoin="round"/>
+
+              {/* Iris circle */}
+              <circle cx="50" cy="65" r="9" stroke="hsl(41,62%,60%)" strokeWidth="1" fill="none"/>
+
+              {/* Pupil — filled */}
+              <circle cx="50" cy="65" r="3.5" fill="hsl(41,62%,60%)"/>
+
+              {/* Subtle inner iris detail */}
+              <circle cx="50" cy="65" r="6" stroke="hsl(41,62%,60%)" strokeWidth="0.4" fill="none" opacity="0.4"/>
+
+              {/* Hem line */}
+              <line x1="14" y1="88" x2="86" y2="88" stroke="hsl(41,62%,60%)" strokeWidth="0.6" opacity="0.35"/>
+              {/* Corner dots */}
+              <circle cx="14" cy="88" r="1" fill="hsl(41,62%,60%)" opacity="0.4"/>
+              <circle cx="86" cy="88" r="1" fill="hsl(41,62%,60%)" opacity="0.4"/>
+            </svg>
+          </div>
+
+          <div className="splash-wordmark">Velier</div>
+          <div className="splash-tagline">Access everything · Own nothing</div>
+
+          <button className="splash-enter" onClick={handleEnter}>
+            Enter
+          </button>
+        </div>
+      );
+    };
+
+        // ── ROUTER ──
+    const useHash = () => {
+      const [hash, setHash] = useState(window.location.hash || '#/');
+      useEffect(() => {
+        const onHash = () => setHash(window.location.hash || '#/');
+        window.addEventListener('hashchange', onHash);
+        return () => window.removeEventListener('hashchange', onHash);
+      }, []);
+      return hash;
+    };
+
+    const navigate = (path) => { window.location.hash = path; };
+
+    // ── TOAST ──
+    const Toast = ({ message, onClose }) => {
+      useEffect(() => {
+        const t = setTimeout(onClose, 3000);
+        return () => clearTimeout(t);
+      }, []);
+      return (
+        <div className="toast">
+          <span>✦</span>
+          <span>{message}</span>
+          <button onClick={onClose} style={{background:'none',border:'none',color:'var(--champagne-dim)',cursor:'pointer',fontSize:'1rem',marginLeft:'0.5rem'}}>×</button>
+        </div>
+      );
+    };
+
+    // ── NAV ──
+    const Nav = ({ wishlistCount }) => {
+      const [menuOpen, setMenuOpen] = useState(false);
+      const [splashVisible, setSplashVisible] = useState(
+        () => !sessionStorage.getItem('velier_entered')
+      );
+      const { user, logout, setAuthModal } = useAuth();
+      useEffect(() => {
+        const onStorage = () => setSplashVisible(!sessionStorage.getItem('velier_entered'));
+        window.addEventListener('storage', onStorage);
+        const onEntered = () => setSplashVisible(false);
+        window.addEventListener('velier_entered', onEntered);
+        return () => {
+          window.removeEventListener('storage', onStorage);
+          window.removeEventListener('velier_entered', onEntered);
+        };
+      }, []);
+      const hash = useHash();
+      const isActive = (p) => hash.startsWith(p);
+
+      return (
+        <>
+          <nav className={`nav${splashVisible ? ' splash-hidden' : ''}`}>
+            <a href="#/" className="nav-logo" onClick={() => setMenuOpen(false)}>
+              Velier
+            </a>
+            <ul className="nav-links">
+              <li><a href="#/browse" style={isActive('#/browse') ? {color:'var(--champagne)'} : {}}>Explore</a></li>
+              <li><a href="#/browse?category=Watches">Watches</a></li>
+              <li><a href="#/browse#bags" onClick={() => setTimeout(() => navigate('#/browse?category=Bags'), 10)}>Bags</a></li>
+              <li><a href="#/browse?category=Dresses">Dresses</a></li>
+              <li><a href="#/browse?category=Jewellery">Jewellery</a></li>
+              <li><a href="#/trade" style={isActive('#/trade') ? {color:'var(--champagne)'} : {}}>Exchange</a></li>
+              <li><a href="#how-it-works" onClick={(e) => { e.preventDefault(); navigate('#/'); setTimeout(() => { const el = document.getElementById('how-it-works'); if(el) el.scrollIntoView({behavior:'smooth'}); }, 50); }}>How It Works</a></li>
+            </ul>
+            <div className="nav-actions">
+              {user ? (
+                <>
+                  <a href="#/dashboard" className="nav-cta" style={isActive('#/dashboard') ? {color:'var(--champagne)'} : {}}>
+                    {user.full_name ? user.full_name.split(' ')[0] : 'Account'}
+                  </a>
+                  <button onClick={logout} className="nav-cta">Sign Out</button>
+                </>
+              ) : (
+                <>
+                  <button onClick={() => setAuthModal('login')} className="nav-cta">Sign In</button>
+                  <button onClick={() => setAuthModal('signup')} className="nav-cta primary">Join Velier</button>
+                </>
+              )}
+              <div className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
+                <span style={menuOpen ? {transform:'rotate(45deg) translate(4px, 4px)'} : {}}></span>
+                <span style={menuOpen ? {opacity:0} : {}}></span>
+                <span style={menuOpen ? {transform:'rotate(-45deg) translate(4px, -4px)'} : {}}></span>
+              </div>
+            </div>
+          </nav>
+          <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
+            <a href="#/" onClick={() => setMenuOpen(false)}>Home</a>
+            <a href="#/browse" onClick={() => setMenuOpen(false)}>Explore</a>
+            <a href="#/browse?category=Watches" onClick={() => setMenuOpen(false)}>Watches</a>
+            <a href="#/browse?category=Bags" onClick={() => setMenuOpen(false)}>Bags</a>
+            <a href="#/browse?category=Dresses" onClick={() => setMenuOpen(false)}>Dresses</a>
+            <a href="#/trade" onClick={() => setMenuOpen(false)}>Exchange</a>
+            <a href="#how-it-works" onClick={(e) => { e.preventDefault(); setMenuOpen(false); navigate('#/'); setTimeout(() => { const el = document.getElementById('how-it-works'); if(el) el.scrollIntoView({behavior:'smooth'}); }, 80); }}>How It Works</a>
+            {user ? (
+              <>
+                <a href="#/dashboard" onClick={() => setMenuOpen(false)}>My Dashboard</a>
+                <a href="#/list" onClick={() => setMenuOpen(false)}>List an Item</a>
+                <a href="#/" onClick={() => { setMenuOpen(false); logout(); }}>Sign Out</a>
+              </>
+            ) : (
+              <>
+                <a href="#/" onClick={() => { setMenuOpen(false); setAuthModal('login'); }}>Sign In</a>
+                <a href="#/" onClick={() => { setMenuOpen(false); setAuthModal('signup'); }}>Join Velier</a>
+              </>
+            )}
+          </div>
+        </>
+      );
+    };
+
+    // ── FOOTER ──
+    const Footer = () => (
+      <footer className="footer">
+        <div className="container">
+          <div className="footer-grid">
+            <div className="footer-brand">
+              <div className="logo-wrap">
+                <VelierLogo size={28} />
+                <span style={{fontFamily:'Cormorant Garamond',fontSize:'1.25rem',fontWeight:'300',letterSpacing:'0.35em',textTransform:'uppercase',color:'#ffffff'}}>Velier</span>
+              </div>
+              <p>The world's most refined peer-to-peer luxury rental platform. Access extraordinary pieces. Own nothing.</p>
+            </div>
+            <div className="footer-col">
+              <h5>Discover</h5>
+              <ul>
+                <li><a href="#/trade">Exchange</a></li>
+                <li><a href="#/browse?category=Watches">Watches</a></li>
+                <li><a href="#/browse?category=Bags">Bags</a></li>
+                <li><a href="#/browse?category=Dresses">Dresses</a></li>
+                <li><a href="#/browse?category=Jewellery">Jewellery</a></li>
+                <li><a href="#/browse?category=Shoes">Shoes</a></li>
+              </ul>
+            </div>
+            <div className="footer-col">
+              <h5>Lend</h5>
+              <ul>
+                <li><a href="#/list">List an Item</a></li>
+                <li><a href="#/list">How It Works</a></li>
+                <li><a href="#/list">Pricing Guide</a></li>
+                <li><a href="#/list">Insurance</a></li>
+              </ul>
+            </div>
+            <div className="footer-col">
+              <h5>Company</h5>
+              <ul>
+                <li><a href="#/">About Velier</a></li>
+                <li><a href="#/">Trust & Safety</a></li>
+                <li><a href="#/">Press</a></li>
+                <li><a href="#/">Careers</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <p>© 2024 Velier. All rights reserved.</p>
+            <p style={{fontFamily:'Cormorant Garamond',fontStyle:'italic',fontSize:'0.9rem',color:'var(--gold-dim)'}}>Access everything. Own nothing.</p>
+            <p style={{display:'flex',gap:'1.5rem'}}>
+              <a href="#/" style={{color:'var(--champagne-dim)',textDecoration:'none',fontSize:'0.75rem'}}>Privacy</a>
+              <a href="#/" style={{color:'var(--champagne-dim)',textDecoration:'none',fontSize:'0.75rem'}}>Terms</a>
+            </p>
+          </div>
+        </div>
+      </footer>
+    );
+
+    // ── LISTING CARD ──
+    const ListingCard = ({ listing, wishlist, onWishlistToggle }) => {
+      const imgUrl = getItemVisual(listing);
+      const inWishlist = wishlist.includes(listing.id);
+
+      return (
+        <div className="card reveal" onClick={() => navigate(`#/listing/${listing.id}`)}>
+          <div className="card-image" style={imgUrl ? {backgroundImage:`url(${imgUrl})`,backgroundSize:'cover',backgroundPosition:'center'} : {}}>
+            {!imgUrl && <div className="item-visual">✦</div>}
+            <div className={`wishlist-btn ${inWishlist ? 'active' : ''}`}
+              onClick={(e) => { e.stopPropagation(); onWishlistToggle(listing.id); }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill={inWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+            </div>
+            <span className="category-badge">{listing.category}</span>
+          </div>
+          <div className="card-body">
+            <div className="card-brand">{listing.brand}</div>
+            <div className="card-title">{listing.title}</div>
+            {listing.location && <div style={{fontSize:'0.72rem',color:'var(--champagne-dim)',marginBottom:'0.4rem',letterSpacing:'0.04em'}}>{listing.location}</div>}
+            <div className="card-meta">
+              <div className="card-price">
+                ${listing.daily_rate}<span>/day</span>
+              </div>
+              <div className="card-rating">
+                <span className="star">★</span>
+                {listing.rating}
+                <span>({listing.reviews})</span>
+              </div>
+            </div>
+            {listing.retail_price && <div className="card-retail">RRP ${listing.retail_price?.toLocaleString()}</div>}
+          </div>
+        </div>
+      );
+    };
+
+    // ── HERO CINEMA ──
+    const HERO_CLIPS = [
+      'https://videos.pexels.com/video-files/11667737/11667737-uhd_2560_1440_24fps.mp4', // Omega watch
+      'https://videos.pexels.com/video-files/6230464/6230464-hd_1920_1080_24fps.mp4',   // Rolex slow-mo
+      'https://videos.pexels.com/video-files/8798283/8798283-uhd_2732_1440_25fps.mp4',   // Woman with bag
+      'https://videos.pexels.com/video-files/4716688/4716688-uhd_2732_1440_25fps.mp4',   // Gold chain close-up
+    ];
+
+    // Start offset in seconds per clip (so we skip messy opening frames)
+    const HERO_OFFSETS = [0, 3, 0, 0]; // Rolex starts at 3s to skip shaky intro
+
+    const HeroCinema = () => {
+      const [current, setCurrent] = React.useState(0);
+      const [fading, setFading] = React.useState(false);
+      const vidRefs = React.useRef([]);
+      const timerRef = React.useRef(null);
+
+      const playClip = (idx) => {
+        const vid = vidRefs.current[idx];
+        if (!vid) return;
+        vid.currentTime = HERO_OFFSETS[idx] || 0;
+        const doPlay = () => vid.play().catch(() => {});
+        if (vid.readyState >= 3) {
+          doPlay();
+        } else {
+          vid.addEventListener('canplay', doPlay, { once: true });
+        }
+      };
+
+      const advance = React.useCallback((cur) => {
+        const nextIdx = (cur + 1) % HERO_CLIPS.length;
+        // Pre-seek next clip so it's ready
+        const nextVid = vidRefs.current[nextIdx];
+        if (nextVid) {
+          nextVid.currentTime = HERO_OFFSETS[nextIdx] || 0;
+          // Preload by loading
+          if (nextVid.readyState < 2) nextVid.load();
+        }
+        setFading(true);
+        setTimeout(() => {
+          setCurrent(nextIdx);
+          setFading(false);
+          playClip(nextIdx);
+          timerRef.current = setTimeout(() => advance(nextIdx), 6000);
+        }, 1800);
+      }, []);
+
+      React.useEffect(() => {
+        // Preload all clips
+        vidRefs.current.forEach((v, i) => {
+          if (v) { v.load(); }
+        });
+        playClip(0);
+        timerRef.current = setTimeout(() => advance(0), 6000);
+        return () => clearTimeout(timerRef.current);
+      }, []);
+
+      return (
+        <div style={{position:'absolute',inset:0,overflow:'hidden',zIndex:0,pointerEvents:'none'}}>
+          {HERO_CLIPS.map((src, i) => (
+            <video
+              key={i}
+              ref={el => vidRefs.current[i] = el}
+              src={src}
+              muted playsInline preload="auto"
+              loop={false}
+              className='hero-video'
+              style={{
+                opacity: i === current ? (fading ? 0 : 0.6) : 0,
+                transition: 'opacity 1.8s ease-in-out',
+                zIndex: i === current ? 1 : 0,
+              }}
+            />
+          ))}
+        </div>
+      );
+    };
+
+    // ── HOMEPAGE ──
+    const HomePage = ({ wishlist, onWishlistToggle, onToast }) => {
+      const [featured, setFeatured] = useState([]);
+      const [loading, setLoading] = useState(true);
+
+      useEffect(() => {
+        fetch('/api/listings?featured=true&limit=4')
+          .then(r => r.json()).then(data => { setFeatured(data); setLoading(false); })
+          .catch(() => setLoading(false));
+        window.scrollTo(0, 0);
+      }, []);
+
+      const categories = [
+        { label: 'Watches', cat: 'Watches', icon: (
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" width="40" height="40">
+            {/* Case lugs top */}
+            <rect x="15" y="4" width="10" height="5" rx="1.5"/>
+            {/* Case lugs bottom */}
+            <rect x="15" y="31" width="10" height="5" rx="1.5"/>
+            {/* Watch case */}
+            <circle cx="20" cy="20" r="11" strokeWidth="1"/>
+            {/* Dial ring */}
+            <circle cx="20" cy="20" r="8.5" strokeWidth="0.6" strokeDasharray="1 2.1"/>
+            {/* Hands */}
+            <line x1="20" y1="20" x2="20" y2="13.5" strokeWidth="1.2"/>
+            <line x1="20" y1="20" x2="24" y2="22" strokeWidth="0.9"/>
+            {/* Crown */}
+            <rect x="31" y="18.5" width="2.5" height="3" rx="0.8"/>
+          </svg>
+        )},
+        { label: 'Bags', cat: 'Bags', icon: (
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" width="40" height="40">
+            {/* Handle arch */}
+            <path d="M14 14 Q14 7 20 7 Q26 7 26 14"/>
+            {/* Body */}
+            <rect x="8" y="14" width="24" height="19" rx="2.5"/>
+            {/* Clasp */}
+            <rect x="17" y="21" width="6" height="4" rx="1"/>
+            <line x1="20" y1="21" x2="20" y2="19"/>
+          </svg>
+        )},
+        { label: 'Dresses', cat: 'Dresses', icon: (
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" width="40" height="40">
+            {/* Neckline */}
+            <path d="M15 5 Q20 10 25 5"/>
+            {/* Shoulders to waist */}
+            <path d="M15 5 L13 16 L20 18 L27 16 L25 5"/>
+            {/* Skirt flare */}
+            <path d="M13 16 Q8 24 6 36 L34 36 Q32 24 27 16"/>
+            {/* Waist detail */}
+            <line x1="13" y1="20" x2="27" y2="20" strokeWidth="0.6"/>
+          </svg>
+        )},
+        { label: 'Jewellery', cat: 'Jewellery', icon: (
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" width="40" height="40">
+            {/* Necklace chain arc */}
+            <path d="M8 12 Q20 28 32 12" strokeWidth="0.8"/>
+            {/* Pendant diamond */}
+            <path d="M20 26 L16 31 L20 37 L24 31 Z"/>
+            <line x1="16" y1="31" x2="24" y2="31" strokeWidth="0.7"/>
+            {/* Chain clasps */}
+            <circle cx="8" cy="12" r="1.2" fill="currentColor"/>
+            <circle cx="32" cy="12" r="1.2" fill="currentColor"/>
+          </svg>
+        )},
+        { label: 'Shoes', cat: 'Shoes', icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" width="40" height="40">
+            <path d="m15 10.42 4.8-5.07" />
+            <path d="M19 18h3" />
+            <path d="M9.5 22 21.414 9.415A2 2 0 0 0 21.2 6.4l-5.61-4.208A1 1 0 0 0 14 3v2a2 2 0 0 1-1.394 1.906L8.677 8.053A1 1 0 0 0 8 9c-.155 6.393-2.082 9-4 9a2 2 0 0 0 0 4h14" />
+          </svg>
+        )},
+      ];
+      const brands = ['Prada', 'Gucci', 'Chanel', 'Hermès', 'Rolex', 'Cartier', 'Valentino', 'Bottega Veneta', 'Audemars Piguet', 'Saint Laurent', 'Louboutin', 'Alexander McQueen'];
+
+      return (
+        <div>
+          {/* HERO */}
+          <section className="hero">
+            <HeroCinema />
+            <div className="hero-video-overlay"></div>
+            <div className="hero-eyebrow">The Velier Collection</div>
+            <h1>The world's finest<br/><em>luxury awaits you</em></h1>
+            <p className="hero-sub">Rent extraordinary pieces from Prada, Chanel, Rolex, and Hermès. Wear what was once unattainable.</p>
+            <div className="hero-actions">
+              <a href="#/browse" className="btn btn-gold btn-lg">Explore the Collection</a>
+              <a href="#/list" className="btn btn-outline btn-lg">List Your Pieces</a>
+            </div>
+            <div className="hero-scroll">
+              Discover
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+            </div>
+          </section>
+
+          {/* FEATURED */}
+          <section className="section">
+            <div className="container">
+              <div className="section-header">
+                <div className="section-label">Curated Selections</div>
+                <h2>Featured Pieces</h2>
+                <p>Handpicked from our most coveted lenders — verified, immaculate, extraordinary</p>
+              </div>
+              {loading ? (
+                <div className="grid-4">
+                  {[1,2,3,4].map(i => (
+                    <div key={i} style={{background:'var(--obsidian-2)',border:'1px solid var(--border)'}}>
+                      <div className="skeleton" style={{aspectRatio:'4/5'}}></div>
+                      <div style={{padding:'1rem'}}>
+                        <div className="skeleton" style={{height:10,marginBottom:8,width:'40%'}}></div>
+                        <div className="skeleton" style={{height:14,marginBottom:8,width:'80%'}}></div>
+                        <div className="skeleton" style={{height:10,width:'60%'}}></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid-4">
+                  {featured.map(l => (
+                    <ListingCard key={l.id} listing={l} wishlist={wishlist} onWishlistToggle={onWishlistToggle} />
+                  ))}
+                </div>
+              )}
+              <div style={{textAlign:'center',marginTop:'2.5rem'}}>
+                <a href="#/browse" className="btn btn-outline">View All Listings</a>
+              </div>
+            </div>
+          </section>
+
+          {/* CATEGORIES */}
+          <div className="divider"></div>
+          <section className="section">
+            <div className="container">
+              <div className="section-header">
+                <div className="section-label">Browse by Category</div>
+                <h2>Shop the Wardrobe</h2>
+              </div>
+              <div className="category-grid">
+                {categories.map(c => (
+                  <a key={c.cat} href={`#/browse?category=${c.cat}`} className="category-tile">
+                    <span className="cat-icon">{c.icon}</span>
+                    <span className="cat-label">{c.label}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </section>
+
+
+          {/* TRUST & SECURITY */}
+          <section className="trust-section">
+            <div className="container">
+              <div className="section-header">
+                <div className="section-label">Protected from Day One</div>
+                <h2>Trust & Security</h2>
+                <p>Every transaction on Velier is backed by multiple layers of verification and protection</p>
+              </div>
+              <div className="trust-grid">
+                <div className="trust-card reveal">
+                  <div className="trust-icon">◈</div>
+                  <h4>ID Verification</h4>
+                  <p>All renters and traders must complete government-issued ID verification via our secure partner before any item is released. No exceptions.</p>
+                </div>
+                <div className="trust-card reveal reveal-delay-1">
+                  <div className="trust-icon">◈</div>
+                  <h4>Security Deposit</h4>
+                  <p>A refundable security deposit of 15–20% of the item's market value is held via Stripe and released automatically upon safe return.</p>
+                </div>
+                <div className="trust-card reveal reveal-delay-2">
+                  <div className="trust-icon">◈</div>
+                  <h4>Condition Reports</h4>
+                  <p>Timestamped photo condition reports are submitted by both parties before handover and on return — creating an irrefutable record.</p>
+                </div>
+                <div className="trust-card reveal reveal-delay-1">
+                  <div className="trust-icon">◈</div>
+                  <h4>Lender Insurance</h4>
+                  <p>Optional insurance covers accidental damage, theft, and loss during the hire period. Choose from three tiers when you list your item.</p>
+                </div>
+                <div className="trust-card reveal reveal-delay-2">
+                  <div className="trust-icon">◈</div>
+                  <h4>Escrow Payments</h4>
+                  <p>Funds are held in escrow until the item is confirmed delivered. Lenders are paid within 24 hours of the rental commencing.</p>
+                </div>
+                <div className="trust-card reveal">
+                  <div className="trust-icon">◈</div>
+                  <h4>Dispute Resolution</h4>
+                  <p>Our in-house concierge team mediates any disputes within 48 hours, with access to all condition reports, photos, and transaction history.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* BRAND MARQUEE */}
+          <div className="brand-strip">
+            <div className="brand-marquee">
+              {[...brands, ...brands].map((b, i) => <span key={i}>{b}</span>)}
+            </div>
+          </div>
+
+          {/* HOW IT WORKS */}
+          <section className="section" id="how-it-works">
+            <div className="container">
+              <div className="section-header">
+                <div className="section-label">The Process</div>
+                <h2>How Velier Works</h2>
+                <p>Seamless, secure, and surprisingly simple</p>
+              </div>
+              <div className="hiw-steps">
+                <div className="hiw-step reveal reveal-delay-1">
+                  <div className="hiw-num">01</div>
+                  <h3>Discover & Wish</h3>
+                  <p>Browse thousands of verified luxury pieces from private owners across Europe and beyond. Save favourites to your wishlist.</p>
+                </div>
+                <div className="hiw-step reveal reveal-delay-2">
+                  <div className="hiw-num">02</div>
+                  <h3>Reserve & Connect</h3>
+                  <p>Select your dates, send a message to the owner, and confirm your booking. Our escrow payment system protects both parties.</p>
+                </div>
+                <div className="hiw-step reveal reveal-delay-3">
+                  <div className="hiw-num">03</div>
+                  <h3>Wear & Return</h3>
+                  <p>Receive the piece, live extraordinarily, and return it with care. Reviews build trust on both sides of every transaction.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* LENDER CTA */}
+          <section style={{padding:'0'}}>
+            <div className="lender-cta container" style={{maxWidth:'100%'}}>
+              <div className="container" style={{padding:0}}>
+                <div className="lender-cta" style={{padding:'5rem 0'}}>
+                  <div>
+                    <div className="section-label" style={{marginBottom:'0.75rem'}}>For Owners</div>
+                    <h2>Your wardrobe<br/>is working capital</h2>
+                    <p>The pieces collecting dust in your wardrobe could be earning you hundreds every month. List with Velier and let the world borrow what you love.</p>
+                    <a href="#/list" className="btn btn-gold btn-lg">Start Earning Today</a>
+                  </div>
+                  <div className="earnings-preview">
+                    <h4>Estimated Monthly Earnings</h4>
+                    <div className="earnings-row"><span className="label">Chanel Classic Flap (3 rentals)</span><span className="value">$585</span></div>
+                    <div className="earnings-row"><span className="label">Rolex Datejust (4 rentals)</span><span className="value">$1,000</span></div>
+                    <div className="earnings-row"><span className="label">Hermès Birkin (2 rentals)</span><span className="value">$900</span></div>
+                    <div className="earnings-row" style={{paddingTop:'0.75rem',marginTop:'0.25rem',borderTop:'1px solid var(--border)'}}>
+                      <span className="label" style={{color:'var(--champagne)',fontWeight:500}}>Total Potential</span>
+                      <span className="value" style={{fontSize:'2rem'}}>$2,485<span style={{fontSize:'0.8rem',color:'var(--champagne-dim)'}}>/mo</span></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <Footer />
+        </div>
+      );
+    };
+
+    // ── BROWSE PAGE ──
+    const BrowsePage = ({ wishlist, onWishlistToggle }) => {
+      const hash = useHash();
+      const params = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
+      const initialCategory = params.get('category') || 'All';
+
+      const [listings, setListings] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [selectedBrands, setSelectedBrands] = useState([]);
+      const [activeCategory, setActiveCategory] = useState(initialCategory);
+      const [sort, setSort] = useState('featured');
+      const allBrands = ['Prada', 'Gucci', 'Chanel', 'Hermès', 'Bottega Veneta', 'Valentino', 'Rolex', 'Audemars Piguet', 'Cartier', 'Saint Laurent', 'Louboutin', 'Alexander McQueen'];
+      const categories = ['All', 'Bags', 'Watches', 'Dresses', 'Jewellery', 'Shoes'];
+
+      useEffect(() => {
+        setLoading(true);
+        let url = '/api/listings?';
+        if (activeCategory !== 'All') url += `category=${activeCategory}&`;
+        if (selectedBrands.length === 1) url += `brand=${selectedBrands[0]}&`;
+        url += `sort=${sort}`;
+        fetch(url)
+          .then(r => r.json())
+          .then(data => {
+            const filtered = selectedBrands.length > 1
+              ? data.filter(l => selectedBrands.includes(l.brand))
+              : data;
+            setListings(filtered);
+            setLoading(false);
+          })
+          .catch(() => setLoading(false));
+        window.scrollTo(0, 0);
+      }, [activeCategory, selectedBrands, sort]);
+
+      useEffect(() => {
+        const p = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
+        const cat = p.get('category') || 'All';
+        setActiveCategory(cat);
+      }, [hash]);
+
+      const toggleBrand = (brand) => {
+        setSelectedBrands(prev =>
+          prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
+        );
+      };
+
+      const removeChip = (brand) => setSelectedBrands(prev => prev.filter(b => b !== brand));
+
+      return (
+        <div>
+          <div className="page-header">
+            <div className="container">
+              <div className="breadcrumb"><a href="#/">Home</a><span>/</span><span>Explore</span></div>
+              <h1 style={{fontSize:'clamp(2rem,4vw,3.5rem)'}}>The Collection</h1>
+              <p style={{marginTop:'0.5rem'}}>Curated luxury from the world's most discerning private wardrobes</p>
+            </div>
+          </div>
+
+          <div className="container section">
+            {/* Category Tabs */}
+            <div className="category-tabs">
+              {categories.map(c => (
+                <button key={c} className={`cat-tab ${activeCategory === c ? 'active' : ''}`}
+                  onClick={() => setActiveCategory(c)}>
+                  {c}
+                </button>
+              ))}
+            </div>
+
+            <div className="browse-layout">
+              {/* Sidebar */}
+              <aside className="filter-sidebar">
+                <div className="filter-section">
+                  <span className="filter-label">Brand House</span>
+                  {allBrands.map(brand => (
+                    <label key={brand} className="filter-option" onClick={() => toggleBrand(brand)}>
+                      <div className={`filter-check ${selectedBrands.includes(brand) ? 'checked' : ''}`}></div>
+                      {brand}
+                    </label>
+                  ))}
+                </div>
+                {selectedBrands.length > 0 && (
+                  <button className="btn btn-ghost btn-sm" style={{paddingLeft:0}} onClick={() => setSelectedBrands([])}>
+                    Clear Filters
+                  </button>
+                )}
+              </aside>
+
+              {/* Listings */}
+              <div>
+                <div className="browse-header">
+                  <div>
+                    {selectedBrands.length > 0 && (
+                      <div className="filter-chips">
+                        {selectedBrands.map(b => (
+                          <span key={b} className="chip" onClick={() => removeChip(b)}>
+                            {b} <span className="chip-x">×</span>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <span className="browse-count">{listings.length} piece{listings.length !== 1 ? 's' : ''} available</span>
+                  </div>
+                  <select className="sort-select" value={sort} onChange={e => setSort(e.target.value)}>
+                    <option value="featured">Featured</option>
+                    <option value="price_asc">Price: Low to High</option>
+                    <option value="price_desc">Price: High to Low</option>
+                    <option value="rating">Highest Rated</option>
+                  </select>
+                </div>
+
+                {loading ? (
+                  <div className="loading"><div className="loading-ring"></div><p>Curating your selection…</p></div>
+                ) : listings.length === 0 ? (
+                  <div className="empty-state">
+                    <h3>No pieces found</h3>
+                    <p>Try adjusting your filters or browse all categories</p>
+                    <button className="btn btn-outline" onClick={() => { setSelectedBrands([]); setActiveCategory('All'); }}>
+                      Clear All Filters
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid-4">
+                    {listings.map(l => (
+                      <ListingCard key={l.id} listing={l} wishlist={wishlist} onWishlistToggle={onWishlistToggle} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          <Footer />
+        </div>
+      );
+    };
+
+    // ── LISTING DETAIL PAGE ──
+    const ListingDetailPage = ({ id, wishlist, onWishlistToggle, onToast }) => {
+      const [listing, setListing] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [activeImg, setActiveImg] = useState(0);
+      const [startDate, setStartDate] = useState('');
+      const [endDate, setEndDate] = useState('');
+      const [days, setDays] = useState(0);
+
+      useEffect(() => {
+        fetch(`/api/listings/${id}`)
+          .then(r => r.json()).then(data => { setListing(data); setLoading(false); })
+          .catch(() => setLoading(false));
+        window.scrollTo(0, 0);
+      }, [id]);
+
+      useEffect(() => {
+        if (startDate && endDate) {
+          const d1 = new Date(startDate), d2 = new Date(endDate);
+          const diff = Math.max(0, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)));
+          setDays(diff);
+        } else setDays(0);
+      }, [startDate, endDate]);
+
+      if (loading) return <div className="loading" style={{marginTop:'5rem'}}><div className="loading-ring"></div></div>;
+      if (!listing) return <div className="empty-state" style={{marginTop:'5rem'}}><h3>Piece Not Found</h3><p>This listing may no longer be available</p><a href="#/browse" className="btn btn-outline">Back to Collection</a></div>;
+
+      const inWishlist = wishlist.includes(listing.id);
+      const effectiveRate = listing && days >= 30 && listing.monthly_rate
+        ? listing.monthly_rate / 30
+        : listing && days >= 7 && listing.weekly_rate
+          ? listing.weekly_rate / 7
+          : listing ? listing.daily_rate : 0;
+      const subtotal = days * effectiveRate;
+      const rateLabel = days >= 30 ? 'monthly' : days >= 7 ? 'weekly' : 'daily';
+      const serviceFee = subtotal * 0.15;
+      const total = subtotal + serviceFee;
+      const imgUrl = getItemVisual(listing);
+
+      const handleWishlist = () => {
+        onWishlistToggle(listing.id);
+        fetch(`/api/listings/${listing.id}/wishlist`, {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ action: inWishlist ? 'remove' : 'add' })
+        });
+        onToast(inWishlist ? 'Removed from wishlist' : 'Added to wishlist');
+      };
+
+      const thumbVisuals = ['large','detail','lifestyle'];
+
+      return (
+        <div>
+          <div className="page-header">
+            <div className="container">
+              <div className="breadcrumb">
+                <a href="#/">Home</a><span>/</span>
+                <a href="#/browse">Collection</a><span>/</span>
+                <span>{listing.brand}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="container section">
+            <div className="listing-layout">
+              {/* Gallery */}
+              <div>
+                <div className="gallery-main" style={imgUrl ? {backgroundImage:`url(${imgUrl})`,backgroundSize:'cover',backgroundPosition:'center',borderRadius:'4px'} : {}}>
+                  {!imgUrl && <div style={{fontSize:'10rem',userSelect:'none'}}>✦</div>}
+                </div>
+                <div className="gallery-thumbs">
+                  {[0,1,2].map(i => (
+                    <div key={i} className={`gallery-thumb ${activeImg === i ? 'active' : ''}`} onClick={() => setActiveImg(i)}
+                      style={imgUrl ? {backgroundImage:`url(${imgUrl})`,backgroundSize:'cover',backgroundPosition:'center'} : {}}>
+                      {!imgUrl && <span style={{fontSize:'2.5rem'}}>✦</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Detail */}
+              <div className="listing-detail-right">
+                <div className="listing-brand">{listing.brand}</div>
+                <h1 className="listing-title-h1">{listing.title}</h1>
+                <div className="listing-rating">
+                  <span className="stars">{'★'.repeat(Math.round(listing.rating))}</span>
+                  <strong>{listing.rating}</strong>
+                  <span>({listing.reviews} reviews)</span>
+                  <span>·</span>
+                  <span>{listing.wishlist_count} saved</span>
+                </div>
+
+                <div className="listing-attrs">
+                  <div className="attr-pill"><div className="attr-name">Condition</div><div className="attr-val">{listing.condition}</div></div>
+                  <div className="attr-pill"><div className="attr-name">Colour</div><div className="attr-val">{listing.colour}</div></div>
+                  <div className="attr-pill"><div className="attr-name">Size</div><div className="attr-val">{listing.size}</div></div>
+                  <div className="attr-pill"><div className="attr-name">Category</div><div className="attr-val">{listing.category}</div></div>
+                </div>
+
+                <div className="verified-id-badge">◈ ID Verification Required to Reserve</div>
+                <p style={{marginBottom:'1.5rem',fontSize:'0.88rem',lineHeight:1.75,color:'var(--champagne-dim)'}}>{listing.description}</p>
+
+                {/* Rate Schedule */}
+                {listing.retail_price && (
+                  <div className="retail-value">Retail value: <strong>${listing.retail_price?.toLocaleString()}</strong> — hire from <strong>${listing.daily_rate}/day</strong></div>
+                )}
+                <div className="rate-schedule">
+                  <div className="rate-schedule-title">Hire Rates</div>
+                  <div className="rate-row">
+                    <span className="rate-row-label">Daily</span>
+                    <span className="rate-row-price">${listing.daily_rate}<span style={{fontSize:'0.72rem',color:'var(--champagne-dim)',marginLeft:'2px'}}>/day</span></span>
+                  </div>
+                  <div className="rate-row">
+                    <span className="rate-row-label">Weekly <span className="rate-row-save">7+ days</span></span>
+                    <span className="rate-row-price">${listing.weekly_rate}<span style={{fontSize:'0.72rem',color:'var(--champagne-dim)',marginLeft:'2px'}}>/week</span>
+                      <span className="rate-row-save" style={{marginLeft:'0.4rem'}}>Save {Math.round((1 - listing.weekly_rate/(listing.daily_rate*7))*100)}%</span>
+                    </span>
+                  </div>
+                  <div className="rate-row">
+                    <span className="rate-row-label">Monthly <span className="rate-row-save">30+ days</span></span>
+                    <span className="rate-row-price">${listing.monthly_rate}<span style={{fontSize:'0.72rem',color:'var(--champagne-dim)',marginLeft:'2px'}}>/month</span>
+                      <span className="rate-row-save" style={{marginLeft:'0.4rem'}}>Save {Math.round((1 - listing.monthly_rate/(listing.daily_rate*30))*100)}%</span>
+                    </span>
+                  </div>
+                </div>
+
+
+                {/* Insurance */}
+                <div className="insurance-box">
+                  <div className="insurance-box-title">◈ Lender Insurance</div>
+                  <label className="insurance-tier">
+                    <input type="radio" name="insurance" value="none" defaultChecked />
+                    <div className="insurance-tier-body">
+                      <div className="insurance-tier-name">No Coverage</div>
+                      <div className="insurance-tier-desc">Security deposit only. Renter liable for damage beyond normal wear.</div>
+                      <div className="insurance-tier-price">Included</div>
+                    </div>
+                  </label>
+                  <label className="insurance-tier">
+                    <input type="radio" name="insurance" value="standard" />
+                    <div className="insurance-tier-body">
+                      <div className="insurance-tier-name">Standard Protection</div>
+                      <div className="insurance-tier-desc">Covers accidental damage up to item retail value. Excludes theft and loss.</div>
+                      <div className="insurance-tier-price">+8% of hire total</div>
+                    </div>
+                  </label>
+                  <label className="insurance-tier">
+                    <input type="radio" name="insurance" value="comprehensive" />
+                    <div className="insurance-tier-body">
+                      <div className="insurance-tier-name">Comprehensive Cover</div>
+                      <div className="insurance-tier-desc">Full coverage — accidental damage, theft, and loss. Peace of mind for high-value pieces.</div>
+                      <div className="insurance-tier-price">+14% of hire total</div>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Pricing calculator */}
+                <div className="pricing-box">
+                  <h4>Reserve This Piece</h4>
+                  <div className="date-inputs">
+                    <input type="date" className="date-input" value={startDate} onChange={e => setStartDate(e.target.value)} min={new Date().toISOString().split('T')[0]} placeholder="From" />
+                    <input type="date" className="date-input" value={endDate} onChange={e => setEndDate(e.target.value)} min={startDate || new Date().toISOString().split('T')[0]} placeholder="To" />
+                  </div>
+                  {days > 0 && (
+                    <>
+                      <div className="pricing-row"><span className="pl">${effectiveRate.toFixed(0)}/day ({rateLabel} rate) × {days} days</span><span className="pv">${subtotal.toFixed(2)}</span></div>
+                      <div className="pricing-row"><span className="pl">Service fee (15%)</span><span className="pv">${serviceFee.toFixed(2)}</span></div>
+                      <div className="pricing-row pricing-total"><span className="pl">Total</span><span className="pv">${total.toFixed(2)}</span></div>
+                    </>
+                  )}
+                  {!days && <p style={{fontSize:'0.8rem',color:'var(--champagne-dim)',marginBottom:'0.5rem',textAlign:'center'}}>Select dates to calculate total</p>}
+                  <button className="btn btn-gold" style={{width:'100%',marginTop:'0.75rem'}}
+                    disabled={days === 0}
+                    onClick={() => navigate(`#/booking/${listing.id}?start=${startDate}&end=${endDate}&days=${days}&total=${total.toFixed(2)}`)}>
+                    Reserve This Piece
+                  </button>
+                  <button className="btn btn-outline" style={{width:'100%',marginTop:'0.5rem'}} onClick={handleWishlist}>
+                    {inWishlist ? '♥ Saved to Wishlist' : '♡ Add to Wishlist'}
+                  </button>
+                </div>
+
+                {/* Owner card */}
+                <div className="owner-card">
+                  <div className="owner-avatar">{listing.owner_avatar}</div>
+                  <div className="owner-info">
+                    <h5>{listing.owner_name}
+                      {listing.owner_verified ? <span className="verified-badge">✦ Verified</span> : null}
+                    </h5>
+                    <small>★ {listing.owner_rating} · {listing.owner_reviews} reviews · {listing.owner_location}</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <Footer />
+        </div>
+      );
+    };
+
+    // ── BOOKING PAGE ──
+    const BookingPage = ({ listingId, searchParams }) => {
+      const params = new URLSearchParams(searchParams);
+      const startDate = params.get('start') || '';
+      const endDate = params.get('end') || '';
+      const days = parseInt(params.get('days') || '0');
+      const total = parseFloat(params.get('total') || '0');
+
+      const [listing, setListing] = useState(null);
+      const [name, setName] = useState('');
+      const [email, setEmail] = useState('');
+      const [message, setMessage] = useState('');
+      const [confirmed, setConfirmed] = useState(false);
+      const [loading, setLoading] = useState(false);
+
+      useEffect(() => {
+        fetch(`/api/listings/${listingId}`).then(r => r.json()).then(setListing);
+        window.scrollTo(0, 0);
+      }, [listingId]);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!name || !email) return;
+        setLoading(true);
+        try {
+          const res = await fetch('/api/bookings', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+              listing_id: listingId, renter_name: name, renter_email: email,
+              message, start_date: startDate, end_date: endDate, total_amount: total
+            })
+          });
+          if (res.ok) setConfirmed(true);
+        } catch (err) { console.error(err); }
+        setLoading(false);
+      };
+
+      if (confirmed) return (
+        <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
+          <div className="confirmation-state">
+            <div className="check">✓</div>
+            <h2>Booking Confirmed</h2>
+            <p>Your reservation has been sent to the owner. You'll receive a confirmation to <strong>{email}</strong> once they accept.</p>
+            <p style={{marginBottom:'2rem',fontSize:'0.82rem',color:'var(--champagne-dim)'}}>Booking reference: VEL-{Date.now().toString().slice(-6)}</p>
+            <div style={{display:'flex',gap:'1rem',justifyContent:'center'}}>
+              <a href="#/" className="btn btn-outline">Return Home</a>
+              <a href="#/browse" className="btn btn-gold">Continue Browsing</a>
+            </div>
+          </div>
+        </div>
+      );
+
+      return (
+        <div>
+          <div className="page-header">
+            <div className="container">
+              <div className="breadcrumb"><a href="#/">Home</a><span>/</span><a href={`#/listing/${listingId}`}>Listing</a><span>/</span><span>Reserve</span></div>
+              <h1 style={{fontSize:'clamp(1.75rem,3vw,2.5rem)'}}>Complete Your Reservation</h1>
+            </div>
+          </div>
+
+          <div className="container section">
+            <div className="booking-layout">
+              <form onSubmit={handleSubmit}>
+                <h3 style={{marginBottom:'1.5rem',fontSize:'1.2rem'}}>Your Details</h3>
+
+                <div className="grid-2" style={{marginBottom:'1.25rem'}}>
+                  <div className="form-group" style={{marginBottom:0}}>
+                    <label className="form-label">Full Name</label>
+                    <input className="form-input" value={name} onChange={e => setName(e.target.value)} required placeholder="Your full name" />
+                  </div>
+                  <div className="form-group" style={{marginBottom:0}}>
+                    <label className="form-label">Email Address</label>
+                    <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="your@email.com" />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Message to Owner (optional)</label>
+                  <textarea className="form-textarea" value={message} onChange={e => setMessage(e.target.value)} placeholder="Introduce yourself and share the occasion…" />
+                </div>
+
+                <h3 style={{marginBottom:'1.25rem',marginTop:'2rem',fontSize:'1.2rem'}}>Payment</h3>
+                <div className="payment-placeholder">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                  Payment processing powered by Stripe — coming soon. No card required to reserve.
+                </div>
+
+                <button type="submit" className="btn btn-gold btn-lg" style={{width:'100%'}} disabled={loading || !name || !email}>
+                  {loading ? 'Processing…' : 'Confirm Reservation'}
+                </button>
+                <p style={{fontSize:'0.75rem',color:'var(--champagne-dim)',textAlign:'center',marginTop:'0.75rem'}}>
+                  Your reservation is not charged until the owner accepts. Free to cancel within 24 hours.
+                </p>
+              </form>
+
+              {/* Summary Sidebar */}
+              <div className="booking-summary">
+                <h4>Booking Summary</h4>
+                {listing && (
+                  <>
+                    <div style={{background:'var(--obsidian-3)',padding:'1rem',marginBottom:'1rem',display:'flex',gap:'0.875rem',alignItems:'center'}}>
+                      <div style={getItemVisual(listing) ? {width:'56px',height:'56px',flexShrink:0,backgroundImage:`url(${getItemVisual(listing)})`,backgroundSize:'cover',backgroundPosition:'center',borderRadius:'2px'} : {fontSize:'2.5rem',width:'56px',height:'56px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                        {!getItemVisual(listing) && '✦'}
+                      </div>
+                      <div>
+                        <div style={{fontSize:'0.68rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.2rem'}}>{listing.brand}</div>
+                        <div style={{fontFamily:'Cormorant Garamond',fontSize:'0.95rem',color:'var(--champagne)'}}>{listing.title}</div>
+                      </div>
+                    </div>
+                    <div className="pricing-row"><span className="pl">Rental period</span><span className="pv">{days} day{days !== 1 ? 's' : ''}</span></div>
+                    <div className="pricing-row"><span className="pl">{startDate} → {endDate}</span></div>
+                    <div className="pricing-row"><span className="pl">Daily rate</span><span className="pv">${listing.daily_rate}/day</span></div>
+                    <div className="pricing-row"><span className="pl">Subtotal</span><span className="pv">${(days * listing.daily_rate).toFixed(2)}</span></div>
+                    <div className="pricing-row"><span className="pl">Service fee (15%)</span><span className="pv">${(days * listing.daily_rate * 0.15).toFixed(2)}</span></div>
+                    <div className="pricing-row pricing-total"><span className="pl">Total</span><span className="pv">${total.toFixed(2)}</span></div>
+                  </>
+                )}
+                <div style={{marginTop:'1rem',padding:'0.75rem',background:'rgba(200,155,50,0.05)',border:'1px solid var(--border)',fontSize:'0.75rem',color:'var(--champagne-dim)'}}>
+                  ✦ Protected by Velier's buyer guarantee
+                </div>
+              </div>
+            </div>
+          </div>
+          <Footer />
+        </div>
+      );
+    };
+
+    // ── LIST AN ITEM PAGE ──
+    const SUPABASE_URL = 'https://gwcesifbgjlwsnchzjwi.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3Y2VzaWZiZ2psd3NuY2h6andpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzMjkzNjIsImV4cCI6MjA5MTkwNTM2Mn0.-Abj4om252fDFQQiKELAwTQURkhV1IpVrxKVPzycesU';
+
+    const ListPage = () => {
+      const { user, token } = useAuth();
+      const [step, setStep] = useState(1);
+      const [form, setForm] = useState({
+        title: '', brand: '', category: '', description: '',
+        daily_rate: '', condition: 'Excellent', colour: '', size: '',
+        location: '', owner_name: '', owner_email: ''
+      });
+      const [photos, setPhotos] = useState([]);   // { file, preview, url }
+      const [uploading, setUploading] = useState(false);
+      const [uploadError, setUploadError] = useState('');
+      const [submitted, setSubmitted] = useState(false);
+
+      const brands = ['Prada', 'Gucci', 'Chanel', 'Hermès', 'Bottega Veneta', 'Valentino', 'Rolex', 'Audemars Piguet', 'Cartier', 'Saint Laurent', 'Louboutin', 'Alexander McQueen', 'Other'];
+      const categories = ['Bags', 'Watches', 'Dresses', 'Jewellery', 'Shoes', 'Other'];
+      const conditions = ['Like New', 'Excellent', 'Very Good', 'Good'];
+
+      const set = (k, v) => setForm(f => ({...f, [k]: v}));
+
+      const estimatedMonthly = form.daily_rate ? Math.round(parseFloat(form.daily_rate) * 3 * 0.80) : 0;
+
+      // Upload a single file to Supabase Storage
+      const uploadPhoto = async (file) => {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'x-filename': file.name,
+            'x-content-type': file.type,
+          },
+          body: file,
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || 'Upload failed');
+        }
+        const { url } = await res.json();
+        return url;
+      };
+
+      const handleFileSelect = async (files) => {
+        const arr = Array.from(files).slice(0, 8 - photos.length);
+        if (!arr.length) return;
+        setUploading(true); setUploadError('');
+        const newPhotos = [];
+        for (const file of arr) {
+          const preview = URL.createObjectURL(file);
+          try {
+            const url = await uploadPhoto(file);
+            newPhotos.push({ file, preview, url });
+          } catch (e) {
+            setUploadError(`Failed to upload ${file.name}: ${e.message}`);
+          }
+        }
+        setPhotos(prev => [...prev, ...newPhotos]);
+        setUploading(false);
+      };
+
+      const removePhoto = (i) => setPhotos(prev => prev.filter((_, idx) => idx !== i));
+
+      const handleSubmit = async () => {
+        try {
+          const imageUrl = photos.length > 0 ? photos[0].url : null;
+          const authHeaders = token
+            ? { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+            : { 'Content-Type': 'application/json' };
+          const res = await fetch('/api/submit-listing', {
+            method: 'POST',
+            headers: authHeaders,
+            body: JSON.stringify({ ...form, image: imageUrl })
+          });
+          if (res.ok) setSubmitted(true);
+        } catch (err) { console.error(err); }
+      };
+
+      useEffect(() => { window.scrollTo(0, 0); }, []);
+
+      const steps = ['Details', 'Pricing', 'Photos', 'Review'];
+
+      if (submitted) return (
+        <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
+          <div className="confirmation-state">
+            <div className="check">✓</div>
+            <h2>Listing Submitted</h2>
+            <p>We'll review your piece and get it live on the platform within 24 hours. Our team will be in touch at <strong>{form.owner_email}</strong>.</p>
+            <div style={{display:'flex',gap:'1rem',justifyContent:'center',marginTop:'2rem'}}>
+              <a href="#/" className="btn btn-outline">Return Home</a>
+              <a href="#/browse" className="btn btn-gold">Browse the Collection</a>
+            </div>
+          </div>
+        </div>
+      );
+
+      return (
+        <div>
+          <div className="page-header">
+            <div className="container">
+              <div className="breadcrumb"><a href="#/">Home</a><span>/</span><span>List an Item</span></div>
+              <h1 style={{fontSize:'clamp(1.75rem,3vw,2.5rem)'}}>List Your Piece</h1>
+              <p style={{marginTop:'0.5rem'}}>Turn your wardrobe into income. Join thousands of lenders earning from their luxury pieces.</p>
+            </div>
+          </div>
+
+          <div className="container section" style={{maxWidth:'760px',margin:'0 auto'}}>
+            {/* Wizard Steps */}
+            <div className="wizard-steps">
+              {steps.map((s, i) => (
+                <React.Fragment key={s}>
+                  {i > 0 && <div className={`wizard-connector ${i < step ? 'done' : ''}`}></div>}
+                  <div className="wizard-step-item">
+                    <div className={`step-dot ${step === i+1 ? 'active' : step > i+1 ? 'done' : ''}`}>
+                      {step > i+1 ? '✓' : i+1}
+                    </div>
+                    <span className={`step-label ${step === i+1 ? 'active' : ''}`}>{s}</span>
+                  </div>
+                </React.Fragment>
+              ))}
+            </div>
+
+            {/* Step 1: Details */}
+            {step === 1 && (
+              <div>
+                <h3 style={{marginBottom:'1.5rem'}}>Item Details</h3>
+                <div className="form-group">
+                  <label className="form-label">Item Title *</label>
+                  <input className="form-input" value={form.title} onChange={e => set('title', e.target.value)} placeholder="e.g. Chanel Classic Double Flap Bag" />
+                </div>
+                <div className="grid-2">
+                  <div className="form-group">
+                    <label className="form-label">Brand *</label>
+                    <select className="form-select" value={form.brand} onChange={e => set('brand', e.target.value)}>
+                      <option value="">Select brand</option>
+                      {brands.map(b => <option key={b}>{b}</option>)}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Category *</label>
+                    <select className="form-select" value={form.category} onChange={e => set('category', e.target.value)}>
+                      {categories.map(c => <option key={c}>{c}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div className="grid-2">
+                  <div className="form-group">
+                    <label className="form-label">Colour</label>
+                    <input className="form-input" value={form.colour} onChange={e => set('colour', e.target.value)} placeholder="e.g. Black, Ivory" />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Size / Dimensions</label>
+                    <input className="form-input" value={form.size} onChange={e => set('size', e.target.value)} placeholder="e.g. Medium, UK 10, 30cm" />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Condition *</label>
+                  <div style={{display:'flex',gap:'0.5rem',flexWrap:'wrap'}}>
+                    {conditions.map(c => (
+                      <button key={c} type="button"
+                        className={`btn btn-sm ${form.condition === c ? 'btn-gold' : 'btn-outline'}`}
+                        onClick={() => set('condition', c)}>
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Description</label>
+                  <textarea className="form-textarea" value={form.description} onChange={e => set('description', e.target.value)} placeholder="Describe the piece — its history, provenance, any notable features…" style={{minHeight:'120px'}} />
+                </div>
+                <button className="btn btn-gold" style={{width:'100%'}} onClick={() => setStep(2)} disabled={!form.title || !form.brand}>
+                  Continue to Pricing →
+                </button>
+              </div>
+            )}
+
+            {/* Step 2: Pricing */}
+            {step === 2 && (
+              <div>
+                <h3 style={{marginBottom:'1.5rem'}}>Set Your Price</h3>
+                <div className="form-group">
+                  <label className="form-label">Daily Rental Rate ($) *</label>
+                  <input className="form-input" type="number" value={form.daily_rate} onChange={e => set('daily_rate', e.target.value)} placeholder="e.g. 95" min="1" />
+                </div>
+
+                {form.daily_rate && (
+                  <div className="estimator">
+                    <h5>Estimated Earnings</h5>
+                    <div className="estimate-value">${estimatedMonthly}</div>
+                    <div className="estimate-sub">per month at 3 rentals/month (80% your share)</div>
+                    <div style={{height:'1px',background:'var(--border)',margin:'1rem 0'}}></div>
+                    <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.78rem',color:'var(--champagne-dim)'}}>
+                      <span>Daily rate</span><span>${form.daily_rate}</span>
+                    </div>
+                    <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.78rem',color:'var(--champagne-dim)'}}>
+                      <span>Velier fee (20%)</span><span>${(parseFloat(form.daily_rate) * 0.2).toFixed(2)}</span>
+                    </div>
+                    <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.78rem',color:'var(--gold)'}}>
+                      <span>Your daily earnings</span><span>${(parseFloat(form.daily_rate) * 0.8).toFixed(2)}</span>
+                    </div>
+                  </div>
+                )}
+
+                <div style={{background:'var(--obsidian-3)',border:'1px solid var(--border)',padding:'1rem',marginBottom:'1.25rem',fontSize:'0.8rem',color:'var(--champagne-dim)'}}>
+                  <strong style={{color:'var(--champagne)',display:'block',marginBottom:'0.25rem'}}>Pricing Guide</strong>
+                  Bags: $50–$450/day · Watches: $100–$400/day · Dresses: $80–$200/day · Jewellery: $100–$200/day
+                </div>
+
+                <div style={{display:'flex',gap:'0.75rem'}}>
+                  <button className="btn btn-outline" onClick={() => setStep(1)}>← Back</button>
+                  <button className="btn btn-gold" style={{flex:1}} onClick={() => setStep(3)} disabled={!form.daily_rate}>Continue to Photos →</button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Photos */}
+            {step === 3 && (
+              <div>
+                <h3 style={{marginBottom:'0.5rem'}}>Upload Photos</h3>
+                <p style={{fontSize:'0.82rem',color:'var(--champagne-dim)',marginBottom:'1.5rem'}}>Add up to 8 photos. First photo will be the main listing image.</p>
+
+                {/* Drop zone */}
+                <label htmlFor="photo-upload" style={{display:'block',border:'2px dashed var(--border-hover)',padding:'2.5rem 2rem',textAlign:'center',marginBottom:'1.25rem',cursor:'pointer',transition:'border-color 0.2s'}}
+                  onMouseEnter={e => e.currentTarget.style.borderColor='var(--gold-dim)'}
+                  onMouseLeave={e => e.currentTarget.style.borderColor='var(--border-hover)'}
+                  onDragOver={e => { e.preventDefault(); e.currentTarget.style.borderColor='var(--gold)'; }}
+                  onDragLeave={e => e.currentTarget.style.borderColor='var(--border-hover)'}
+                  onDrop={e => { e.preventDefault(); e.currentTarget.style.borderColor='var(--border-hover)'; handleFileSelect(e.dataTransfer.files); }}>
+                  <input id="photo-upload" type="file" accept="image/*" multiple style={{display:'none'}}
+                    onChange={e => handleFileSelect(e.target.files)} />
+                  {uploading ? (
+                    <div style={{color:'var(--gold)'}}>Uploading...</div>
+                  ) : (
+                    <>
+                      <div style={{fontSize:'2rem',marginBottom:'0.75rem',opacity:0.6}}>+</div>
+                      <p style={{fontSize:'0.88rem',color:'var(--champagne)',marginBottom:'0.35rem'}}>Tap to select photos or drag & drop</p>
+                      <p style={{fontSize:'0.75rem',color:'var(--champagne-dim)'}}>JPG, PNG, WEBP · up to 8 photos</p>
+                    </>
+                  )}
+                </label>
+
+                {uploadError && <div style={{background:'rgba(200,60,60,0.12)',border:'1px solid rgba(200,60,60,0.25)',padding:'0.75rem',fontSize:'0.82rem',color:'#e88',marginBottom:'1rem'}}>{uploadError}</div>}
+
+                {/* Photo previews */}
+                {photos.length > 0 && (
+                  <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'0.5rem',marginBottom:'1.25rem'}}>
+                    {photos.map((p, i) => (
+                      <div key={i} style={{position:'relative',aspectRatio:1}}>
+                        <img src={p.preview} style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'2px'}} />
+                        {i === 0 && <span style={{position:'absolute',top:4,left:4,background:'var(--gold)',color:'var(--obsidian)',fontSize:'0.6rem',padding:'1px 5px',letterSpacing:'0.05em',textTransform:'uppercase'}}>Main</span>}
+                        <button onClick={() => removePhoto(i)} style={{position:'absolute',top:3,right:3,background:'rgba(0,0,0,0.7)',border:'none',color:'#fff',width:20,height:20,borderRadius:'50%',cursor:'pointer',fontSize:'0.75rem',lineHeight:1,display:'flex',alignItems:'center',justifyContent:'center'}}>×</button>
+                      </div>
+                    ))}
+                    {photos.length < 8 && (
+                      <label htmlFor="photo-upload-more" style={{aspectRatio:1,background:'var(--obsidian-3)',border:'1px dashed var(--border)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.5rem',color:'var(--champagne-dim)',cursor:'pointer'}}>
+                        <input id="photo-upload-more" type="file" accept="image/*" multiple style={{display:'none'}} onChange={e => handleFileSelect(e.target.files)} />
+                        +
+                      </label>
+                    )}
+                  </div>
+                )}
+
+                <p style={{fontSize:'0.75rem',color:'var(--champagne-dim)',marginBottom:'1.5rem'}}>
+                  ✦ Natural light, neutral background, multiple angles — higher quality photos get 3× more bookings.
+                </p>
+                <div style={{display:'flex',gap:'0.75rem'}}>
+                  <button className="btn btn-outline" onClick={() => setStep(2)}>← Back</button>
+                  <button className="btn btn-gold" style={{flex:1}} onClick={() => setStep(4)} disabled={uploading}>Continue to Review →</button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Review */}
+            {step === 4 && (
+              <div>
+                <h3 style={{marginBottom:'1.5rem'}}>Review & Submit</h3>
+                <div style={{background:'var(--obsidian-2)',border:'1px solid var(--border)',padding:'1.5rem',marginBottom:'1.5rem'}}>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem'}}>
+                    {[
+                      ['Title', form.title],['Brand', form.brand],['Category', form.category],
+                      ['Condition', form.condition],['Colour', form.colour],['Size', form.size],
+                      ['Daily Rate', form.daily_rate ? `$${form.daily_rate}` : '—']
+                    ].map(([k,v]) => (
+                      <div key={k}>
+                        <div style={{fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--champagne-dim)',marginBottom:'0.2rem'}}>{k}</div>
+                        <div style={{fontSize:'0.9rem',color:'var(--champagne)'}}>{v || '—'}</div>
+                      </div>
+                    ))}
+                  </div>
+                  {form.description && <div style={{marginTop:'1rem',paddingTop:'1rem',borderTop:'1px solid var(--border)'}}><div style={{fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--champagne-dim)',marginBottom:'0.4rem'}}>Description</div><p style={{fontSize:'0.85rem',lineHeight:1.65}}>{form.description}</p></div>}
+                </div>
+
+                <h3 style={{marginBottom:'1rem',fontSize:'1.1rem'}}>Your Details</h3>
+                <div className="grid-2" style={{marginBottom:'1.25rem'}}>
+                  <div className="form-group" style={{marginBottom:0}}>
+                    <label className="form-label">Your Name *</label>
+                    <input className="form-input" value={form.owner_name} onChange={e => set('owner_name', e.target.value)} placeholder="Your full name" />
+                  </div>
+                  <div className="form-group" style={{marginBottom:0}}>
+                    <label className="form-label">Email Address *</label>
+                    <input className="form-input" type="email" value={form.owner_email} onChange={e => set('owner_email', e.target.value)} placeholder="your@email.com" />
+                  </div>
+                </div>
+
+                <div style={{background:'rgba(200,155,50,0.05)',border:'1px solid rgba(200,155,50,0.15)',padding:'0.875rem',marginBottom:'1.25rem',fontSize:'0.78rem',color:'var(--champagne-dim)'}}>
+                  By submitting, you agree to Velier's Lender Terms and confirm this item belongs to you and is accurately described.
+                </div>
+
+                <div style={{display:'flex',gap:'0.75rem'}}>
+                  <button className="btn btn-outline" onClick={() => setStep(3)}>← Back</button>
+                  <button className="btn btn-gold" style={{flex:1}} onClick={handleSubmit} disabled={!form.owner_name || !form.owner_email}>
+                    Submit for Review
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+          <Footer />
+        </div>
+      );
+    };
+
+
+    // ── TRADE PAGE ──
+    const trades = [
+      { id: 1, title: 'Rolex Submariner Date', brand: 'Rolex', value: 14500, image: 'https://img.chrono24.com/images/uhren/32585129-b02ufm80eqd2mvz1mqzbqvcl-ExtraLarge.jpg', condition: 'Excellent', seeking: 'Patek Philippe Aquanaut 5167 or Audemars Piguet Royal Oak 41mm', owner: 'James R.', location: 'London, UK' },
+      { id: 2, title: 'Hermès Birkin 30 Biscuit Togo', brand: 'Hermès', value: 22000, image: 'https://mightychic.com/wp-content/uploads/2023/12/hermes-birkin-30-biscuit-bag-for-sale-on-mightychic.jpg', condition: 'Excellent', seeking: 'Chanel Classic Double Flap or Hermès Kelly 28', owner: 'Isabelle M.', location: 'Paris, France' },
+      { id: 3, title: 'Patek Philippe Calatrava 5127R', brand: 'Patek Philippe', value: 28000, image: 'https://cdn.swisswatchexpo.com/productphotos/10/11/patek-philippe-calatrava-rose-gold-automatic-mens-watch-5127r-65252_8fb2d.jpg', condition: 'Like New', seeking: 'Patek Philippe Nautilus 5711 or Perpetual Calendar', owner: 'Thomas K.', location: 'Geneva, Switzerland' },
+      { id: 4, title: 'Chanel Classic Double Flap Ivory', brand: 'Chanel', value: 9800, image: 'https://madisonavenuecouture.com/cdn/shop/files/C-V-230601-3-01_1024x1024.jpg?v=1690559192', condition: 'Very Good', seeking: 'Saint Laurent Le 5 à 7 Large or Bottega Veneta Cassette', owner: 'Sofia L.', location: 'Milan, Italy' },
+      { id: 5, title: 'Audemars Piguet Royal Oak 41mm', brand: 'Audemars Piguet', value: 32000, image: 'https://img.chrono24.com/images/uhren/38363070-j9iuygz0p39berthgowhnlm7-ExtraLarge.jpg', condition: 'Excellent', seeking: 'Patek Philippe Nautilus 5711 or Rolex Daytona White Gold', owner: 'Henrik S.', location: 'Stockholm, Sweden' },
+      { id: 6, title: 'Valentino VLogo Fuchsia Gown', brand: 'Valentino', value: 4200, image: 'https://a.1stdibscdn.com/archivesE/upload/366869/v_11197031460738547313/_MG_0562_copy_org_master.jpg?width=1200', condition: 'Excellent', seeking: 'Alexander McQueen gown or Givenchy couture piece', owner: 'Amara D.', location: 'Dubai, UAE' },
+    ];
+
+    const TradePage = () => {
+      return (
+        <div>
+          <div className="trade-hero">
+            <div className="container">
+              <div className="section-label" style={{marginBottom:'1rem'}}>New on Velier</div>
+              <h1>Asset Exchange</h1>
+              <p>Trade luxury pieces peer-to-peer. List your item, set what you're seeking, and exchange with verified members — at a fraction of resale friction.</p>
+              <a href="#/list" className="btn btn-gold" style={{display:'inline-block'}}>List an Item for Trade</a>
+            </div>
+          </div>
+          <div className="container section">
+            <div className="trade-fee-info">
+              <div className="section-label" style={{marginBottom:'1rem',textAlign:'center'}}>How Trades Work</div>
+              <div className="trade-fee-grid">
+                <div className="trade-fee-item">
+                  <div className="tfi-val">2.5%</div>
+                  <div className="tfi-label">Trade fee per party<br/>(capped at $500)</div>
+                </div>
+                <div className="trade-fee-item">
+                  <div className="tfi-val">◈</div>
+                  <div className="tfi-label">ID Verification<br/>required for all trades</div>
+                </div>
+                <div className="trade-fee-item">
+                  <div className="tfi-val">48h</div>
+                  <div className="tfi-label">Escrow window<br/>for condition confirmation</div>
+                </div>
+              </div>
+            </div>
+            <div className="section-header" style={{marginBottom:'2rem'}}>
+              <div className="section-label">Available Trades</div>
+              <h2>Browse Exchange Listings</h2>
+            </div>
+            <div className="trade-grid">
+              {trades.map(t => (
+                <div key={t.id} className="trade-card">
+                  <div className="trade-card-header">
+                    <span style={{fontSize:'0.7rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--champagne-dim)'}}>{t.owner} · {t.location}</span>
+                    <span className="trade-badge">Trade</span>
+                  </div>
+                  <div className="trade-item-img" style={{backgroundImage:`url(${t.image})`,backgroundSize:'cover',backgroundPosition:'center'}}></div>
+                  <div className="trade-item-title">{t.title}</div>
+                  <div className="trade-item-meta">{t.brand} · {t.condition}</div>
+                  <div className="trade-value">Estimated Value: <strong>${t.value.toLocaleString()}</strong></div>
+                  <div className="trade-seeking">
+                    <span style={{fontSize:'0.65rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--champagne-dim)',display:'block',marginBottom:'0.25rem'}}>Seeking</span>
+                    <span>{t.seeking}</span>
+                  </div>
+                  <button className="btn btn-gold" style={{width:'100%',fontSize:'0.78rem'}}
+                    onClick={() => window.dispatchEvent(new CustomEvent('velier-toast', {detail:'Trade enquiry sent. The lender will be notified.'}))}>
+                    Propose a Trade
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+          <Footer />
+        </div>
+      );
+    };
+
+    // ── DASHBOARD PAGE ──
+    const DashboardPage = () => {
+      const { user, token, setAuthModal } = useAuth();
+      const [tab, setTab] = useState('listings');
+      const [listings, setListings] = useState([]);
+      const [bookings, setBookings] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [editListing, setEditListing] = useState(null); // listing being edited
+      const [editForm, setEditForm] = useState({});
+      const [editImage, setEditImage] = useState(null); // current image URL for edit modal
+      const [editUploading, setEditUploading] = useState(false);
+      const [editUploadErr, setEditUploadErr] = useState('');
+      const [saving, setSaving] = useState(false);
+      const [saveMsg, setSaveMsg] = useState('');
+
+      useEffect(() => {
+        if (!user || !token) return;
+        setLoading(true);
+        Promise.all([
+          fetch('/api/dashboard/listings', { headers: { Authorization: `Bearer ${token}` } }).then(async r => {
+            if (r.status === 401) { logout(); return []; }
+            return r.json();
+          }),
+          fetch('/api/dashboard/bookings', { headers: { Authorization: `Bearer ${token}` } }).then(async r => {
+            if (r.status === 401) return [];
+            return r.json();
+          }),
+        ]).then(([l, b]) => {
+          setListings(Array.isArray(l) ? l : []);
+          setBookings(Array.isArray(b) ? b : []);
+          setLoading(false);
+        }).catch(() => setLoading(false));
+      }, [user, token]);
+
+      const deactivateListing = async (id) => {
+        await fetch(`/api/listings/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+        setListings(prev => prev.filter(l => l.id !== id));
+      };
+
+      const openEdit = (l) => {
+        setEditListing(l);
+        setEditImage(l.image || null);
+        setEditForm({
+          title: l.title || '',
+          brand: l.brand || '',
+          category: l.category || '',
+          description: l.description || '',
+          daily_rate: l.daily_rate || '',
+          condition: l.condition || '',
+          colour: l.colour || '',
+          size: l.size || '',
+          location: l.location || '',
+        });
+        setSaveMsg(''); setEditUploadErr('');
+      };
+
+      const handleEditPhoto = async (file) => {
+        if (!file) return;
+        setEditUploading(true); setEditUploadErr('');
+        try {
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}`, 'x-filename': file.name, 'x-content-type': file.type },
+            body: file,
+          });
+          if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error||'Upload failed'); }
+          const { url } = await res.json();
+          setEditImage(url);
+        } catch(e) { setEditUploadErr(e.message); }
+        setEditUploading(false);
+      };
+
+      const saveEdit = async () => {
+        setSaving(true); setSaveMsg('');
+        const daily = parseFloat(editForm.daily_rate);
+        const updates = {
+          ...editForm,
+          daily_rate: daily,
+          weekly_rate: Math.round(daily * 5.5),
+          monthly_rate: Math.round(daily * 18),
+          image: editImage,
+        };
+        const res = await fetch(`/api/listings/${editListing.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify(updates),
+        });
+        setSaving(false);
+        if (res.ok) {
+          const updated = await res.json();
+          setListings(prev => prev.map(l => l.id === editListing.id ? { ...l, ...updated } : l));
+          setSaveMsg('Saved');
+          setTimeout(() => { setEditListing(null); setSaveMsg(''); }, 800);
+        } else {
+          const err = await res.json().catch(() => ({}));
+          setSaveMsg(err.error || 'Save failed — please try again');
+        }
+      };
+
+      const fld = (label, key, type = 'text', placeholder = '') => (
+        <div style={{marginBottom:'1rem'}}>
+          <label style={{display:'block',fontSize:'0.7rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--champagne-dim)',marginBottom:'0.4rem'}}>{label}</label>
+          {key === 'description' ? (
+            <textarea value={editForm[key]} onChange={e => setEditForm(f => ({...f, [key]: e.target.value}))}
+              style={{width:'100%',background:'#1a1713',border:'1px solid rgba(200,168,75,0.15)',borderRadius:'2px',padding:'0.7rem 0.9rem',color:'var(--champagne)',fontSize:'0.9rem',outline:'none',resize:'vertical',minHeight:'80px',boxSizing:'border-box'}} />
+          ) : (
+            <input type={type} value={editForm[key]} onChange={e => setEditForm(f => ({...f, [key]: e.target.value}))} placeholder={placeholder}
+              style={{width:'100%',background:'#1a1713',border:'1px solid rgba(200,168,75,0.15)',borderRadius:'2px',padding:'0.7rem 0.9rem',color:'var(--champagne)',fontSize:'0.9rem',outline:'none',boxSizing:'border-box'}} />
+          )}
+        </div>
+      );
+
+      if (!user) return (
+        <div style={{minHeight:'60vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'1.5rem',padding:'4rem 2rem'}}>
+          <h2 style={{fontFamily:'Cormorant Garamond',fontSize:'2rem',fontWeight:400,color:'var(--champagne)'}}>Sign in to access your dashboard</h2>
+          <p style={{color:'var(--champagne-dim)'}}>Manage your listings and reservations in one place.</p>
+          <button onClick={() => setAuthModal('login')} style={{background:'var(--gold)',border:'none',borderRadius:'2px',padding:'0.85rem 2.5rem',color:'var(--obsidian)',fontWeight:600,fontSize:'0.9rem',letterSpacing:'0.08em',textTransform:'uppercase',cursor:'pointer'}}>Sign In</button>
+        </div>
+      );
+
+      const tabStyle = (t) => ({
+        background:'none', border:'none', cursor:'pointer', padding:'0.6rem 1.25rem',
+        color: tab === t ? 'var(--champagne)' : 'var(--champagne-dim)',
+        borderBottom: tab === t ? '1px solid var(--gold)' : '1px solid transparent',
+        fontSize:'0.85rem', letterSpacing:'0.1em', textTransform:'uppercase', fontFamily:'Switzer, sans-serif',
+      });
+
+      const statusBadge = (s) => {
+        const colors = { confirmed: '#4caf7d', pending: '#c8a84b', cancelled: '#e06060', live: '#4caf7d' };
+        return <span style={{background:`${colors[s]||'#888'}22`,color:colors[s]||'#888',border:`1px solid ${colors[s]||'#888'}44`,borderRadius:'2px',padding:'2px 8px',fontSize:'0.75rem',letterSpacing:'0.06em',textTransform:'uppercase'}}>{s}</span>;
+      };
+
+      return (
+        <div style={{maxWidth:'1000px',margin:'0 auto',padding:'6rem 2rem 4rem'}}>
+
+          {/* Edit Modal */}
+          {editListing && (
+            <div style={{position:'fixed',inset:0,zIndex:99999,overflowY:'auto',background:'rgba(0,0,0,0.8)',backdropFilter:'blur(8px)'}} onClick={() => setEditListing(null)}>
+              <div style={{background:'#131109',border:'1px solid rgba(200,168,75,0.2)',borderRadius:'2px',width:'100%',maxWidth:'560px',padding:'2rem',margin:'5vh auto 4rem',position:'relative'}} onClick={e => e.stopPropagation()}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.75rem'}}>
+                  <h2 style={{fontFamily:'Cormorant Garamond',fontSize:'1.6rem',fontWeight:400,color:'var(--champagne)',margin:0}}>Edit Listing</h2>
+                  <button onClick={() => setEditListing(null)} style={{background:'none',border:'none',color:'var(--champagne-dim)',fontSize:'1.5rem',cursor:'pointer',lineHeight:1}}>×</button>
+                </div>
+                {/* Photo section */}
+                <div style={{marginBottom:'1.5rem'}}>
+                  <label style={{display:'block',fontSize:'0.7rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--champagne-dim)',marginBottom:'0.6rem'}}>Photo</label>
+                  {editImage ? (
+                    <div style={{position:'relative'}}>
+                      <img src={editImage} style={{width:'100%',height:'180px',objectFit:'cover',borderRadius:'2px',display:'block'}} />
+                      <label style={{position:'absolute',bottom:'0.5rem',right:'0.5rem',background:'rgba(0,0,0,0.75)',border:'1px solid rgba(200,168,75,0.4)',color:'var(--champagne)',fontSize:'0.72rem',letterSpacing:'0.08em',textTransform:'uppercase',padding:'0.4rem 0.75rem',borderRadius:'2px',cursor:'pointer'}}>
+                        {editUploading ? 'Uploading...' : 'Replace Photo'}
+                        <input type="file" accept="image/*" style={{display:'none'}} onChange={e => handleEditPhoto(e.target.files[0])} disabled={editUploading} />
+                      </label>
+                    </div>
+                  ) : (
+                    <label style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'0.5rem',border:'2px dashed rgba(200,168,75,0.25)',borderRadius:'2px',padding:'2rem',cursor:'pointer',color:'var(--champagne-dim)',fontSize:'0.85rem'}}>
+                      {editUploading ? 'Uploading...' : '+ Add Photo'}
+                      <input type="file" accept="image/*" style={{display:'none'}} onChange={e => handleEditPhoto(e.target.files[0])} disabled={editUploading} />
+                    </label>
+                  )}
+                  {editUploadErr && <div style={{color:'#e88',fontSize:'0.78rem',marginTop:'0.4rem'}}>{editUploadErr}</div>}
+                </div>
+                {fld('Title', 'title')}
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem'}}>
+                  {fld('Brand', 'brand')}
+                  {fld('Category', 'category')}
+                  {fld('Colour', 'colour')}
+                  {fld('Size', 'size')}
+                  {fld('Condition', 'condition')}
+                  {fld('Location', 'location')}
+                  {fld('Daily Rate ($)', 'daily_rate', 'number')}
+                </div>
+                {fld('Description', 'description')}
+                <div style={{display:'flex',gap:'0.75rem',marginTop:'0.5rem',alignItems:'center'}}>
+                  <button onClick={() => setEditListing(null)} style={{background:'none',border:'1px solid var(--border-hover)',color:'var(--champagne-dim)',borderRadius:'2px',padding:'0.75rem 1.25rem',fontSize:'0.82rem',letterSpacing:'0.08em',textTransform:'uppercase',cursor:'pointer'}}>Cancel</button>
+                  <button onClick={saveEdit} disabled={saving} style={{flex:1,background:'var(--gold)',border:'none',borderRadius:'2px',padding:'0.75rem',color:'var(--obsidian)',fontWeight:700,fontSize:'0.85rem',letterSpacing:'0.08em',textTransform:'uppercase',cursor:saving?'not-allowed':'pointer',opacity:saving?0.7:1}}>
+                    {saving ? 'Saving...' : 'Save Changes'}
+                  </button>
+                  {saveMsg && <span style={{fontSize:'0.82rem',color: saveMsg==='Saved' ? '#4caf7d' : '#e06060'}}>{saveMsg}</span>}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div style={{marginBottom:'2.5rem'}}>
+            <h1 style={{fontFamily:'Cormorant Garamond',fontSize:'2.5rem',fontWeight:400,color:'var(--champagne)',marginBottom:'0.5rem'}}>My Account</h1>
+            <p style={{color:'var(--champagne-dim)'}}>{user.email} &nbsp;·&nbsp; <a href="#/list" style={{color:'var(--gold)'}}>+ List a new item</a></p>
+          </div>
+
+          <div style={{display:'flex',gap:'0',borderBottom:'1px solid var(--border)',marginBottom:'2.5rem'}}>
+            <button style={tabStyle('listings')} onClick={() => setTab('listings')}>My Listings ({listings.length})</button>
+            <button style={tabStyle('bookings')} onClick={() => setTab('bookings')}>My Reservations ({bookings.length})</button>
+          </div>
+
+          {loading ? (
+            <div style={{textAlign:'center',padding:'4rem',color:'var(--champagne-dim)'}}>Loading...</div>
+          ) : tab === 'listings' ? (
+            listings.length === 0 ? (
+              <div style={{textAlign:'center',padding:'4rem',color:'var(--champagne-dim)'}}>
+                <p style={{marginBottom:'1.5rem'}}>You haven't listed any items yet.</p>
+                <a href="#/list" style={{background:'var(--gold)',borderRadius:'2px',padding:'0.8rem 2rem',color:'var(--obsidian)',fontWeight:600,fontSize:'0.85rem',letterSpacing:'0.08em',textTransform:'uppercase',textDecoration:'none'}}>List Your First Item</a>
+              </div>
+            ) : (
+              <div style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
+                {listings.map(l => (
+                  <div key={l.id} style={{background:'var(--obsidian-3)',border:'1px solid var(--border)',borderRadius:'2px',padding:'1.5rem',display:'flex',gap:'1.5rem',alignItems:'center',transition:'border-color 0.2s',cursor:'pointer'}}
+                    onClick={() => openEdit(l)}
+                    onMouseEnter={e => e.currentTarget.style.borderColor='rgba(200,168,75,0.3)'}
+                    onMouseLeave={e => e.currentTarget.style.borderColor='var(--border)'}
+                  >
+                    {l.image && <img src={l.image} alt={l.title} style={{width:'80px',height:'80px',objectFit:'cover',borderRadius:'2px',flexShrink:0}} />}
+                    <div style={{flex:1}}>
+                      <div style={{display:'flex',alignItems:'center',gap:'0.75rem',marginBottom:'0.35rem'}}>
+                        <h3 style={{fontFamily:'Cormorant Garamond',fontSize:'1.2rem',fontWeight:400,color:'var(--champagne)',margin:0}}>{l.title}</h3>
+                        {statusBadge(l.is_active ? 'live' : 'inactive')}
+                      </div>
+                      <p style={{color:'var(--champagne-dim)',fontSize:'0.85rem',margin:'0 0 0.5rem'}}>{l.category} · {l.brand} · {l.location}</p>
+                      <p style={{color:'var(--gold)',fontSize:'0.9rem',margin:0}}>${l.daily_rate}/day · ${l.weekly_rate}/week · ${l.monthly_rate}/month</p>
+                    </div>
+                    <div style={{display:'flex',flexDirection:'column',gap:'0.5rem',alignItems:'flex-end',flexShrink:0}}>
+                      <button onClick={e => { e.stopPropagation(); openEdit(l); }}
+                        style={{background:'none',border:'1px solid rgba(200,168,75,0.25)',color:'var(--champagne-dim)',borderRadius:'2px',padding:'0.4rem 0.9rem',fontSize:'0.75rem',letterSpacing:'0.06em',textTransform:'uppercase',cursor:'pointer'}}>Edit</button>
+                      <button onClick={e => { e.stopPropagation(); deactivateListing(l.id); }}
+                        style={{background:'none',border:'1px solid rgba(200,80,80,0.3)',color:'rgba(200,80,80,0.7)',borderRadius:'2px',padding:'0.4rem 0.9rem',fontSize:'0.75rem',letterSpacing:'0.06em',textTransform:'uppercase',cursor:'pointer'}}>Remove</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          ) : (
+            bookings.length === 0 ? (
+              <div style={{textAlign:'center',padding:'4rem',color:'var(--champagne-dim)'}}>
+                <p style={{marginBottom:'1.5rem'}}>No reservations yet.</p>
+                <a href="#/browse" style={{background:'var(--gold)',borderRadius:'2px',padding:'0.8rem 2rem',color:'var(--obsidian)',fontWeight:600,fontSize:'0.85rem',letterSpacing:'0.08em',textTransform:'uppercase',textDecoration:'none'}}>Browse the Collection</a>
+              </div>
+            ) : (
+              <div style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
+                {bookings.map(b => (
+                  <div key={b.id} style={{background:'var(--obsidian-3)',border:'1px solid var(--border)',borderRadius:'2px',padding:'1.5rem'}}>
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.5rem'}}>
+                      <h3 style={{fontFamily:'Cormorant Garamond',fontSize:'1.2rem',fontWeight:400,color:'var(--champagne)',margin:0}}>Booking #{b.id}</h3>
+                      {statusBadge(b.status)}
+                    </div>
+                    <p style={{color:'var(--champagne-dim)',fontSize:'0.85rem',margin:'0 0 0.25rem'}}>{b.start_date} → {b.end_date} &nbsp;·&nbsp; {b.days} day{b.days !== 1 ? 's' : ''}</p>
+                    <p style={{color:'var(--gold)',fontSize:'0.9rem',margin:0}}>${b.total_price?.toLocaleString()} total {b.insurance_tier !== 'none' ? `· ${b.insurance_tier} insurance` : ''}</p>
+                  </div>
+                ))}
+              </div>
+            )
+          )}
+        </div>
+      );
+    };
+
+    // ── ADMIN PANEL ──
+    const ADMIN_SECRET = 'velier-admin-2026';
+
+    const AdminPage = () => {
+      const [authed, setAuthed] = useState(() => sessionStorage.getItem('velier_admin') === 'true');
+      const [password, setPassword] = useState('');
+      const [authError, setAuthError] = useState('');
+      const [tab, setTab] = useState('listings');
+      const [listings, setListings] = useState([]);
+      const [users, setUsers] = useState([]);
+      const [bookings, setBookings] = useState([]);
+      const [loading, setLoading] = useState(false);
+      const [toast, setToast] = useState('');
+
+      const adminFetch = (path, opts = {}) => fetch(path, {
+        ...opts,
+        headers: { 'x-admin-secret': ADMIN_SECRET, 'Content-Type': 'application/json', ...(opts.headers || {}) }
+      });
+
+      const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
+
+      const handleLogin = (e) => {
+        e.preventDefault();
+        if (password === ADMIN_SECRET) {
+          sessionStorage.setItem('velier_admin', 'true');
+          setAuthed(true);
+        } else {
+          setAuthError('Incorrect password');
+        }
+      };
+
+      const loadTab = async (t) => {
+        setTab(t); setLoading(true);
+        try {
+          if (t === 'listings') {
+            const r = await adminFetch('/api/admin/listings');
+            setListings(await r.json());
+          } else if (t === 'users') {
+            const r = await adminFetch('/api/admin/users');
+            setUsers(await r.json());
+          } else if (t === 'bookings') {
+            const r = await adminFetch('/api/admin/bookings');
+            setBookings(await r.json());
+          }
+        } catch(e) { showToast('Load failed'); }
+        setLoading(false);
+      };
+
+      useEffect(() => { if (authed) loadTab('listings'); }, [authed]);
+
+      const toggleListing = async (id, current) => {
+        await adminFetch(`/api/admin/listings/${id}`, { method: 'PATCH', body: JSON.stringify({ is_active: !current }) });
+        setListings(prev => prev.map(l => l.id === id ? {...l, is_active: !current} : l));
+        showToast(current ? 'Listing suspended' : 'Listing approved');
+      };
+
+      const deleteListing = async (id) => {
+        if (!confirm('Delete this listing permanently?')) return;
+        await adminFetch(`/api/admin/listings/${id}`, { method: 'DELETE' });
+        setListings(prev => prev.filter(l => l.id !== id));
+        showToast('Listing deleted');
+      };
+
+      const deleteUser = async (id) => {
+        if (!confirm('Delete this user permanently?')) return;
+        await adminFetch(`/api/admin/users/${id}`, { method: 'DELETE' });
+        setUsers(prev => prev.filter(u => u.id !== id));
+        showToast('User deleted');
+      };
+
+      const updateBookingStatus = async (id, status) => {
+        await adminFetch(`/api/admin/bookings/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) });
+        setBookings(prev => prev.map(b => b.id === id ? {...b, status} : b));
+        showToast('Status updated');
+      };
+
+      const tabStyle = (t) => ({
+        background:'none', border:'none', cursor:'pointer', padding:'0.7rem 1.5rem',
+        color: tab === t ? '#fff' : 'rgba(255,255,255,0.45)',
+        borderBottom: tab === t ? '2px solid #c8a84b' : '2px solid transparent',
+        fontSize:'0.82rem', letterSpacing:'0.1em', textTransform:'uppercase',
+        fontFamily:'Switzer, sans-serif', transition:'color 0.2s',
+      });
+
+      const badge = (val, trueLabel='Active', falseLabel='Suspended') => (
+        <span style={{background: val ? '#4caf7d22' : '#e0606022', color: val ? '#4caf7d' : '#e06060',
+          border: `1px solid ${val ? '#4caf7d44' : '#e0606044'}`, borderRadius:'2px',
+          padding:'2px 8px', fontSize:'0.72rem', letterSpacing:'0.06em', textTransform:'uppercase'}}>
+          {val ? trueLabel : falseLabel}
+        </span>
+      );
+
+      const statusBadge = (s) => {
+        const c = {confirmed:'#4caf7d',pending:'#c8a84b',cancelled:'#e06060'}[s] || '#888';
+        return <span style={{background:`${c}22`,color:c,border:`1px solid ${c}44`,borderRadius:'2px',padding:'2px 8px',fontSize:'0.72rem',letterSpacing:'0.06em',textTransform:'uppercase'}}>{s}</span>;
+      };
+
+      if (!authed) return (
+        <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'#0d0b09'}}>
+          <div style={{background:'#131109',border:'1px solid rgba(200,168,75,0.2)',padding:'2.5rem',width:'100%',maxWidth:'380px',margin:'1rem'}}>
+            <h2 style={{fontFamily:'Cormorant Garamond',fontSize:'1.8rem',fontWeight:400,color:'#c8a84b',marginBottom:'0.25rem',textAlign:'center'}}>VELIER</h2>
+            <p style={{color:'rgba(255,255,255,0.4)',fontSize:'0.75rem',letterSpacing:'0.15em',textTransform:'uppercase',textAlign:'center',marginBottom:'2rem'}}>Admin Access</p>
+            {authError && <div style={{background:'rgba(200,60,60,0.15)',border:'1px solid rgba(200,60,60,0.3)',padding:'0.75rem',marginBottom:'1rem',color:'#e88',fontSize:'0.85rem',borderRadius:'2px'}}>{authError}</div>}
+            <form onSubmit={handleLogin}>
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+                placeholder="Admin password" autoFocus
+                style={{width:'100%',background:'#1a1713',border:'1px solid rgba(200,168,75,0.15)',padding:'0.85rem 1rem',color:'#fff',fontSize:'0.95rem',outline:'none',marginBottom:'1rem',boxSizing:'border-box'}} />
+              <button type="submit" style={{width:'100%',background:'#c8a84b',border:'none',padding:'0.9rem',color:'#0d0b09',fontWeight:700,fontSize:'0.85rem',letterSpacing:'0.1em',textTransform:'uppercase',cursor:'pointer'}}>Enter</button>
+            </form>
+          </div>
+        </div>
+      );
+
+      return (
+        <div style={{minHeight:'100vh',background:'#0a0908',color:'#fff',fontFamily:'Switzer, sans-serif'}}>
+          {/* Admin nav */}
+          <div style={{background:'#131109',borderBottom:'1px solid rgba(200,168,75,0.12)',padding:'0 2rem',display:'flex',alignItems:'center',justifyContent:'space-between',height:'56px',position:'sticky',top:0,zIndex:100}}>
+            <div style={{display:'flex',alignItems:'center',gap:'1.5rem'}}>
+              <span style={{fontFamily:'Cormorant Garamond',fontSize:'1.2rem',color:'#c8a84b',letterSpacing:'0.1em'}}>VELIER ADMIN</span>
+              <span style={{color:'rgba(255,255,255,0.2)',fontSize:'0.75rem'}}>◈</span>
+              <button style={tabStyle('listings')} onClick={() => loadTab('listings')}>Listings</button>
+              <button style={tabStyle('users')} onClick={() => loadTab('users')}>Users</button>
+              <button style={tabStyle('bookings')} onClick={() => loadTab('bookings')}>Bookings</button>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
+              <a href="#/" style={{color:'rgba(255,255,255,0.4)',fontSize:'0.78rem',textDecoration:'none',letterSpacing:'0.08em'}}>← Back to site</a>
+              <button onClick={() => { sessionStorage.removeItem('velier_admin'); setAuthed(false); }}
+                style={{background:'none',border:'1px solid rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.4)',padding:'0.35rem 0.85rem',fontSize:'0.75rem',letterSpacing:'0.08em',cursor:'pointer'}}>Sign Out</button>
+            </div>
+          </div>
+
+          <div style={{maxWidth:'1200px',margin:'0 auto',padding:'2rem'}}>
+            {/* Stats row */}
+            {tab === 'listings' && (
+              <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'1rem',marginBottom:'2rem'}}>
+                {[
+                  ['Total Listings', listings.length],
+                  ['Active', listings.filter(l=>l.is_active).length],
+                  ['Suspended', listings.filter(l=>!l.is_active).length],
+                  ['Categories', [...new Set(listings.map(l=>l.category))].length],
+                ].map(([label, val]) => (
+                  <div key={label} style={{background:'#131109',border:'1px solid rgba(200,168,75,0.1)',padding:'1.25rem 1.5rem'}}>
+                    <div style={{fontSize:'1.8rem',fontFamily:'Cormorant Garamond',color:'#c8a84b',marginBottom:'0.25rem'}}>{val}</div>
+                    <div style={{fontSize:'0.72rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(255,255,255,0.4)'}}>{label}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {tab === 'users' && (
+              <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'1rem',marginBottom:'2rem'}}>
+                {[
+                  ['Total Users', users.length],
+                  ['Confirmed', users.filter(u=>u.confirmed).length],
+                  ['Unconfirmed', users.filter(u=>!u.confirmed).length],
+                ].map(([label, val]) => (
+                  <div key={label} style={{background:'#131109',border:'1px solid rgba(200,168,75,0.1)',padding:'1.25rem 1.5rem'}}>
+                    <div style={{fontSize:'1.8rem',fontFamily:'Cormorant Garamond',color:'#c8a84b',marginBottom:'0.25rem'}}>{val}</div>
+                    <div style={{fontSize:'0.72rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(255,255,255,0.4)'}}>{label}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {tab === 'bookings' && (
+              <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'1rem',marginBottom:'2rem'}}>
+                {[
+                  ['Total Bookings', bookings.length],
+                  ['Confirmed', bookings.filter(b=>b.status==='confirmed').length],
+                  ['Pending', bookings.filter(b=>b.status==='pending').length],
+                  ['Revenue', '$' + bookings.filter(b=>b.status==='confirmed').reduce((s,b)=>s+(b.total_price||0),0).toLocaleString()],
+                ].map(([label, val]) => (
+                  <div key={label} style={{background:'#131109',border:'1px solid rgba(200,168,75,0.1)',padding:'1.25rem 1.5rem'}}>
+                    <div style={{fontSize:'1.8rem',fontFamily:'Cormorant Garamond',color:'#c8a84b',marginBottom:'0.25rem'}}>{val}</div>
+                    <div style={{fontSize:'0.72rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(255,255,255,0.4)'}}>{label}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {loading ? (
+              <div style={{textAlign:'center',padding:'4rem',color:'rgba(255,255,255,0.3)'}}>Loading...</div>
+            ) : (
+              <>
+              {/* LISTINGS TABLE */}
+              {tab === 'listings' && (
+                <div style={{background:'#131109',border:'1px solid rgba(200,168,75,0.1)'}}>
+                  <div style={{padding:'1rem 1.5rem',borderBottom:'1px solid rgba(200,168,75,0.08)',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                    <span style={{fontSize:'0.78rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(255,255,255,0.4)'}}>User-Submitted Listings</span>
+                    <span style={{fontSize:'0.78rem',color:'rgba(255,255,255,0.25)'}}>{listings.length} total</span>
+                  </div>
+                  {listings.length === 0 ? (
+                    <div style={{padding:'3rem',textAlign:'center',color:'rgba(255,255,255,0.3)'}}>No user listings yet</div>
+                  ) : listings.map(l => (
+                    <div key={l.id} style={{display:'flex',gap:'1rem',alignItems:'center',padding:'1rem 1.5rem',borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
+                      {l.image ? (
+                        <img src={l.image} style={{width:56,height:56,objectFit:'cover',borderRadius:'2px',flexShrink:0}} />
+                      ) : (
+                        <div style={{width:56,height:56,background:'#1a1713',borderRadius:'2px',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',color:'rgba(255,255,255,0.2)',fontSize:'1.2rem'}}>◈</div>
+                      )}
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontFamily:'Cormorant Garamond',fontSize:'1.05rem',color:'#fff',marginBottom:'0.2rem',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{l.title}</div>
+                        <div style={{fontSize:'0.75rem',color:'rgba(255,255,255,0.4)'}}>{l.brand} · {l.category} · {l.location || 'No location'} · <span style={{color:'#c8a84b'}}>${l.daily_rate}/day</span></div>
+                      </div>
+                      <div style={{display:'flex',alignItems:'center',gap:'0.75rem',flexShrink:0}}>
+                        {badge(l.is_active)}
+                        <button onClick={() => toggleListing(l.id, l.is_active)}
+                          style={{background: l.is_active ? 'rgba(224,96,96,0.1)' : 'rgba(76,175,125,0.1)',
+                            border: `1px solid ${l.is_active ? 'rgba(224,96,96,0.3)' : 'rgba(76,175,125,0.3)'}`,
+                            color: l.is_active ? '#e06060' : '#4caf7d',
+                            padding:'0.35rem 0.85rem',fontSize:'0.75rem',letterSpacing:'0.06em',cursor:'pointer',textTransform:'uppercase'}}>
+                          {l.is_active ? 'Suspend' : 'Approve'}
+                        </button>
+                        <button onClick={() => deleteListing(l.id)}
+                          style={{background:'none',border:'1px solid rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.3)',
+                            padding:'0.35rem 0.85rem',fontSize:'0.75rem',letterSpacing:'0.06em',cursor:'pointer',textTransform:'uppercase'}}>
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* USERS TABLE */}
+              {tab === 'users' && (
+                <div style={{background:'#131109',border:'1px solid rgba(200,168,75,0.1)'}}>
+                  <div style={{padding:'1rem 1.5rem',borderBottom:'1px solid rgba(200,168,75,0.08)'}}>
+                    <span style={{fontSize:'0.78rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(255,255,255,0.4)'}}>Registered Users</span>
+                  </div>
+                  {users.length === 0 ? (
+                    <div style={{padding:'3rem',textAlign:'center',color:'rgba(255,255,255,0.3)'}}>No users yet</div>
+                  ) : users.map(u => (
+                    <div key={u.id} style={{display:'flex',alignItems:'center',gap:'1rem',padding:'1rem 1.5rem',borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
+                      <div style={{width:38,height:38,borderRadius:'50%',background:'rgba(200,168,75,0.12)',display:'flex',alignItems:'center',justifyContent:'center',color:'#c8a84b',fontFamily:'Cormorant Garamond',fontSize:'1rem',flexShrink:0}}>
+                        {(u.full_name||u.email||'?')[0].toUpperCase()}
+                      </div>
+                      <div style={{flex:1}}>
+                        <div style={{color:'#fff',fontSize:'0.9rem',marginBottom:'0.15rem'}}>{u.full_name || '—'}</div>
+                        <div style={{color:'rgba(255,255,255,0.4)',fontSize:'0.78rem'}}>{u.email} · Joined {new Date(u.created_at).toLocaleDateString()}</div>
+                      </div>
+                      <div style={{display:'flex',alignItems:'center',gap:'0.75rem',flexShrink:0}}>
+                        {badge(u.confirmed, 'Verified', 'Unverified')}
+                        {u.last_sign_in && <span style={{fontSize:'0.72rem',color:'rgba(255,255,255,0.3)'}}>Last seen {new Date(u.last_sign_in).toLocaleDateString()}</span>}
+                        <button onClick={() => deleteUser(u.id)}
+                          style={{background:'none',border:'1px solid rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.3)',
+                            padding:'0.35rem 0.85rem',fontSize:'0.75rem',letterSpacing:'0.06em',cursor:'pointer',textTransform:'uppercase'}}>
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* BOOKINGS TABLE */}
+              {tab === 'bookings' && (
+                <div style={{background:'#131109',border:'1px solid rgba(200,168,75,0.1)'}}>
+                  <div style={{padding:'1rem 1.5rem',borderBottom:'1px solid rgba(200,168,75,0.08)'}}>
+                    <span style={{fontSize:'0.78rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(255,255,255,0.4)'}}>All Bookings</span>
+                  </div>
+                  {bookings.length === 0 ? (
+                    <div style={{padding:'3rem',textAlign:'center',color:'rgba(255,255,255,0.3)'}}>No bookings yet</div>
+                  ) : bookings.map(b => (
+                    <div key={b.id} style={{display:'flex',alignItems:'center',gap:'1rem',padding:'1rem 1.5rem',borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
+                      <div style={{flex:1}}>
+                        <div style={{color:'#fff',fontSize:'0.9rem',marginBottom:'0.2rem'}}>Booking #{b.id} · Listing #{b.listing_id}</div>
+                        <div style={{color:'rgba(255,255,255,0.4)',fontSize:'0.78rem'}}>{b.start_date} → {b.end_date} · {b.days} day{b.days!==1?'s':''} · <span style={{color:'#c8a84b'}}>${b.total_price?.toLocaleString()}</span></div>
+                      </div>
+                      <div style={{display:'flex',alignItems:'center',gap:'0.75rem',flexShrink:0}}>
+                        {statusBadge(b.status)}
+                        <select value={b.status} onChange={e => updateBookingStatus(b.id, e.target.value)}
+                          style={{background:'#1a1713',border:'1px solid rgba(200,168,75,0.15)',color:'rgba(255,255,255,0.6)',
+                            padding:'0.3rem 0.6rem',fontSize:'0.75rem',cursor:'pointer',outline:'none'}}>
+                          <option value="pending">Pending</option>
+                          <option value="confirmed">Confirmed</option>
+                          <option value="cancelled">Cancelled</option>
+                          <option value="completed">Completed</option>
+                        </select>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              </>
+            )}
+          </div>
+
+          {/* Toast */}
+          {toast && (
+            <div style={{position:'fixed',bottom:'2rem',left:'50%',transform:'translateX(-50%)',background:'#131109',border:'1px solid rgba(200,168,75,0.3)',padding:'0.75rem 1.5rem',color:'#c8a84b',fontSize:'0.85rem',letterSpacing:'0.06em',zIndex:9999}}>
+              {toast}
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // ── MAIN APP ──
+    const App = () => {
+      const hash = useHash();
+      const [wishlist, setWishlist] = useState(() => {
+        try { return JSON.parse(localStorage.getItem('velier_wishlist') || '[]'); } catch { return []; }
+      });
+      const [toast, setToast] = useState(null);
+      const [showSplash, setShowSplash] = useState(() => {
+        return !sessionStorage.getItem('velier_entered');
+      });
+      const handleEnter = () => {
+        sessionStorage.setItem('velier_entered', '1');
+        setShowSplash(false);
+        window.dispatchEvent(new Event('velier_entered'));
+      };
+
+      useEffect(() => {
+        localStorage.setItem('velier_wishlist', JSON.stringify(wishlist));
+      }, [wishlist]);
+
+      const handleWishlistToggle = useCallback((id) => {
+        setWishlist(prev =>
+          prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+        );
+      }, []);
+
+      const showToast = useCallback((msg) => {
+        setToast(msg);
+      }, []);
+
+      // Parse route
+      let page = 'home';
+      let listingId = null;
+      let bookingId = null;
+      let bookingSearch = '';
+
+      if (hash.startsWith('#/listing/')) {
+        page = 'listing';
+        listingId = hash.replace('#/listing/', '').split('?')[0];
+      } else if (hash.startsWith('#/booking/')) {
+        page = 'booking';
+        const rest = hash.replace('#/booking/', '');
+        bookingId = rest.split('?')[0];
+        bookingSearch = rest.includes('?') ? rest.split('?')[1] : '';
+      } else if (hash.startsWith('#/browse')) {
+        page = 'browse';
+      } else if (hash.startsWith('#/trade')) {
+        page = 'trade';
+      } else if (hash.startsWith('#/list')) {
+        page = 'list';
+      } else if (hash.startsWith('#/dashboard')) {
+        page = 'dashboard';
+      } else if (hash.startsWith('#/admin')) {
+        page = 'admin';
+      }
+
+      return (
+        <>
+          {showSplash && <SplashScreen onEnter={handleEnter} />}
+          {page !== 'admin' && <Nav wishlistCount={wishlist.length} />}
+          <div className={!showSplash ? 'page-entering' : ''}>
+            <main style={{paddingTop: page === 'home' ? '0' : '0'}}>
+              {page === 'home' && <HomePage wishlist={wishlist} onWishlistToggle={handleWishlistToggle} onToast={showToast} />}
+              {page === 'browse' && <BrowsePage wishlist={wishlist} onWishlistToggle={handleWishlistToggle} />}
+              {page === 'listing' && <ListingDetailPage id={listingId} wishlist={wishlist} onWishlistToggle={handleWishlistToggle} onToast={showToast} />}
+              {page === 'booking' && <BookingPage listingId={bookingId} searchParams={bookingSearch} />}
+              {page === 'list' && <ListPage />}
+              {page === 'trade' && <TradePage />}
+              {page === 'dashboard' && <DashboardPage />}
+              {page === 'admin' && <AdminPage />}
+            </main>
+          </div>
+          {toast && <Toast message={toast} onClose={() => setToast(null)} />}
+        </>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<AuthProvider><App /></AuthProvider>);
+  </script>
+  <script>
+    // Scroll Reveal
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.1 });
+    function initReveal() {
+      document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    }
+    initReveal();
+    new MutationObserver(initReveal).observe(document.body, { childList: true, subtree: true });
+  </script>
+</body>
+</html>
