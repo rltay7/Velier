@@ -328,37 +328,45 @@
     ══════════════════════════════════════════════════════ */
 
     /* ── 1. CUSTOM MAGNETIC CURSOR ── */
-    * { cursor: none !important; }
-    @media (hover: none) { * { cursor: auto !important; } }
-    .velier-cursor {
-      position: fixed; top: 0; left: 0; z-index: 999999;
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: rgba(200,155,50,0.85);
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      transition: width 0.25s cubic-bezier(0.25,0,0,1),
-                  height 0.25s cubic-bezier(0.25,0,0,1),
-                  background 0.25s ease,
-                  opacity 0.3s ease;
-      mix-blend-mode: normal;
+    @media (hover: hover) and (pointer: fine) {
+      * { cursor: none !important; }
     }
+    .velier-cursor,
     .velier-cursor-ring {
-      position: fixed; top: 0; left: 0; z-index: 999998;
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      border: 1px solid rgba(200,155,50,0.35);
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      transition: width 0.4s cubic-bezier(0.25,0,0,1),
-                  height 0.4s cubic-bezier(0.25,0,0,1),
-                  border-color 0.3s ease,
-                  opacity 0.3s ease;
+      display: none; /* hidden by default — JS shows on desktop only */
     }
-    .velier-cursor.hovering { width: 6px; height: 6px; background: rgba(200,155,50,1); }
-    .velier-cursor-ring.hovering { width: 52px; height: 52px; border-color: rgba(200,155,50,0.6); }
-    .velier-cursor.clicking { width: 14px; height: 14px; }
-    .velier-cursor-ring.clicking { width: 28px; height: 28px; }
+    @media (hover: hover) and (pointer: fine) {
+      .velier-cursor {
+        display: block;
+        position: fixed; top: -100px; left: -100px; z-index: 999999;
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        background: rgba(200,155,50,0.85);
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        transition: width 0.25s cubic-bezier(0.25,0,0,1),
+                    height 0.25s cubic-bezier(0.25,0,0,1),
+                    background 0.25s ease,
+                    opacity 0.3s ease;
+      }
+      .velier-cursor-ring {
+        display: block;
+        position: fixed; top: -100px; left: -100px; z-index: 999998;
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        border: 1px solid rgba(200,155,50,0.35);
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        transition: width 0.4s cubic-bezier(0.25,0,0,1),
+                    height 0.4s cubic-bezier(0.25,0,0,1),
+                    border-color 0.3s ease,
+                    opacity 0.3s ease;
+      }
+      .velier-cursor.hovering { width: 6px; height: 6px; background: rgba(200,155,50,1); }
+      .velier-cursor-ring.hovering { width: 52px; height: 52px; border-color: rgba(200,155,50,0.6); }
+      .velier-cursor.clicking { width: 14px; height: 14px; }
+      .velier-cursor-ring.clicking { width: 28px; height: 28px; }
+    }
 
     /* ── 2. FILM GRAIN OVERLAY ── */
     .film-grain {
@@ -3547,16 +3555,31 @@
           });
         };
 
-        observeRevealEls();
+        // Initial observe — delay to let React paint first
+        setTimeout(observeRevealEls, 300);
 
-        // Re-observe after route changes & after React re-renders new content
-        window.addEventListener('hashchange', () => setTimeout(observeRevealEls, 250));
+        // Re-observe after route changes
+        window.addEventListener('hashchange', () => setTimeout(observeRevealEls, 400));
+
+        // Debounced MutationObserver — re-observe after React finishes rendering
         let revealTimer;
         const mo2 = new MutationObserver(() => {
           clearTimeout(revealTimer);
-          revealTimer = setTimeout(observeRevealEls, 150); // debounce — don't fire on every keystroke
+          revealTimer = setTimeout(observeRevealEls, 200);
         });
         mo2.observe(document.body, { childList: true, subtree: true });
+
+        // Also immediately reveal elements already in viewport (above the fold)
+        const immediateReveal = () => {
+          document.querySelectorAll('.reveal:not(.revealed)').forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.top < window.innerHeight && rect.bottom > 0) {
+              el.classList.add('revealed');
+            }
+          });
+        };
+        setTimeout(immediateReveal, 350);
+        window.addEventListener('hashchange', () => setTimeout(immediateReveal, 450));
 
         // ── 5. KINETIC NAVBAR ──
         const nav = document.querySelector('.nav');
