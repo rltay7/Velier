@@ -57,20 +57,7 @@
     h3 { font-size: clamp(1.25rem, 2vw, 1.6rem); line-height: 1.25; }
     p { color: var(--champagne-dim); }
 
-    /* ── SCROLL REVEAL ── */
-    .reveal {
-      opacity: 0;
-      transform: translateY(32px);
-      transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1);
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.2s; }
-    .reveal-delay-3 { transition-delay: 0.3s; }
-    .reveal-delay-4 { transition-delay: 0.4s; }
+    /* ── SCROLL REVEAL — defined in Tier 1 Luxury Animations section below ── */
 
     /* ── SCROLLBAR ── */
     ::-webkit-scrollbar { width: 6px; }
@@ -412,6 +399,10 @@
     .reveal-delay-2 { transition-delay: 0.2s; }
     .reveal-delay-3 { transition-delay: 0.3s; }
     .reveal-delay-4 { transition-delay: 0.45s; }
+    /* Respect reduced motion — accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
 
     /* ── 4. WORD-BY-WORD HERO REVEAL ── */
     .hero-word {
@@ -3531,26 +3522,40 @@
         }
 
         // ── 2. SCROLL REVEAL WITH INERTIA ──
-        const revealEls = () => {
-          document.querySelectorAll('.section-header, .hiw-step, .category-card, .listing-card, .trade-card, .trust-item, .lender-cta, .section-label').forEach((el, i) => {
-            if (!el.classList.contains('reveal')) {
-              el.classList.add('reveal');
+        // Single persistent observer — mobile-safe thresholds
+        const revealObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('revealed');
+              revealObserver.unobserve(entry.target);
             }
           });
-          const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('revealed');
-                observer.unobserve(entry.target);
-              }
-            });
-          }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-          document.querySelectorAll('.reveal:not(.revealed)').forEach(el => observer.observe(el));
+        }, {
+          threshold: 0.05,         // Only 5% visible needed — works on small mobile screens
+          rootMargin: '0px 0px 0px 0px'  // No negative margin — safe for all viewports
+        });
+
+        const observeRevealEls = () => {
+          // Elements that already have .reveal in HTML (hardcoded)
+          document.querySelectorAll('.reveal:not(.revealed)').forEach(el => revealObserver.observe(el));
+          // Dynamically add .reveal to section-level elements that don't have it yet
+          document.querySelectorAll(
+            '.section-header:not(.reveal), .hiw-step:not(.reveal), .category-card:not(.reveal), .trust-card:not(.reveal), .lender-cta:not(.reveal)'
+          ).forEach(el => {
+            el.classList.add('reveal');
+            revealObserver.observe(el);
+          });
         };
-        revealEls();
-        // Re-run on navigation
-        window.addEventListener('hashchange', () => setTimeout(revealEls, 200));
-        const mo2 = new MutationObserver(() => revealEls());
+
+        observeRevealEls();
+
+        // Re-observe after route changes & after React re-renders new content
+        window.addEventListener('hashchange', () => setTimeout(observeRevealEls, 250));
+        let revealTimer;
+        const mo2 = new MutationObserver(() => {
+          clearTimeout(revealTimer);
+          revealTimer = setTimeout(observeRevealEls, 150); // debounce — don't fire on every keystroke
+        });
         mo2.observe(document.body, { childList: true, subtree: true });
 
         // ── 5. KINETIC NAVBAR ──
