@@ -2446,8 +2446,8 @@
 
           {/* Edit Modal */}
           {editListing && (
-            <div style={{position:'fixed',inset:0,zIndex:99999,display:'flex',alignItems:'flex-start',justifyContent:'center',overflowY:'auto',background:'rgba(0,0,0,0.8)',backdropFilter:'blur(8px)',padding:'2rem 1rem'}} onClick={() => setEditListing(null)}>
-              <div style={{background:'#131109',border:'1px solid rgba(200,168,75,0.2)',borderRadius:'2px',width:'100%',maxWidth:'560px',padding:'2rem',margin:'auto'}} onClick={e => e.stopPropagation()}>
+            <div style={{position:'fixed',inset:0,zIndex:99999,overflowY:'auto',background:'rgba(0,0,0,0.8)',backdropFilter:'blur(8px)'}} onClick={() => setEditListing(null)}>
+              <div style={{background:'#131109',border:'1px solid rgba(200,168,75,0.2)',borderRadius:'2px',width:'100%',maxWidth:'560px',padding:'2rem',margin:'5vh auto 4rem',position:'relative'}} onClick={e => e.stopPropagation()}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.75rem'}}>
                   <h2 style={{fontFamily:'Cormorant Garamond',fontSize:'1.6rem',fontWeight:400,color:'var(--champagne)',margin:0}}>Edit Listing</h2>
                   <button onClick={() => setEditListing(null)} style={{background:'none',border:'none',color:'var(--champagne-dim)',fontSize:'1.5rem',cursor:'pointer',lineHeight:1}}>×</button>
