@@ -205,17 +205,22 @@
       position: relative; overflow: hidden;
       background: var(--obsidian);
     }
+    .hero-video-wrap {
+      position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+    }
     .hero-video {
       position: absolute; inset: 0; width: 100%; height: 100%;
       object-fit: cover; object-position: center;
-      opacity: 0.45; pointer-events: none;
+      opacity: 0; pointer-events: none;
+      transition: opacity 1.8s ease-in-out;
     }
+    .hero-video.active { opacity: 0.6; }
     .hero-video-overlay {
       position: absolute; inset: 0;
-      background: linear-gradient(to bottom, rgba(13,11,9,0.35) 0%, rgba(13,11,9,0.55) 50%, rgba(13,11,9,0.85) 100%);
-      pointer-events: none;
+      background: linear-gradient(to bottom, rgba(13,11,9,0.2) 0%, rgba(13,11,9,0.45) 50%, rgba(13,11,9,0.92) 100%);
+      pointer-events: none; z-index: 1;
     }
-    .hero > *:not(.hero-video):not(.hero-video-overlay) { position: relative; z-index: 2; }
+    .hero > *:not(.hero-video-wrap):not(.hero-video-overlay) { position: relative; z-index: 2; }
     .hero-eyebrow {
       font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase;
       color: var(--gold); margin-bottom: 1.5rem;
@@ -1221,6 +1226,59 @@
       );
     };
 
+    // ── HERO CINEMA ──
+    const HERO_CLIPS = [
+      'https://videos.pexels.com/video-files/8798283/8798283-uhd_2732_1440_25fps.mp4',
+      'https://videos.pexels.com/video-files/6230464/6230464-hd_1920_1080_24fps.mp4',
+      'https://videos.pexels.com/video-files/11667737/11667737-uhd_2560_1440_24fps.mp4',
+      'https://videos.pexels.com/video-files/34738710/14726377_2560_1440_30fps.mp4',
+    ];
+
+    const HeroCinema = () => {
+      const [current, setCurrent] = React.useState(0);
+      const [next, setNext] = React.useState(null);
+      const vidRefs = React.useRef([]);
+
+      React.useEffect(() => {
+        // Start first video
+        if (vidRefs.current[0]) {
+          vidRefs.current[0].play().catch(() => {});
+        }
+        const interval = setInterval(() => {
+          setCurrent(prev => {
+            const nextIdx = (prev + 1) % HERO_CLIPS.length;
+            setNext(nextIdx);
+            if (vidRefs.current[nextIdx]) {
+              vidRefs.current[nextIdx].currentTime = 0;
+              vidRefs.current[nextIdx].play().catch(() => {});
+            }
+            setTimeout(() => {
+              setCurrent(nextIdx);
+              setNext(null);
+            }, 1800);
+            return prev;
+          });
+        }, 9000);
+        return () => clearInterval(interval);
+      }, []);
+
+      return (
+        <div style={{position:'absolute',inset:0,overflow:'hidden',zIndex:0,pointerEvents:'none'}}>
+          {HERO_CLIPS.map((src, i) => (
+            <video
+              key={i}
+              ref={el => vidRefs.current[i] = el}
+              src={src}
+              muted playsInline preload={i === 0 ? 'auto' : 'none'}
+              loop={false}
+              className={'hero-video' + (i === current || i === next ? ' active' : '')}
+              style={{zIndex: i === next ? 1 : i === current ? 0 : -1}}
+            />
+          ))}
+        </div>
+      );
+    };
+
     // ── HOMEPAGE ──
     const HomePage = ({ wishlist, onWishlistToggle, onToast }) => {
       const [featured, setFeatured] = useState([]);
@@ -1299,10 +1357,7 @@
         <div>
           {/* HERO */}
           <section className="hero">
-            <video className="hero-video" autoPlay muted loop playsInline
-              src="https://cdn.coverr.co/videos/coverr-a-model-walking-on-the-runway-4017/1080p.mp4"
-              poster="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=80">
-            </video>
+            <HeroCinema />
             <div className="hero-video-overlay"></div>
             <div className="hero-eyebrow">The Velier Collection</div>
             <h1>The world's finest<br/><em>luxury awaits you</em></h1>
