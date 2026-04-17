@@ -1093,7 +1093,7 @@
       return (
         <>
           <nav className={`nav${splashVisible ? ' splash-hidden' : ''}`}>
-            <a href="#/" className="nav-logo" onClick={() => setMenuOpen(false)}>
+            <a href="#/" className="nav-logo" onClick={() => { setMenuOpen(false); window.scrollTo({top:0,behavior:'smooth'}); }}>
               Velier
             </a>
             <ul className="nav-links">
