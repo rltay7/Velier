@@ -7,7 +7,12 @@
     }
   </script>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#08070b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Velier" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <title>Velier — Access everything. Own nothing.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -206,7 +211,7 @@
     .hero {
       min-height: 100vh;
       display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center;
-      padding: 8rem 2rem 5rem;
+      padding: clamp(5rem, 12vh, 8rem) 2rem clamp(3rem, 8vh, 5rem);
       position: relative; overflow: hidden;
       background: var(--obsidian);
     }
@@ -698,6 +703,7 @@
       display: flex; align-items: center; gap: 0.75rem;
       animation: slideUp 0.3s ease;
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      max-width: calc(100vw - 4rem);
     }
     @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
@@ -723,16 +729,19 @@
       display: none; position: fixed; inset: 0; z-index: 99;
       background: var(--obsidian);
       flex-direction: column; padding: 5rem 2rem 2rem;
-      gap: 1.5rem;
+      gap: 1.5rem; overflow-y: auto;
     }
     .mobile-menu.open { display: flex; }
-    .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 1.75rem; color: var(--champagne); text-decoration: none; }
+    .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 1.75rem; color: var(--champagne); text-decoration: none; padding: 0.25rem 0; display: block; }
+    .mobile-menu a:active { color: var(--gold); }
+    .mobile-menu-divider { height: 1px; background: var(--border); margin: 0.5rem 0; }
 
     /* ── EMPTY STATE ── */
     .empty-state { text-align: center; padding: 5rem 2rem; }
     .empty-state h3 { margin-bottom: 0.5rem; font-size: 1.4rem; }
     .empty-state p { font-size: 0.88rem; margin-bottom: 1.5rem; }
 
+    /* ── RESPONSIVE ── */
     /* ── RESPONSIVE ── */
     @media (max-width: 1100px) {
       .grid-4 { grid-template-columns: repeat(2, 1fr); }
@@ -745,16 +754,48 @@
       .lender-cta { grid-template-columns: 1fr; }
     }
     @media (max-width: 768px) {
+      /* Nav */
       .nav-links { display: none; }
       .hamburger { display: flex; }
+      /* Grids */
       .grid-4 { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
       .grid-3 { grid-template-columns: 1fr; }
       .category-grid { grid-template-columns: repeat(3, 1fr); }
+      /* Home */
       .hiw-steps { grid-template-columns: 1fr; }
+      .section { padding: 3rem 0; }
+      .section-sm { padding: 2rem 0; }
+      .page-header { padding: 5.5rem 0 2rem; }
+      .hero { padding: 5rem 0 4rem; }
+      /* Footer */
       .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
       .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+      /* List wizard */
       .wizard-step-item .step-label { display: none; }
+      .wizard-connector { width: 32px; }
+      /* Hero */
       .hero-actions { flex-direction: column; align-items: center; }
+      .hero-sub { font-size: 0.92rem; }
+      /* Trade */
+      .trade-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .trade-grid { grid-template-columns: 1fr; }
+      .propose-modal { padding: 1.5rem; }
+      .propose-modal > form > div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
+      .trade-form-wrap { padding: 1.5rem; }
+      .trade-fee-grid { grid-template-columns: 1fr; }
+      /* Admin */
+      .admin-stat-grid { grid-template-columns: repeat(2, 1fr) !important; }
+      .admin-nav-tabs { gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .admin-row-actions { flex-direction: column; gap: 0.5rem !important; align-items: flex-start !important; }
+      /* Booking */
+      .booking-layout { grid-template-columns: 1fr; }
+      /* Toast */
+      .toast { bottom: 1rem; left: 1rem; right: 1rem; width: auto; }
+      /* Browse */
+      .filter-sidebar { padding: 0; }
+      .browse-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+      /* Dashboard */
+      .dashboard-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; }
     }
     @media (max-width: 480px) {
       .grid-4 { grid-template-columns: 1fr; }
@@ -762,6 +803,24 @@
       .listing-attrs { grid-template-columns: 1fr; }
       .date-inputs { grid-template-columns: 1fr; }
       .nav-cta.primary { display: none; }
+      /* Sections */
+      .section { padding: 2.5rem 0; }
+      .page-header { padding: 5rem 0 1.75rem; }
+      /* Trade */
+      .trade-tab { padding: 0.6rem 1rem; font-size: 0.7rem; }
+      .duration-options { flex-direction: column; }
+      .trade-fee-grid { grid-template-columns: 1fr; }
+      /* Admin stats — 1 col on very small */
+      .admin-stat-grid { grid-template-columns: 1fr 1fr !important; }
+      /* Cards */
+      .card-body { padding: 0.875rem; }
+      /* Lender CTA */
+      .lender-cta { padding: 3rem 1rem; }
+      /* Hero */
+      .hero h1 { font-size: clamp(2rem, 9vw, 4rem); }
+      /* Safe area for notched phones */
+      .nav { padding-left: max(1.5rem, env(safe-area-inset-left)); padding-right: max(1.5rem, env(safe-area-inset-right)); }
+      .mobile-menu { padding-bottom: max(2rem, env(safe-area-inset-bottom)); }
     }
   </style>
 </head>
@@ -1163,6 +1222,7 @@
             <a href="#/browse?category=Dresses" onClick={() => setMenuOpen(false)}>Dresses</a>
             <a href="#/trade" onClick={() => setMenuOpen(false)}>Exchange</a>
             <a href="#how-it-works" onClick={(e) => { e.preventDefault(); setMenuOpen(false); navigate('#/'); setTimeout(() => { const el = document.getElementById('how-it-works'); if(el) el.scrollIntoView({behavior:'smooth'}); }, 80); }}>How It Works</a>
+            <div className="mobile-menu-divider"></div>
             {user ? (
               <>
                 <a href="#/dashboard" onClick={() => setMenuOpen(false)}>My Dashboard</a>
@@ -3091,25 +3151,24 @@
       return (
         <div style={{minHeight:'100vh',background:'#0a0908',color:'#fff',fontFamily:'Switzer, sans-serif'}}>
           {/* Admin nav */}
-          <div style={{background:'#131109',borderBottom:'1px solid rgba(200,168,75,0.12)',padding:'0 2rem',display:'flex',alignItems:'center',justifyContent:'space-between',height:'56px',position:'sticky',top:0,zIndex:100}}>
-            <div style={{display:'flex',alignItems:'center',gap:'1.5rem'}}>
-              <span style={{fontFamily:'Cormorant Garamond',fontSize:'1.2rem',color:'#c8a84b',letterSpacing:'0.1em'}}>VELIER ADMIN</span>
-              <span style={{color:'rgba(255,255,255,0.2)',fontSize:'0.75rem'}}>◈</span>
+          <div style={{background:'#131109',borderBottom:'1px solid rgba(200,168,75,0.12)',padding:'0 1.25rem',display:'flex',alignItems:'center',justifyContent:'space-between',minHeight:'56px',position:'sticky',top:0,zIndex:100,flexWrap:'wrap',gap:'0.5rem'}}>
+            <div className="admin-nav-tabs" style={{display:'flex',alignItems:'center',gap:'0.5rem',overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
+              <span style={{fontFamily:'Cormorant Garamond',fontSize:'1.1rem',color:'#c8a84b',letterSpacing:'0.1em',flexShrink:0,paddingRight:'0.75rem'}}>VELIER</span>
               <button style={tabStyle('listings')} onClick={() => loadTab('listings')}>Listings</button>
               <button style={tabStyle('users')} onClick={() => loadTab('users')}>Users</button>
               <button style={tabStyle('bookings')} onClick={() => loadTab('bookings')}>Bookings</button>
             </div>
-            <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
-              <a href="#/" style={{color:'rgba(255,255,255,0.4)',fontSize:'0.78rem',textDecoration:'none',letterSpacing:'0.08em'}}>← Back to site</a>
+            <div style={{display:'flex',alignItems:'center',gap:'0.75rem',flexShrink:0}}>
+              <a href="#/" style={{color:'rgba(255,255,255,0.4)',fontSize:'0.75rem',textDecoration:'none',letterSpacing:'0.06em'}}>← Site</a>
               <button onClick={() => { sessionStorage.removeItem('velier_admin'); setAuthed(false); }}
-                style={{background:'none',border:'1px solid rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.4)',padding:'0.35rem 0.85rem',fontSize:'0.75rem',letterSpacing:'0.08em',cursor:'pointer'}}>Sign Out</button>
+                style={{background:'none',border:'1px solid rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.4)',padding:'0.3rem 0.7rem',fontSize:'0.72rem',letterSpacing:'0.06em',cursor:'pointer'}}>Out</button>
             </div>
           </div>
 
           <div style={{maxWidth:'1200px',margin:'0 auto',padding:'2rem'}}>
             {/* Stats row */}
             {tab === 'listings' && (
-              <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'1rem',marginBottom:'2rem'}}>
+              <div className="admin-stat-grid" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'1rem',marginBottom:'2rem'}}>
                 {[
                   ['Total Listings', listings.length],
                   ['Active', listings.filter(l=>l.is_active).length],
@@ -3124,7 +3183,7 @@
               </div>
             )}
             {tab === 'users' && (
-              <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'1rem',marginBottom:'2rem'}}>
+              <div className="admin-stat-grid" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'1rem',marginBottom:'2rem'}}>
                 {[
                   ['Total Users', users.length],
                   ['Confirmed', users.filter(u=>u.email_confirmed_at).length],
@@ -3138,7 +3197,7 @@
               </div>
             )}
             {tab === 'bookings' && (
-              <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'1rem',marginBottom:'2rem'}}>
+              <div className="admin-stat-grid" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'1rem',marginBottom:'2rem'}}>
                 {[
                   ['Total Bookings', bookings.length],
                   ['Confirmed', bookings.filter(b=>b.status==='confirmed').length],
@@ -3177,7 +3236,7 @@
                         <div style={{fontFamily:'Cormorant Garamond',fontSize:'1.05rem',color:'#fff',marginBottom:'0.2rem',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{l.title}</div>
                         <div style={{fontSize:'0.75rem',color:'rgba(255,255,255,0.4)'}}>{l.brand} · {l.category} · {l.location || 'No location'} · <span style={{color:'#c8a84b'}}>${l.daily_rate}/day</span></div>
                       </div>
-                      <div style={{display:'flex',alignItems:'center',gap:'0.75rem',flexShrink:0}}>
+                      <div className="admin-row-actions" style={{display:'flex',alignItems:'center',gap:'0.75rem',flexShrink:0}}>
                         {badge(l.is_active)}
                         <button onClick={() => toggleListing(l.id, l.is_active)}
                           style={{background: l.is_active ? 'rgba(224,96,96,0.1)' : 'rgba(76,175,125,0.1)',
