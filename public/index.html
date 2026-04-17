@@ -1234,32 +1234,53 @@
       'https://videos.pexels.com/video-files/34738710/14726377_2560_1440_30fps.mp4',     // Luxury boutique
     ];
 
+    // Start offset in seconds per clip (so we skip messy opening frames)
+    const HERO_OFFSETS = [0, 3, 0, 0]; // Rolex starts at 3s to skip shaky intro
+
     const HeroCinema = () => {
       const [current, setCurrent] = React.useState(0);
-      const [next, setNext] = React.useState(null);
+      const [fading, setFading] = React.useState(false);
       const vidRefs = React.useRef([]);
+      const timerRef = React.useRef(null);
+
+      const playClip = (idx) => {
+        const vid = vidRefs.current[idx];
+        if (!vid) return;
+        vid.currentTime = HERO_OFFSETS[idx] || 0;
+        const doPlay = () => vid.play().catch(() => {});
+        if (vid.readyState >= 3) {
+          doPlay();
+        } else {
+          vid.addEventListener('canplay', doPlay, { once: true });
+        }
+      };
+
+      const advance = React.useCallback((cur) => {
+        const nextIdx = (cur + 1) % HERO_CLIPS.length;
+        // Pre-seek next clip so it's ready
+        const nextVid = vidRefs.current[nextIdx];
+        if (nextVid) {
+          nextVid.currentTime = HERO_OFFSETS[nextIdx] || 0;
+          // Preload by loading
+          if (nextVid.readyState < 2) nextVid.load();
+        }
+        setFading(true);
+        setTimeout(() => {
+          setCurrent(nextIdx);
+          setFading(false);
+          playClip(nextIdx);
+          timerRef.current = setTimeout(() => advance(nextIdx), 6000);
+        }, 1800);
+      }, []);
 
       React.useEffect(() => {
-        // Start first video
-        if (vidRefs.current[0]) {
-          vidRefs.current[0].play().catch(() => {});
-        }
-        const interval = setInterval(() => {
-          setCurrent(prev => {
-            const nextIdx = (prev + 1) % HERO_CLIPS.length;
-            setNext(nextIdx);
-            if (vidRefs.current[nextIdx]) {
-              vidRefs.current[nextIdx].currentTime = 0;
-              vidRefs.current[nextIdx].play().catch(() => {});
-            }
-            setTimeout(() => {
-              setCurrent(nextIdx);
-              setNext(null);
-            }, 1800);
-            return prev;
-          });
-        }, 6000);
-        return () => clearInterval(interval);
+        // Preload all clips
+        vidRefs.current.forEach((v, i) => {
+          if (v) { v.load(); }
+        });
+        playClip(0);
+        timerRef.current = setTimeout(() => advance(0), 6000);
+        return () => clearTimeout(timerRef.current);
       }, []);
 
       return (
@@ -1269,10 +1290,14 @@
               key={i}
               ref={el => vidRefs.current[i] = el}
               src={src}
-              muted playsInline preload={i === 0 ? 'auto' : 'none'}
+              muted playsInline preload="auto"
               loop={false}
-              className={'hero-video' + (i === current || i === next ? ' active' : '')}
-              style={{zIndex: i === next ? 1 : i === current ? 0 : -1}}
+              className='hero-video'
+              style={{
+                opacity: i === current ? (fading ? 0 : 0.6) : 0,
+                transition: 'opacity 1.8s ease-in-out',
+                zIndex: i === current ? 1 : 0,
+              }}
             />
           ))}
         </div>
