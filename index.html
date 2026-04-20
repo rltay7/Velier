@@ -8,7 +8,7 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#f5f0ea" />
+  <meta name="theme-color" content="#08070b" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Velier" />
@@ -20,22 +20,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Switzer:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      /* ── Light palette (Soho House inspired) ── */
-      --obsidian: #f5f0ea;        /* page bg — warm linen */
-      --obsidian-2: #ffffff;      /* card bg — pure white */
-      --obsidian-3: #ede8e0;      /* alt section — warm cream */
-      --obsidian-4: #e4ddd4;      /* input bg — light warm */
-      --obsidian-5: #d5cdc2;      /* borders — warm grey */
-      --gold: hsl(41, 55%, 42%);  /* gold — deeper, richer on light */
-      --gold-dim: hsl(41, 40%, 35%);
-      --gold-light: hsl(41, 55%, 50%);
-      --champagne: #1c1a17;       /* primary text — warm charcoal */
-      --champagne-dim: #6b6560;   /* secondary text — warm grey */
-      --white: #ffffff;
-      --border: rgba(0, 0, 0, 0.09);
-      --border-hover: rgba(0, 0, 0, 0.18);
-      --overlay: rgba(245, 240, 234, 0.7);
-      /* ── Dark tokens (kept for hero, splash, footer, trade hero) ── */
+      --obsidian: #0d0b09;
+      --obsidian-2: #131109;
+      --obsidian-3: #1a1713;
+      --obsidian-4: #22201a;
+      --obsidian-5: #2e2b24;
+      --gold: hsl(41, 62%, 60%);
+      --gold-dim: hsl(41, 40%, 45%);
+      --gold-light: hsl(41, 70%, 75%);
+      --champagne: #e8dfc8;
+      --champagne-dim: #9e9484;
+      --white: #f5f0e8;
+      --border: rgba(200, 180, 130, 0.12);
+      --border-hover: rgba(200, 180, 130, 0.28);
+      --overlay: rgba(13, 11, 9, 0.7);
+      /* Dark tokens */
       --dark-bg: #0d0b09;
       --dark-2: #131109;
       --dark-3: #1a1713;
@@ -84,10 +83,10 @@
       position: fixed; top: 0; left: 0; right: 0; z-index: 10000;
       padding: 1.25rem clamp(1rem, 4vw, 3rem);
       display: flex; align-items: center; justify-content: space-between;
-      background: rgba(245,240,234,0.92);
+      background: rgba(8,7,10,0.55);
       backdrop-filter: blur(20px) saturate(160%);
       -webkit-backdrop-filter: blur(20px) saturate(160%);
-      border-bottom: 1px solid rgba(0,0,0,0.07);
+      border-bottom: 1px solid rgba(200,155,50,0.08);
       transition: opacity 0.4s ease;
     }
     .nav.splash-hidden {
@@ -100,7 +99,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.45rem; font-weight: 300; letter-spacing: 0.35em;
       text-transform: uppercase;
-      color: var(--champagne);
+      color: #ffffff;
       -webkit-text-stroke: none;
       text-stroke: none;
     }
@@ -128,9 +127,9 @@
       display: inline-flex; align-items: center;
       border-radius: 0;
     }
-    .nav-cta:hover { background: var(--obsidian-3); border-color: var(--gold-dim); color: var(--gold); }
-    .nav-cta.primary { background: var(--champagne); border-color: var(--champagne); color: var(--obsidian-2); font-weight: 600; }
-    .nav-cta.primary:hover { background: var(--gold); border-color: var(--gold); color: #fff; }
+    .nav-cta:hover { background: var(--obsidian-4); border-color: var(--gold-dim); color: var(--gold-light); }
+    .nav-cta.primary { background: var(--gold); border-color: var(--gold); color: var(--obsidian); font-weight: 600; }
+    .nav-cta.primary:hover { background: var(--gold-light); }
 
     .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px; }
     .hamburger span { display: block; width: 22px; height: 1px; background: var(--champagne); transition: all 0.3s; }
@@ -165,7 +164,7 @@
       transition: all 0.3s;
       cursor: pointer;
     }
-    .card:hover { border-color: var(--border-hover); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.10); }
+    .card:hover { border-color: var(--border-hover); transform: translateY(-3px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
     .card-image {
       aspect-ratio: 4/5;
       background: var(--obsidian-3);
@@ -175,7 +174,7 @@
     .card-image svg { width: 48px; height: 48px; opacity: 0.2; }
     .card-image .wishlist-btn {
       position: absolute; top: 0.75rem; right: 0.75rem;
-      background: rgba(255,255,255,0.88); border: 1px solid var(--border);
+      background: rgba(13,11,9,0.8); border: 1px solid var(--border);
       width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: all 0.2s; backdrop-filter: blur(8px);
     }
@@ -183,7 +182,7 @@
     .card-image .wishlist-btn.active svg { fill: var(--gold); stroke: var(--gold); }
     .card-image .category-badge {
       position: absolute; bottom: 0.75rem; left: 0.75rem;
-      background: rgba(255,255,255,0.90); backdrop-filter: blur(8px);
+      background: rgba(13,11,9,0.85); backdrop-filter: blur(8px);
       border: 1px solid var(--border);
       padding: 0.25rem 0.6rem;
       font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
@@ -299,9 +298,9 @@
 
 
     /* ── TRADE PAGE ── */
-    .trade-hero { padding: 5rem 0 3rem; background: linear-gradient(180deg, var(--dark-2) 0%, var(--dark-bg) 100%); border-bottom: 1px solid var(--dark-border); text-align: center; }
-    .trade-hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 300; color: var(--dark-text); margin-bottom: 0.75rem; }
-    .trade-hero p { color: var(--dark-text-dim); max-width: 520px; margin: 0 auto 2rem; font-size: 0.9rem; line-height: 1.7; }
+    .trade-hero { padding: 5rem 0 3rem; background: linear-gradient(180deg, var(--obsidian-2) 0%, var(--obsidian) 100%); border-bottom: 1px solid var(--border); text-align: center; }
+    .trade-hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 300; color: var(--champagne); margin-bottom: 0.75rem; }
+    .trade-hero p { color: var(--champagne-dim); max-width: 520px; margin: 0 auto 2rem; font-size: 0.9rem; line-height: 1.7; }
     .trade-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
     .trade-card { background: var(--obsidian-2); border: 1px solid var(--border); padding: 1.5rem; transition: border-color 0.2s, transform 0.2s; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
     .trade-card:hover { border-color: var(--gold-dim); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.10); }
@@ -500,11 +499,10 @@
     .nav.scrolled {
       padding-top: 0.7rem !important;
       padding-bottom: 0.7rem !important;
-      background: rgba(245,240,234,0.97) !important;
-      border-bottom-color: rgba(0,0,0,0.10) !important;
+      background: rgba(8,7,10,0.88) !important;
+      border-bottom-color: rgba(200,155,50,0.18) !important;
       backdrop-filter: blur(28px) saturate(180%) !important;
       -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
-      box-shadow: 0 2px 20px rgba(0,0,0,0.06) !important;
     }
 
     /* ── TRUST & SECURITY ── */
@@ -708,12 +706,12 @@
     /* ── LENDER CTA ── */
     .lender-cta {
       padding: 6rem clamp(1rem, 4vw, 3rem);
-      background: var(--dark-bg);
+      background: var(--obsidian-2);
       border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
       display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
     }
-    .lender-cta h2 { margin-bottom: 1rem; color: var(--dark-text); }
-    .lender-cta p { margin-bottom: 2rem; font-size: 0.95rem; line-height: 1.7; color: var(--dark-text-dim); }
+    .lender-cta h2 { margin-bottom: 1rem; }
+    .lender-cta p { margin-bottom: 2rem; font-size: 0.95rem; line-height: 1.7; }
     .earnings-preview {
       background: var(--obsidian-3); border: 1px solid var(--border);
       padding: 2rem;
@@ -869,7 +867,7 @@
     /* ── PAGE HEADER ── */
     .page-header {
       padding: 8rem 0 3rem;
-      background: var(--obsidian-3);
+      background: radial-gradient(ellipse at 50% -20%, rgba(200,155,50,0.06) 0%, transparent 60%);
       border-bottom: 1px solid var(--border);
     }
     .page-header .container { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -891,8 +889,7 @@
     /* ── TOAST ── */
     .toast {
       position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
-      background: var(--dark-bg); border: 1px solid var(--dark-border);
-      color: var(--dark-text);
+      background: var(--obsidian-4); border: 1px solid var(--border-hover);
       padding: 0.875rem 1.25rem; font-size: 0.85rem;
       display: flex; align-items: center; gap: 0.75rem;
       animation: slideUp 0.3s ease;
@@ -901,16 +898,12 @@
     }
     @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-    /* ── FOOTER — dark for contrast ── */
+    /* ── FOOTER ── */
     .footer {
       padding: 4rem 0 2rem;
-      background: var(--dark-bg);
-      border-top: none;
+      background: var(--obsidian-2);
+      border-top: 1px solid var(--border);
     }
-    .footer, .footer h5, .footer p, .footer a { color: var(--dark-text-dim); }
-    .footer h5 { color: var(--dark-text) !important; }
-    .footer-col ul a:hover { color: var(--dark-text) !important; }
-    .footer-bottom { border-top-color: var(--dark-border) !important; }
     .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
     .footer-brand .logo-wrap { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
     .footer-brand .logo-wrap svg { width: 28px; height: 28px; }
