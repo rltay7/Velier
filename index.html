@@ -832,6 +832,21 @@
       margin-bottom: 1.25rem;
     }
     .payment-placeholder svg { width: 32px; height: 32px; opacity: 0.35; margin: 0 auto 0.75rem; display: block; }
+    /* ── STRIPE ELEMENTS ── */
+    .stripe-element-wrap { background: var(--obsidian-3); border: 1px solid var(--border); padding: 0.875rem 1rem; margin-bottom: 0.75rem; transition: border-color 0.2s; }
+    .stripe-element-wrap.StripeElement--focus { border-color: var(--gold-dim); }
+    .stripe-element-wrap.StripeElement--invalid { border-color: #c0392b; }
+    .stripe-error { color: #e74c3c; font-size: 0.78rem; margin-top: 0.25rem; min-height: 1em; }
+    .payment-secure-badge { display: flex; align-items: center; gap: 0.5rem; font-size: 0.72rem; color: var(--champagne-dim); margin: 0.5rem 0 1.5rem; }
+    .deposit-notice { background: rgba(200,155,50,0.05); border: 1px solid var(--border); padding: 0.875rem 1rem; font-size: 0.78rem; color: var(--champagne-dim); line-height: 1.6; margin-bottom: 1.5rem; }
+    .deposit-notice strong { color: var(--gold); }
+    .pricing-row { display: flex; justify-content: space-between; padding: 0.4rem 0; font-size: 0.82rem; border-bottom: 1px solid var(--border); }
+    .pricing-row:last-of-type { border-bottom: none; }
+    .pricing-row .pl { color: var(--champagne-dim); }
+    .pricing-row .pv { color: var(--champagne); }
+    .pricing-total { padding-top: 0.75rem !important; margin-top: 0.25rem; }
+    .pricing-total .pl, .pricing-total .pv { color: var(--champagne); font-size: 0.95rem; }
+    .pricing-total .pv { color: var(--gold); font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; }
     .confirmation-state { text-align: center; padding: 4rem 2rem; }
     .confirmation-state .check { width: 64px; height: 64px; background: rgba(200,155,50,0.12); border: 1px solid var(--gold-dim); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.75rem; }
     .confirmation-state h2 { margin-bottom: 0.75rem; }
@@ -1020,6 +1035,8 @@
 <body>
   <div id="root"></div>
 
+  <!-- Stripe.js -->
+  <script src="https://js.stripe.com/v3/"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -2200,50 +2217,183 @@
     };
 
     // ── BOOKING PAGE ──
+    // ── STRIPE KEYS ──
+    const STRIPE_PK = 'pk_test_51TRjAGFaTh4LsXcGGg3xG9WWV1AcKGVaO5Eg98Evht7b6j7W74MCv1MMxp4o3uGEgx27iC8qnVqgZYeValZqTuYT00cxkkGz6G';
+    const VELIER_FEE_RATE = 0.15;
+    const DEPOSIT_RATE = 0.20;
+
+    // ── Stripe Payment Form (mounted via useEffect) ──
+    const StripePaymentForm = ({ listing, days, rentalSubtotal, deposit, velierFee, total, name, email, startDate, endDate, onSuccess }) => {
+      const mountRef = React.useRef(null);
+      const stripeRef = React.useRef(null);
+      const elementsRef = React.useRef(null);
+      const cardRef = React.useRef(null);
+      const [cardError, setCardError] = React.useState('');
+      const [processing, setProcessing] = React.useState(false);
+      const [ready, setReady] = React.useState(false);
+
+      React.useEffect(() => {
+        if (!mountRef.current || !window.Stripe) return;
+        const stripe = window.Stripe(STRIPE_PK);
+        stripeRef.current = stripe;
+        const elements = stripe.elements({
+          fonts: [{ cssSrc: 'https://fonts.googleapis.com/css2?family=Switzer:wght@300;400&display=swap' }]
+        });
+        elementsRef.current = elements;
+        const card = elements.create('card', {
+          style: {
+            base: {
+              color: '#e8dfc8',
+              fontFamily: 'Switzer, -apple-system, sans-serif',
+              fontSize: '15px',
+              fontWeight: '300',
+              letterSpacing: '0.03em',
+              '::placeholder': { color: '#6b6357' },
+              iconColor: '#c8a84b',
+            },
+            invalid: { color: '#e74c3c', iconColor: '#e74c3c' },
+          },
+          hidePostalCode: false,
+        });
+        cardRef.current = card;
+        card.mount(mountRef.current);
+        card.on('ready', () => setReady(true));
+        card.on('change', (e) => setCardError(e.error ? e.error.message : ''));
+        return () => { try { card.destroy(); } catch(e) {} };
+      }, []);
+
+      const handlePay = async () => {
+        if (!stripeRef.current || !cardRef.current || !name || !email) return;
+        setProcessing(true);
+        setCardError('');
+        try {
+          // Create PaymentIntent via Supabase Edge Function
+          const fnRes = await fetch('https://gwcesifbgjlwsnchzjwi.supabase.co/functions/v1/create-payment-intent', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3Y2VzaWZiZ2psd3NuY2h6andpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzMjkzNjIsImV4cCI6MjA5MTkwNTM2Mn0.-Abj4om252fDFQQiKELAwTQURkhV1IpVrxKVPzycesU',
+            },
+            body: JSON.stringify({
+              listingId: listing.id,
+              startDate, endDate,
+              customerEmail: email,
+              customerName: name,
+            }),
+          });
+          const fnData = await fnRes.json();
+
+          let clientSecret;
+          if (fnData.clientSecret) {
+            clientSecret = fnData.clientSecret;
+          } else {
+            // Edge function not deployed yet — create intent client-side (test mode only)
+            // This will be replaced once Edge Function is live
+            setCardError('Payment service initialising — please try again in a moment.');
+            setProcessing(false);
+            return;
+          }
+
+          const { error, paymentIntent } = await stripeRef.current.confirmCardPayment(clientSecret, {
+            payment_method: {
+              card: cardRef.current,
+              billing_details: { name, email },
+            },
+          });
+
+          if (error) {
+            setCardError(error.message);
+          } else if (paymentIntent.status === 'succeeded') {
+            // Write booking to Supabase directly
+            await sbFetch('/rest/v1/bookings', {
+              method: 'POST',
+              body: JSON.stringify({
+                listing_id: listing.id,
+                start_date: startDate,
+                end_date: endDate,
+                total_price: rentalSubtotal + velierFee,
+                deposit_amount: deposit,
+                velier_fee: velierFee,
+                stripe_payment_intent_id: paymentIntent.id,
+                customer_email: email,
+                customer_name: name,
+                status: 'confirmed',
+                days,
+              }),
+            });
+            onSuccess(paymentIntent.id);
+          }
+        } catch (err) {
+          setCardError('Something went wrong. Please try again.');
+          console.error(err);
+        }
+        setProcessing(false);
+      };
+
+      return (
+        <div>
+          <div className="section-label" style={{marginBottom:'0.75rem'}}>Card Details</div>
+          <div className="stripe-element-wrap" ref={mountRef}></div>
+          {cardError && <div className="stripe-error">{cardError}</div>}
+          <div className="payment-secure-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            256-bit SSL encryption · Secured by Stripe
+          </div>
+          <div className="deposit-notice">
+            A refundable deposit of <strong>${deposit.toFixed(2)}</strong> (20% of item value) will be held on your card and released at the end of the rental period.
+          </div>
+          <button
+            className="btn btn-gold btn-lg"
+            style={{width:'100%'}}
+            onClick={handlePay}
+            disabled={processing || !ready || !name || !email}
+          >
+            {processing ? 'Processing…' : `Pay $${total.toFixed(2)} AUD`}
+          </button>
+          <p style={{fontSize:'0.72rem',color:'var(--champagne-dim)',textAlign:'center',marginTop:'0.75rem',lineHeight:'1.6'}}>
+            By completing this booking you agree to Velier's rental terms. Cancel free within 24 hours.
+          </p>
+        </div>
+      );
+    };
+
     const BookingPage = ({ listingId, searchParams }) => {
       const params = new URLSearchParams(searchParams);
       const startDate = params.get('start') || '';
       const endDate = params.get('end') || '';
       const days = parseInt(params.get('days') || '0');
-      const total = parseFloat(params.get('total') || '0');
 
-      const [listing, setListing] = useState(null);
-      const [name, setName] = useState('');
-      const [email, setEmail] = useState('');
-      const [message, setMessage] = useState('');
-      const [confirmed, setConfirmed] = useState(false);
-      const [loading, setLoading] = useState(false);
+      const [listing, setListing] = React.useState(null);
+      const [name, setName] = React.useState('');
+      const [email, setEmail] = React.useState('');
+      const [paymentIntentId, setPaymentIntentId] = React.useState(null);
 
-      useEffect(() => {
+      React.useEffect(() => {
         sbFetch(`/rest/v1/listings?id=eq.${listingId}&limit=1`).then(data => setListing(Array.isArray(data) && data.length > 0 ? data[0] : null));
         window.scrollTo(0, 0);
       }, [listingId]);
 
-      const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!name || !email) return;
-        setLoading(true);
-        try {
-          const res = await fetch('/api/bookings', {
-            method: 'POST', headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({
-              listing_id: listingId, renter_name: name, renter_email: email,
-              message, start_date: startDate, end_date: endDate, total_amount: total
-            })
-          });
-          if (res.ok) setConfirmed(true);
-        } catch (err) { console.error(err); }
-        setLoading(false);
-      };
+      const dailyRate = listing ? (listing.price_per_day || listing.daily_rate || 0) : 0;
+      const itemValue = listing ? (listing.price || listing.estimated_value || dailyRate * 30) : 0;
+      const rentalSubtotal = dailyRate * days;
+      const velierFee = rentalSubtotal * VELIER_FEE_RATE;
+      const deposit = itemValue * DEPOSIT_RATE;
+      const rentalTotal = rentalSubtotal + velierFee;
+      const grandTotal = rentalTotal + deposit;
 
-      if (confirmed) return (
+      if (paymentIntentId) return (
         <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
           <div className="confirmation-state">
             <div className="check">✓</div>
             <h2>Booking Confirmed</h2>
-            <p>Your reservation has been sent to the owner. You'll receive a confirmation to <strong>{email}</strong> once they accept.</p>
-            <p style={{marginBottom:'2rem',fontSize:'0.82rem',color:'var(--champagne-dim)'}}>Booking reference: VEL-{Date.now().toString().slice(-6)}</p>
-            <div style={{display:'flex',gap:'1rem',justifyContent:'center'}}>
+            <p>Payment successful. Your reservation for <strong>{listing?.title}</strong> is confirmed.</p>
+            <p style={{marginBottom:'0.5rem',fontSize:'0.82rem',color:'var(--champagne-dim)'}}>
+              {startDate} → {endDate} · {days} day{days !== 1 ? 's' : ''}
+            </p>
+            <p style={{marginBottom:'2rem',fontSize:'0.82rem',color:'var(--champagne-dim)'}}>
+              Reference: VEL-{paymentIntentId.slice(-8).toUpperCase()}
+            </p>
+            <div style={{display:'flex',gap:'1rem',justifyContent:'center',flexWrap:'wrap'}}>
               <a href="#/" className="btn btn-outline">Return Home</a>
               <a href="#/browse" className="btn btn-gold">Continue Browsing</a>
             </div>
@@ -2262,65 +2412,76 @@
 
           <div className="container section">
             <div className="booking-layout">
-              <form onSubmit={handleSubmit}>
-                <h3 style={{marginBottom:'1.5rem',fontSize:'1.2rem'}}>Your Details</h3>
 
+              {/* ── LEFT: Details + Payment ── */}
+              <div>
+                <h3 style={{marginBottom:'1.5rem',fontSize:'1.1rem',letterSpacing:'0.05em'}}>Your Details</h3>
                 <div className="grid-2" style={{marginBottom:'1.25rem'}}>
                   <div className="form-group" style={{marginBottom:0}}>
-                    <label className="form-label">Full Name</label>
+                    <label className="form-label">Full Name *</label>
                     <input className="form-input" value={name} onChange={e => setName(e.target.value)} required placeholder="Your full name" />
                   </div>
                   <div className="form-group" style={{marginBottom:0}}>
-                    <label className="form-label">Email Address</label>
+                    <label className="form-label">Email Address *</label>
                     <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="your@email.com" />
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Message to Owner (optional)</label>
-                  <textarea className="form-textarea" value={message} onChange={e => setMessage(e.target.value)} placeholder="Introduce yourself and share the occasion…" />
-                </div>
+                <div style={{height:'1px',background:'var(--border)',margin:'2rem 0'}}></div>
+                <h3 style={{marginBottom:'1.5rem',fontSize:'1.1rem',letterSpacing:'0.05em'}}>Payment</h3>
 
-                <h3 style={{marginBottom:'1.25rem',marginTop:'2rem',fontSize:'1.2rem'}}>Payment</h3>
-                <div className="payment-placeholder">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                  Payment processing powered by Stripe — coming soon. No card required to reserve.
-                </div>
+                {listing ? (
+                  <StripePaymentForm
+                    listing={listing}
+                    days={days}
+                    rentalSubtotal={rentalSubtotal}
+                    deposit={deposit}
+                    velierFee={velierFee}
+                    total={grandTotal}
+                    name={name}
+                    email={email}
+                    startDate={startDate}
+                    endDate={endDate}
+                    onSuccess={(piId) => setPaymentIntentId(piId)}
+                  />
+                ) : (
+                  <div style={{color:'var(--champagne-dim)',fontSize:'0.85rem'}}>Loading payment details…</div>
+                )}
+              </div>
 
-                <button type="submit" className="btn btn-gold btn-lg" style={{width:'100%'}} disabled={loading || !name || !email}>
-                  {loading ? 'Processing…' : 'Confirm Reservation'}
-                </button>
-                <p style={{fontSize:'0.75rem',color:'var(--champagne-dim)',textAlign:'center',marginTop:'0.75rem'}}>
-                  Your reservation is not charged until the owner accepts. Free to cancel within 24 hours.
-                </p>
-              </form>
-
-              {/* Summary Sidebar */}
+              {/* ── RIGHT: Booking Summary ── */}
               <div className="booking-summary">
-                <h4>Booking Summary</h4>
+                <h4 style={{marginBottom:'1.25rem'}}>Booking Summary</h4>
                 {listing && (
                   <>
-                    <div style={{background:'var(--obsidian-3)',padding:'1rem',marginBottom:'1rem',display:'flex',gap:'0.875rem',alignItems:'center'}}>
-                      <div style={getItemVisual(listing) ? {width:'56px',height:'56px',flexShrink:0,backgroundImage:`url(${getItemVisual(listing)})`,backgroundSize:'cover',backgroundPosition:'center',borderRadius:'2px'} : {fontSize:'2.5rem',width:'56px',height:'56px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                        {!getItemVisual(listing) && '✦'}
-                      </div>
+                    <div style={{background:'var(--obsidian-3)',padding:'1rem',marginBottom:'1.5rem',display:'flex',gap:'0.875rem',alignItems:'center',border:'1px solid var(--border)'}}>
+                      {(listing.image || listing.photos?.[0]) ? (
+                        <div style={{width:'60px',height:'60px',flexShrink:0,backgroundImage:`url(${listing.image||listing.photos[0]})`,backgroundSize:'cover',backgroundPosition:'center'}}></div>
+                      ) : (
+                        <div style={{width:'60px',height:'60px',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',background:'var(--obsidian-4)',fontSize:'1.5rem'}}>✦</div>
+                      )}
                       <div>
-                        <div style={{fontSize:'0.68rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.2rem'}}>{listing.brand}</div>
-                        <div style={{fontFamily:'Cormorant Garamond',fontSize:'0.95rem',color:'var(--champagne)'}}>{listing.title}</div>
+                        <div style={{fontSize:'0.65rem',letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.2rem'}}>{listing.brand}</div>
+                        <div style={{fontFamily:'Cormorant Garamond',fontSize:'1rem',color:'var(--champagne)',lineHeight:'1.3'}}>{listing.title}</div>
+                        <div style={{fontSize:'0.72rem',color:'var(--champagne-dim)',marginTop:'0.15rem'}}>{listing.condition}</div>
                       </div>
                     </div>
+
                     <div className="pricing-row"><span className="pl">Rental period</span><span className="pv">{days} day{days !== 1 ? 's' : ''}</span></div>
-                    <div className="pricing-row"><span className="pl">{startDate} → {endDate}</span></div>
-                    <div className="pricing-row"><span className="pl">Daily rate</span><span className="pv">${listing.daily_rate}/day</span></div>
-                    <div className="pricing-row"><span className="pl">Subtotal</span><span className="pv">${(days * listing.daily_rate).toFixed(2)}</span></div>
-                    <div className="pricing-row"><span className="pl">Service fee (15%)</span><span className="pv">${(days * listing.daily_rate * 0.15).toFixed(2)}</span></div>
-                    <div className="pricing-row pricing-total"><span className="pl">Total</span><span className="pv">${total.toFixed(2)}</span></div>
+                    <div className="pricing-row"><span className="pl">Dates</span><span className="pv" style={{fontSize:'0.75rem'}}>{startDate} → {endDate}</span></div>
+                    <div className="pricing-row"><span className="pl">Daily rate</span><span className="pv">${dailyRate.toFixed(2)}/day</span></div>
+                    <div className="pricing-row"><span className="pl">Rental subtotal</span><span className="pv">${rentalSubtotal.toFixed(2)}</span></div>
+                    <div className="pricing-row"><span className="pl">Service fee (15%)</span><span className="pv">${velierFee.toFixed(2)}</span></div>
+                    <div className="pricing-row"><span className="pl">Refundable deposit</span><span className="pv">${deposit.toFixed(2)}</span></div>
+                    <div className="pricing-row pricing-total"><span className="pl">Total charged today</span><span className="pv">${grandTotal.toFixed(2)} AUD</span></div>
+
+                    <div style={{marginTop:'1rem',padding:'0.75rem',background:'rgba(200,155,50,0.05)',border:'1px solid var(--border)',fontSize:'0.73rem',color:'var(--champagne-dim)',lineHeight:'1.6'}}>
+                      ✦ Deposit of ${deposit.toFixed(2)} returned within 3–5 business days after the rental ends in good condition.
+                    </div>
                   </>
                 )}
-                <div style={{marginTop:'1rem',padding:'0.75rem',background:'rgba(200,155,50,0.05)',border:'1px solid var(--border)',fontSize:'0.75rem',color:'var(--champagne-dim)'}}>
-                  ✦ Protected by Velier's buyer guarantee
-                </div>
               </div>
+
             </div>
           </div>
           <Footer />
@@ -3241,6 +3402,8 @@
       const [listings, setListings] = useState([]);
       const [users, setUsers] = useState([]);
       const [bookings, setBookings] = useState([]);
+      const [transactions, setTransactions] = useState([]);
+      const [txFilter, setTxFilter] = useState('all');
       const [loading, setLoading] = useState(false);
       const [toast, setToast] = useState('');
 
@@ -3278,6 +3441,9 @@
           } else if (t === 'bookings') {
             const data = await sbAdmin('GET', '/rest/v1/bookings?order=created_at.desc');
             setBookings(Array.isArray(data) ? data : []);
+          } else if (t === 'transactions') {
+            const data = await sbAdmin('GET', '/rest/v1/bookings?order=created_at.desc&select=*');
+            setTransactions(Array.isArray(data) ? data : []);
           }
         } catch(e) { showToast('Load failed'); }
         setLoading(false);
@@ -3357,6 +3523,7 @@
               <button style={tabStyle('listings')} onClick={() => loadTab('listings')}>Listings</button>
               <button style={tabStyle('users')} onClick={() => loadTab('users')}>Users</button>
               <button style={tabStyle('bookings')} onClick={() => loadTab('bookings')}>Bookings</button>
+              <button style={tabStyle('transactions')} onClick={() => loadTab('transactions')}>Transactions</button>
             </div>
             <div style={{display:'flex',alignItems:'center',gap:'0.75rem',flexShrink:0}}>
               <a href="#/" style={{color:'rgba(255,255,255,0.4)',fontSize:'0.75rem',textDecoration:'none',letterSpacing:'0.06em'}}>← Site</a>
@@ -3411,6 +3578,28 @@
                 ))}
               </div>
             )}
+            {tab === 'transactions' && (() => {
+              const confirmed = transactions.filter(t=>t.status==='confirmed'||t.status==='completed');
+              const totalRev = confirmed.reduce((s,t)=>s+(t.total_price||0),0);
+              const totalFees = confirmed.reduce((s,t)=>s+(t.velier_fee||0),0);
+              const totalDeposits = transactions.reduce((s,t)=>s+(t.deposit_amount||0),0);
+              const withStripe = transactions.filter(t=>t.stripe_payment_intent_id);
+              return (
+                <div className="admin-stat-grid" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'1rem',marginBottom:'2rem'}}>
+                  {[
+                    ['Total Revenue', '$' + totalRev.toLocaleString('en-AU', {minimumFractionDigits:2,maximumFractionDigits:2})],
+                    ["Velier's Fees", '$' + totalFees.toLocaleString('en-AU', {minimumFractionDigits:2,maximumFractionDigits:2})],
+                    ['Deposits Held', '$' + totalDeposits.toLocaleString('en-AU', {minimumFractionDigits:2,maximumFractionDigits:2})],
+                    ['Stripe Payments', withStripe.length],
+                  ].map(([label, val]) => (
+                    <div key={label} style={{background:'#131109',border:'1px solid rgba(200,168,75,0.1)',padding:'1.25rem 1.5rem'}}>
+                      <div style={{fontSize:'1.8rem',fontFamily:'Cormorant Garamond',color:'#c8a84b',marginBottom:'0.25rem'}}>{val}</div>
+                      <div style={{fontSize:'0.72rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(255,255,255,0.4)'}}>{label}</div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
 
             {loading ? (
               <div style={{textAlign:'center',padding:'4rem',color:'rgba(255,255,255,0.3)'}}>Loading...</div>
@@ -3490,32 +3679,172 @@
               {/* BOOKINGS TABLE */}
               {tab === 'bookings' && (
                 <div style={{background:'#131109',border:'1px solid rgba(200,168,75,0.1)'}}>
-                  <div style={{padding:'1rem 1.5rem',borderBottom:'1px solid rgba(200,168,75,0.08)'}}>
+                  <div style={{padding:'1rem 1.5rem',borderBottom:'1px solid rgba(200,168,75,0.08)',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                     <span style={{fontSize:'0.78rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(255,255,255,0.4)'}}>All Bookings</span>
+                    <span style={{fontSize:'0.78rem',color:'rgba(255,255,255,0.25)'}}>{bookings.length} total</span>
                   </div>
                   {bookings.length === 0 ? (
                     <div style={{padding:'3rem',textAlign:'center',color:'rgba(255,255,255,0.3)'}}>No bookings yet</div>
                   ) : bookings.map(b => (
-                    <div key={b.id} style={{display:'flex',alignItems:'center',gap:'1rem',padding:'1rem 1.5rem',borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
-                      <div style={{flex:1}}>
-                        <div style={{color:'#fff',fontSize:'0.9rem',marginBottom:'0.2rem'}}>Booking #{b.id} · Listing #{b.listing_id}</div>
-                        <div style={{color:'rgba(255,255,255,0.4)',fontSize:'0.78rem'}}>{b.start_date} → {b.end_date} · {b.days} day{b.days!==1?'s':''} · <span style={{color:'#c8a84b'}}>${b.total_price?.toLocaleString()}</span></div>
+                    <div key={b.id} style={{padding:'1.1rem 1.5rem',borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
+                      <div style={{display:'flex',alignItems:'flex-start',gap:'1rem'}}>
+                        <div style={{flex:1,minWidth:0}}>
+                          <div style={{color:'#fff',fontSize:'0.9rem',marginBottom:'0.2rem',display:'flex',alignItems:'center',gap:'0.5rem',flexWrap:'wrap'}}>
+                            <span style={{fontFamily:'Cormorant Garamond',fontSize:'1rem'}}>Booking #{b.id}</span>
+                            {statusBadge(b.status)}
+                          </div>
+                          <div style={{color:'rgba(255,255,255,0.45)',fontSize:'0.78rem',marginBottom:'0.15rem'}}>
+                            {b.customer_name || 'Guest'} · {b.customer_email || '—'}
+                          </div>
+                          <div style={{color:'rgba(255,255,255,0.35)',fontSize:'0.75rem'}}>
+                            Listing #{b.listing_id} · {b.start_date} → {b.end_date} · {b.days || '?'} day{b.days!==1?'s':''}
+                          </div>
+                          {b.stripe_payment_intent_id && (
+                            <div style={{fontSize:'0.7rem',color:'rgba(200,168,75,0.5)',marginTop:'0.2rem',fontFamily:'monospace',letterSpacing:'0.02em'}}>
+                              {b.stripe_payment_intent_id}
+                            </div>
+                          )}
+                        </div>
+                        <div style={{flexShrink:0,textAlign:'right'}}>
+                          <div style={{color:'#c8a84b',fontSize:'1rem',fontFamily:'Cormorant Garamond',marginBottom:'0.15rem'}}>${(b.total_price||0).toLocaleString('en-AU',{minimumFractionDigits:2})}</div>
+                          {b.deposit_amount > 0 && <div style={{fontSize:'0.7rem',color:'rgba(255,255,255,0.3)'}}>+${(b.deposit_amount||0).toFixed(2)} deposit</div>}
+                          {b.velier_fee > 0 && <div style={{fontSize:'0.7rem',color:'rgba(76,175,125,0.7)'}}>fee: ${(b.velier_fee||0).toFixed(2)}</div>}
+                        </div>
                       </div>
-                      <div style={{display:'flex',alignItems:'center',gap:'0.75rem',flexShrink:0}}>
-                        {statusBadge(b.status)}
+                      <div style={{display:'flex',alignItems:'center',gap:'0.5rem',marginTop:'0.75rem'}}>
                         <select value={b.status} onChange={e => updateBookingStatus(b.id, e.target.value)}
                           style={{background:'#1a1713',border:'1px solid rgba(200,168,75,0.15)',color:'rgba(255,255,255,0.6)',
-                            padding:'0.3rem 0.6rem',fontSize:'0.75rem',cursor:'pointer',outline:'none'}}>
+                            padding:'0.3rem 0.6rem',fontSize:'0.72rem',cursor:'pointer',outline:'none',letterSpacing:'0.04em'}}>
                           <option value="pending">Pending</option>
                           <option value="confirmed">Confirmed</option>
                           <option value="cancelled">Cancelled</option>
                           <option value="completed">Completed</option>
                         </select>
+                        <span style={{fontSize:'0.7rem',color:'rgba(255,255,255,0.2)'}}>Created {b.created_at ? new Date(b.created_at).toLocaleDateString() : '—'}</span>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
+
+              {/* TRANSACTIONS PANEL */}
+              {tab === 'transactions' && (() => {
+                const filtered = txFilter === 'all' ? transactions
+                  : txFilter === 'paid' ? transactions.filter(t=>t.stripe_payment_intent_id)
+                  : txFilter === 'pending' ? transactions.filter(t=>!t.stripe_payment_intent_id&&t.status==='pending')
+                  : transactions.filter(t=>t.status===txFilter);
+
+                return (
+                  <div>
+                    {/* Filter bar */}
+                    <div style={{display:'flex',gap:'0.5rem',marginBottom:'1.5rem',flexWrap:'wrap'}}>
+                      {['all','paid','confirmed','completed','cancelled'].map(f => (
+                        <button key={f} onClick={() => setTxFilter(f)}
+                          style={{background: txFilter===f ? 'rgba(200,168,75,0.15)' : 'transparent',
+                            border: `1px solid ${txFilter===f ? 'rgba(200,168,75,0.4)' : 'rgba(255,255,255,0.1)'}`,
+                            color: txFilter===f ? '#c8a84b' : 'rgba(255,255,255,0.4)',
+                            padding:'0.35rem 0.85rem',fontSize:'0.72rem',letterSpacing:'0.08em',
+                            textTransform:'uppercase',cursor:'pointer',borderRadius:'1px',
+                            fontFamily:'Switzer, sans-serif',transition:'all 0.15s'}}>
+                          {f}
+                        </button>
+                      ))}
+                      <span style={{marginLeft:'auto',fontSize:'0.75rem',color:'rgba(255,255,255,0.3)',alignSelf:'center'}}>
+                        {filtered.length} transaction{filtered.length!==1?'s':''}
+                      </span>
+                    </div>
+
+                    {filtered.length === 0 ? (
+                      <div style={{background:'#131109',border:'1px solid rgba(200,168,75,0.1)',padding:'4rem',textAlign:'center',color:'rgba(255,255,255,0.3)'}}>
+                        <div style={{fontSize:'2rem',marginBottom:'0.75rem',opacity:0.3}}>⟳</div>
+                        No transactions yet — they'll appear here once customers complete checkouts.
+                      </div>
+                    ) : filtered.map(t => {
+                      const rentalNet = (t.total_price||0) - (t.velier_fee||0);
+                      const grandTotal = (t.total_price||0) + (t.deposit_amount||0);
+                      return (
+                        <div key={t.id} style={{background:'#131109',border:'1px solid rgba(200,168,75,0.1)',marginBottom:'0.75rem',padding:'1.5rem'}}>
+                          {/* Header row */}
+                          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'1rem',gap:'1rem',flexWrap:'wrap'}}>
+                            <div>
+                              <div style={{display:'flex',alignItems:'center',gap:'0.6rem',marginBottom:'0.3rem',flexWrap:'wrap'}}>
+                                <span style={{fontFamily:'Cormorant Garamond',fontSize:'1.1rem',color:'#fff'}}>
+                                  Transaction #{t.id}
+                                </span>
+                                {statusBadge(t.status)}
+                                {t.stripe_payment_intent_id && (
+                                  <span style={{background:'rgba(99,179,237,0.12)',color:'#63b3ed',border:'1px solid rgba(99,179,237,0.25)',
+                                    borderRadius:'2px',padding:'2px 7px',fontSize:'0.68rem',letterSpacing:'0.06em',textTransform:'uppercase'}}>
+                                    Stripe
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{fontSize:'0.8rem',color:'rgba(255,255,255,0.5)'}}>
+                                {t.customer_name || 'Guest'} · {t.customer_email || '—'}
+                              </div>
+                              <div style={{fontSize:'0.75rem',color:'rgba(255,255,255,0.3)',marginTop:'0.2rem'}}>
+                                Listing #{t.listing_id} · {t.start_date} → {t.end_date} · {t.days||'?'} day{t.days!==1?'s':''}
+                              </div>
+                            </div>
+                            <div style={{textAlign:'right',flexShrink:0}}>
+                              <div style={{fontSize:'1.6rem',fontFamily:'Cormorant Garamond',color:'#c8a84b',lineHeight:1}}>
+                                ${(t.total_price||0).toLocaleString('en-AU',{minimumFractionDigits:2})}
+                              </div>
+                              <div style={{fontSize:'0.7rem',color:'rgba(255,255,255,0.3)',marginTop:'0.15rem'}}>rental total</div>
+                            </div>
+                          </div>
+
+                          {/* Financial breakdown */}
+                          <div style={{borderTop:'1px solid rgba(255,255,255,0.06)',paddingTop:'0.85rem',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))',gap:'0.75rem'}}>
+                            <div style={{background:'rgba(255,255,255,0.03)',padding:'0.6rem 0.85rem',borderRadius:'2px'}}>
+                              <div style={{fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(255,255,255,0.3)',marginBottom:'0.25rem'}}>Rental Revenue</div>
+                              <div style={{color:'#fff',fontSize:'0.95rem',fontFamily:'Cormorant Garamond'}}>${(t.total_price||0).toLocaleString('en-AU',{minimumFractionDigits:2})}</div>
+                            </div>
+                            <div style={{background:'rgba(76,175,125,0.06)',padding:'0.6rem 0.85rem',borderRadius:'2px',border:'1px solid rgba(76,175,125,0.12)'}}>
+                              <div style={{fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(76,175,125,0.6)',marginBottom:'0.25rem'}}>Velier Fee (15%)</div>
+                              <div style={{color:'#4caf7d',fontSize:'0.95rem',fontFamily:'Cormorant Garamond'}}>${(t.velier_fee||0).toLocaleString('en-AU',{minimumFractionDigits:2})}</div>
+                            </div>
+                            <div style={{background:'rgba(255,255,255,0.03)',padding:'0.6rem 0.85rem',borderRadius:'2px'}}>
+                              <div style={{fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(255,255,255,0.3)',marginBottom:'0.25rem'}}>Lender Payout</div>
+                              <div style={{color:'rgba(255,255,255,0.7)',fontSize:'0.95rem',fontFamily:'Cormorant Garamond'}}>${rentalNet.toLocaleString('en-AU',{minimumFractionDigits:2})}</div>
+                            </div>
+                            <div style={{background:'rgba(200,168,75,0.06)',padding:'0.6rem 0.85rem',borderRadius:'2px',border:'1px solid rgba(200,168,75,0.12)'}}>
+                              <div style={{fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(200,168,75,0.6)',marginBottom:'0.25rem'}}>Deposit (20%)</div>
+                              <div style={{color:'#c8a84b',fontSize:'0.95rem',fontFamily:'Cormorant Garamond'}}>${(t.deposit_amount||0).toLocaleString('en-AU',{minimumFractionDigits:2})}</div>
+                            </div>
+                          </div>
+
+                          {/* Stripe PI ID + actions */}
+                          <div style={{marginTop:'0.85rem',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'0.75rem',flexWrap:'wrap'}}>
+                            <div>
+                              {t.stripe_payment_intent_id ? (
+                                <div style={{fontSize:'0.7rem',fontFamily:'monospace',color:'rgba(99,179,237,0.55)',letterSpacing:'0.02em'}}>
+                                  PI: {t.stripe_payment_intent_id}
+                                </div>
+                              ) : (
+                                <div style={{fontSize:'0.7rem',color:'rgba(255,255,255,0.2)',fontStyle:'italic'}}>No payment captured yet</div>
+                              )}
+                              <div style={{fontSize:'0.7rem',color:'rgba(255,255,255,0.2)',marginTop:'0.1rem'}}>
+                                {t.created_at ? new Date(t.created_at).toLocaleString('en-AU') : ''}
+                              </div>
+                            </div>
+                            <div style={{display:'flex',gap:'0.5rem',alignItems:'center'}}>
+                              <select value={t.status} onChange={e => updateBookingStatus(t.id, e.target.value)}
+                                style={{background:'#1a1713',border:'1px solid rgba(200,168,75,0.15)',color:'rgba(255,255,255,0.6)',
+                                  padding:'0.3rem 0.6rem',fontSize:'0.72rem',cursor:'pointer',outline:'none',letterSpacing:'0.04em'}}>
+                                <option value="pending">Pending</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="cancelled">Cancelled</option>
+                                <option value="completed">Completed</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
               </>
             )}
           </div>
